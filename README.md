@@ -10,8 +10,8 @@ Implementation of the PSR-7: HTTP message.
 
 Code quality :
 
-[![Build Status](https://travis-ci.com/IngeniozIT/psr3-logger.svg?branch=master)](https://travis-ci.com/IngeniozIT/psr-http-message)
-[![Code Coverage](https://codecov.io/gh/IngeniozIT/psr3-logger/branch/master/graph/badge.svg)](https://codecov.io/gh/IngeniozIT/psr-http-message)
+[![Build Status](https://travis-ci.com/IngeniozIT/psr-http-message.svg?branch=master)](https://travis-ci.com/IngeniozIT/psr-http-message)
+[![Code Coverage](https://codecov.io/gh/IngeniozIT/psr-http-message/branch/master/graph/badge.svg)](https://codecov.io/gh/IngeniozIT/psr-http-message)
 
 # Installation
 
