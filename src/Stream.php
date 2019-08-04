@@ -4,8 +4,8 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\StreamInterface;
-use IngeniozIT\Http\Exceptions\InvalidArgumentException;
-use IngeniozIT\Http\Exceptions\RuntimeException;
+use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
+use IngeniozIT\Http\Message\Exceptions\RuntimeException;
 
 /**
  * Describes a data stream.
@@ -58,7 +58,6 @@ class Stream implements StreamInterface
     public function __toString()
     {
         try {
-            $this->rewind();
             return $this->getContents();
         } catch (\Exception $e) {
             return '';
@@ -72,9 +71,10 @@ class Stream implements StreamInterface
      */
     public function close()
     {
-        if (\is_resource($this->stream)) {
-            fclose($this->stream);
-            $this->detach();
+        $rs = $this->detach();
+
+        if ($rs !== null) {
+            fclose($rs);
         }
     }
 
