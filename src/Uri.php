@@ -29,7 +29,7 @@ use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 class Uri implements UriInterface
 {
     /**
-     * @var array[int] 
+     * @var array[int]
      */
     protected static $ports = [
         "acap" => 674,
@@ -78,49 +78,50 @@ class Uri implements UriInterface
     ];
 
     /**
-     * @var string 
+     * @var string
      */
     protected $scheme = '';
 
     /**
-     * @var string 
+     * @var string
      */
     protected $host = '';
 
     /**
-     * @var ?int 
+     * @var ?int
      */
     protected $port = null;
 
     /**
-     * @var string 
+     * @var string
      */
     protected $user = '';
 
     /**
-     * @var ?string 
+     * @var ?string
      */
     protected $pass = null;
 
     /**
-     * @var string 
+     * @var string
      */
     protected $path = '';
 
     /**
-     * @var string 
+     * @var string
      */
     protected $query = '';
 
     /**
-     * @var string 
+     * @var string
      */
     protected $fragment = '';
 
     /**
      * Constructor.
      *
-     * @param string $uri A string version of the URI.
+     * @param  string $uri A string version of the URI.
+     * @throws InvalidArgumentException when the URI is not valid.
      */
     public function __construct(string $uri = '')
     {
@@ -130,31 +131,28 @@ class Uri implements UriInterface
             throw new InvalidArgumentException('Uri could not be parsed.');
         }
 
-        $uriObject = $this;
-
         if (!empty($parsed['scheme'])) {
-            $uriObject = $uriObject->withScheme($parsed['scheme']);
+            $this->scheme = $parsed['scheme'];
         }
         if (!empty($parsed['host'])) {
-            $uriObject = $uriObject->withHost($parsed['host']);
+            $this->host = $parsed['host'];
         }
         if (!empty($parsed['port'])) {
-            $uriObject = $uriObject->withport($parsed['port']);
+            $this->port = $parsed['port'];
         }
         if (!empty($parsed['user'])) {
-            $uriObject = $uriObject->withUserInfo($parsed['user'], $parsed['pass'] ?? null);
+            $this->user = $parsed['user'];
+            $this->pass = $parsed['pass'] ?? null;
         }
         if (!empty($parsed['path'])) {
-            $uriObject = $uriObject->withPath($parsed['path']);
+            $this->path = $parsed['path'];
         }
         if (!empty($parsed['query'])) {
-            $uriObject = $uriObject->withQuery($parsed['query']);
+            $this->query = $parsed['query'];
         }
         if (!empty($parsed['fragment'])) {
-            $uriObject = $uriObject->withFragment($parsed['fragment']);
+            $this->fragment = $parsed['fragment'];
         }
-
-        return $uriObject;
     }
 
     /**
@@ -606,17 +604,81 @@ class Uri implements UriInterface
      */
     public function __toString()
     {
+        return $this->getUriScheme().
+            $this->getUriAuthority().
+            $this->getUriPath().
+            $this->getUriQuery().
+            $this->getUriFragment();
+    }
+
+    /**
+     * Get a URI-formatted scheme.
+     *
+     * @return string
+     */
+    protected function getUriScheme(): string
+    {
         $scheme = $this->getScheme();
+
+        // If a scheme is present, it MUST be suffixed by ":"
+        return $scheme === '' ? '' : $scheme.':';
+    }
+
+    /**
+     * Get a URI-formatted authority.
+     *
+     * @return string
+     */
+    protected function getUriAuthority(): string
+    {
+        $authority = $this->getAuthority();
+
+        // If an authority is present, it MUST be prefixed by "//"
+        return $authority === '' ? '' : '//'.$authority;
+    }
+
+    /**
+     * Get a URI-formatted path.
+     *
+     * @return string
+     */
+    protected function getUriPath(): string
+    {
+        $path = $this->getPath();
+
+        if ($path === '') {
+            return $path;
+        }
+
+        // If the path is rootless and an authority is present, the path MUST be
+        // prefixed by "/"
+        if ($path[0] !== '/' && $this->getAuthority() !== '') {
+            $path = '/'.$path;
+        }
+
+        return $path === '' ? '' : $path;
+    }
+
+    /**
+     * Get a URI-formatted query.
+     *
+     * @return string
+     */
+    protected function getUriQuery(): string
+    {
         $query = $this->getQuery();
+        return $query === '' ? '' : '?'.$query;
+    }
+
+    /**
+     * Get a URI-formatted fragment.
+     *
+     * @return string
+     */
+    protected function getUriFragment(): string
+    {
         $fragment = $this->getFragment();
-
-        return
-            ('' !== $scheme ? $scheme.'://' : '').
-            $this->getAuthority().
-            $this->getPath().
-            ('' !== $query ? '?'.$query : '').
-            ('' !== $fragment ? '#'.$fragment : '');
-
+        return $fragment === '' ? '' : '#'.$fragment;
     }
 
     /**
@@ -624,7 +686,7 @@ class Uri implements UriInterface
      *
      * @return string
      */
-    protected function getUriUserPassword()
+    protected function getUriUserPassword(): string
     {
         return ($this->pass === null ? '' : ':'.$this->pass);
     }
@@ -634,7 +696,7 @@ class Uri implements UriInterface
      *
      * @return string
      */
-    protected function getUriUserInfo()
+    protected function getUriUserInfo(): string
     {
         $userInfo = $this->getUserInfo();
         return ($userInfo === '' ? '' : $userInfo.'@');

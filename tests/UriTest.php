@@ -5,7 +5,6 @@ namespace IngeniozIT\Http\Tests\Message;
 
 use PHPUnit\Framework\TestCase;
 
-use IngeniozIT\Http\Message\Uri;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -821,4 +820,173 @@ class UriTest extends TestCase
     // FRAGMENT                                   //
     // ========================================== //
 
+    // ========================================== //
+    // TO STRING                                  //
+    // ========================================== //
+
+    /**
+     * Return the string representation as a URI reference.
+     *
+     * @dataProvider getToStringProvider
+     */
+    public function testToString(
+        string $scheme,
+        string $user,
+        ?string $password,
+        string $host,
+        ?int $port,
+        string $path,
+        string $query,
+        string $fragment,
+        string $expectedUri
+    ) {
+        $uri = $this->getUri()
+            ->withScheme($scheme)
+            ->withUserInfo($user, $password)
+            ->withPath($path)
+            ->withHost($host)
+            ->withPort($port)
+            ->withQuery($query)
+            ->withFragment($fragment);
+        $this->assertSame($expectedUri, (string)$uri, "Expected {$expectedUri}, got {$uri} instead.");
+    }
+
+    /**
+     * Provider. Gives input scheme, user name, user password, host, port, path,
+     * query, fragment and the expected __toString output.
+     */
+    public function getToStringProvider()
+    {
+        return [
+            'Full example' => [
+                'http',
+                'username',
+                'password',
+                'hostname',
+                4242,
+                '/path/to/foo',
+                'query=foo&query2=bar',
+                'fragment',
+                'http://username:password@hostname:4242/path/to/foo?query=foo&query2=bar#fragment',
+            ],
+            'Percent encoding' => [
+                'http',
+                'username',
+                'password',
+                'hostname',
+                4242,
+                '/path to foo',
+                'query=fo o&query2=ba r',
+                'frag ment',
+                'http://username:password@hostname:4242/path+to+foo?query=fo+o&query2=ba+r#frag+ment',
+            ],
+            'If a scheme is present, it MUST be suffixed by ":"' => [
+                'http',
+                '',
+                null,
+                '',
+                null,
+                '',
+                '',
+                '',
+                'http:',
+            ],
+            'If an authority is present, it MUST be prefixed by "//"' => [
+                '',
+                '',
+                null,
+                'hostname',
+                null,
+                '',
+                '',
+                '',
+                '//hostname',
+            ],
+            'If the path is rootless and an authority is present, the path MUST be prefixed by "/"' => [
+                '',
+                '',
+                null,
+                'hostname',
+                null,
+                'path/to/foo',
+                '',
+                '',
+                '//hostname/path/to/foo',
+            ],
+            'If a query is present, it MUST be prefixed by "?"' => [
+                '',
+                '',
+                null,
+                '',
+                null,
+                '',
+                'query=foo&query2=bar',
+                '',
+                '?query=foo&query2=bar',
+            ],
+            'If a fragment is present, it MUST be prefixed by "#"' => [
+                '',
+                '',
+                null,
+                '',
+                null,
+                '',
+                '',
+                'fragment',
+                '#fragment',
+            ],
+        ];
+    }
+
+    /**
+     * Return the string representation as a URI reference.
+     *
+     * @dataProvider getStringUriProvider
+     * @param        string $str Expected uri.
+     */
+    public function testToStringFromString(string $str)
+    {
+        $uri = new \IngeniozIT\Http\Message\Uri($str);
+        $this->assertSame($str, (string)$uri, "Expected {$str}, got {$uri} instead.");
+    }
+
+    /**
+     * Provider. Gives input scheme, user name, user password, host, port, path,
+     * query, fragment and the expected __toString output.
+     */
+    public function getStringUriProvider()
+    {
+        return [
+            'Full example' => ['http://username:password@hostname:4242/path/to/foo?query=foo&query2=bar#fragment'],
+            'If a scheme is present, it MUST be suffixed by ":"' => ['http:'],
+            'If an authority is present, it MUST be prefixed by "//"' => ['//hostname'],
+            'If the path is rootless and an authority is present, the path MUST be prefixed by "/"' => ['//hostname/path/to/foo'],
+            'If a query is present, it MUST be prefixed by "?"' => ['?query=foo&query2=bar'],
+            'If a fragment is present, it MUST be prefixed by "#"' => ['#fragment'],
+        ];
+    }
+
+    /**
+     * Return the string representation as a URI reference.
+     *
+     * @dataProvider getInvalidStringUriProvider
+     * @param        string $str Invalid uri.
+     */
+    public function testToStringFromStringError(string $str)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new \IngeniozIT\Http\Message\Uri($str);
+    }
+
+    /**
+     * Provider. Gives invalid uri strings.
+     */
+    public function getInvalidStringUriProvider()
+    {
+        return [
+            'http:///example.com' => ['http:///example.com'],
+            'http://:80' => ['http://:80'],
+            'http://user@:80' => ['http://user@:80'],
+        ];
+    }
 }

@@ -40,12 +40,12 @@ class MessageTest extends TestCase
         $this->assertInstanceOf(MessageInterface::class, $this->getMessage());
     }
 
-    // ------------------------------------------
-    // Protocol version
-    // ------------------------------------------
+    // ========================================== //
+    // Protocol version                           //
+    // ========================================== //
 
     /**
-     * getProcotolVersion classic usage.
+     * Retrieves the HTTP protocol version as a string.
      *
      * @dataProvider getProcotolVersionProvider
      * @param        mixed  $newProtocol      Protocol to give to the Message. null to
@@ -88,7 +88,7 @@ class MessageTest extends TestCase
     /**
      * Provider. Gives input protocol versions and the expected formatted value.
      */
-    public function getProcotolVersionProvider()
+    public function getProcotolVersionProvider(): array
     {
         return [
             'default protocol' => [null, $this->defaultProtocolVersion],
@@ -103,7 +103,7 @@ class MessageTest extends TestCase
     }
 
     /**
-     * getProcotolVersion with invalid values.
+     * The string MUST contain only the HTTP version number (e.g., "1.1", "1.0").
      *
      * @dataProvider getProcotolVersionInvalidVersionProvider
      * @param        mixed $newProtocol Protocol to give to the Message.
@@ -120,7 +120,7 @@ class MessageTest extends TestCase
     /**
      * Provider. Gives invalid protocol versions.
      */
-    public function getProcotolVersionInvalidVersionProvider()
+    public function getProcotolVersionInvalidVersionProvider(): array
     {
         return [
             'full http version HTTP/2.0' => ['HTTP/2.0'],
@@ -131,85 +131,241 @@ class MessageTest extends TestCase
         ];
     }
 
-    // ------------------------------------------
-    // Headers
-    // ------------------------------------------
+    // ========================================== //
+    // Headers                                    //
+    // ========================================== //
 
-    public function testHeadersBasic()
+    /**
+     * Retrieves all message header values.
+     *
+     * The keys represent the header name as it will be sent over the wire, and
+     * each value is an array of strings associated with the header.
+     *
+     * While header names are not case-sensitive, getHeaders() will preserve the
+     * exact case in which headers were originally specified.
+     *
+     * @dataProvider getValidHeadersProvider
+     * @param        array $headers         The headers to check.
+     * @param        array $expectedHeaders The expected output of getHeaders().
+     */
+    public function testGetHeaders(array $headers, array $expectedHeaders)
     {
         $message = $this->getMessage();
 
-        $message2 = $message->withHeader('foo', 'bar');
+        foreach ($headers as $name => $value) {
+            $message = $message->withAddedHeader($name, $value);
+        }
 
-        // Retrieves all message header values.
-        $this->assertSame(['foo' => ['bar']], $message2->getHeaders());
-        // Checks if a header exists
-        $this->assertTrue($message2->hasHeader('foo'));
-        // Retrieves a message header value
-        $this->assertSame(['bar'], $message2->getHeader('foo'));
-        // Retrieves a comma-separated string of the values for a single header
-        $this->assertSame('bar', $message2->getHeaderLine('foo'));
-        // This method MUST be implemented in such a way as to retain the
-        // immutability of the message, and MUST return an instance that has the
-        // new and/or updated header and value.
-        $this->assertNotSame($message, $message2);
-
-        $message3 = $message2->withAddedHeader('foo', 'baz');
-
-        // Retrieves all message header values.
-        $this->assertSame(['foo' => ['bar', 'baz']], $message3->getHeaders());
-        // Checks if a header exists
-        $this->assertTrue($message3->hasHeader('foo'));
-        // Retrieves a message header value
-        $this->assertSame(['bar', 'baz'], $message3->getHeader('foo'));
-        // Retrieves a comma-separated string of the values for a single header
-        $this->assertSame('bar,baz', $message3->getHeaderLine('foo'));
-        // This method MUST be implemented in such a way as to retain the
-        // immutability of the message, and MUST return an instance that has the
-        // new and/or updated header and value.
-        $this->assertNotSame($message2, $message3);
-
-        // If nothing gets updated, the same instance is returned
-        $message4 = $message3->withHeader('foo', ['bar', 'baz']);
-        $this->assertSame($message3, $message4);
+        $this->assertSame($expectedHeaders, $message->getHeaders());
     }
 
     /**
-     * getHeaders with empty headers.
+     * This method returns an array of all the header values of the given
+     * case-insensitive header name.
+     *
+     * @dataProvider getValidHeadersProvider
+     * @param        array $headers         The headers to check.
+     * @param        array $expectedHeaders The expected output of getHeaders().
      */
-    public function testHeadersEmpty()
+    public function testGetHeader(array $headers, array $expectedHeaders)
     {
-        // Empty message
         $message = $this->getMessage();
 
-        // Retrieves all message header values.
-        $this->assertSame([], $message->getHeaders());
-        // Checks if a header exists
+        foreach ($headers as $name => $value) {
+            $message = $message->withAddedHeader($name, $value);
+        }
+
+        foreach ($expectedHeaders as $name => $expectedHeader) {
+            $this->assertSame($expectedHeader, $message->getHeader($name));
+        }
+
+        if (empty($expectedHeaders)) {
+            $this->assertSame([], $message->getHeader('aNonExistingHeader'));
+        }
+    }
+
+    /**
+     * Provider. Return valid headers.
+     */
+    public function getValidHeadersProvider(): array
+    {
+        return [
+            'No headers' => [
+                [],
+                [],
+            ],
+            'One header' => [
+                [
+                    'foo' => ['bar'],
+                ],
+                [
+                    'foo' => ['bar'],
+                ],
+            ],
+            'Multiple headers' => [
+                [
+                    'foo' => ['bar'],
+                    'bar' => 'baz,foo',
+                    'baz' => ['foo', 'bar', 'baz'],
+                ],
+                [
+                    'foo' => ['bar'],
+                    'bar' => ['baz,foo'],
+                    'baz' => ['foo', 'bar', 'baz'],
+                ],
+            ],
+            'Case insensitive headers' => [
+                [
+                    'FoO' => ['bar'],
+                    'FOO' => ['baz', 'foo'],
+                    'foo' => ['foo', 'bar', 'baz'],
+                ],
+                [
+                    'foo' => ['bar', 'baz', 'foo', 'foo', 'bar', 'baz'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * This method returns all of the header values of the given
+     * case-insensitive header name as a string concatenated together using
+     * a comma.
+     *
+     * If the header does not appear in the message, this method MUST return
+     * an empty string.
+     *
+     * @dataProvider getValidHeaderLinesProvider
+     * @param        array $headers             The headers to add.
+     * @param        array $expectedHeaderLines The expected output of getHeaderLine().
+     */
+    public function testGetHeaderLine(array $headers, array $expectedHeaderLines)
+    {
+        $message = $this->getMessage();
+
+        foreach ($headers as $name => $value) {
+            $message = $message->withAddedHeader($name, $value);
+        }
+
+        foreach ($expectedHeaderLines as $name => $expectedHeaderLine) {
+            $this->assertSame($expectedHeaderLine, $message->getHeaderLine($name));
+        }
+    }
+
+    /**
+     * Provider. Return valid headers.
+     */
+    public function getValidHeaderLinesProvider(): array
+    {
+        return [
+            'No headers' => [
+                [],
+                [
+                    'foo' => ''
+                ],
+            ],
+            'One header' => [
+                [
+                    'foo' => ['bar'],
+                ],
+                [
+                    'foo' => 'bar',
+                    'bar' => '',
+                ],
+            ],
+            'Multiple headers' => [
+                [
+                    'foo' => ['bar'],
+                    'bar' => 'baz,foo',
+                    'baz' => ['foo', 'bar', 'baz'],
+                ],
+                [
+                    'foo' => 'bar',
+                    'bar' => 'baz,foo',
+                    'baz' => 'foo,bar,baz',
+                ],
+            ],
+            'Case insensitive headers' => [
+                [
+                    'FoO' => ['bar'],
+                    'FOO' => ['baz', 'foo'],
+                    'foo' => ['foo', 'bar', 'baz'],
+                ],
+                [
+                    'foo' => 'bar,baz,foo,foo,bar,baz',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Checks if a header exists by the given case-insensitive name.
+     */
+    public function testHasHeader()
+    {
+        $message = $this->getMessage();
+
         $this->assertFalse($message->hasHeader('foo'));
-        // Retrieves a message header value
-        $this->assertSame([], $message->getHeader('foo'));
-        // Retrieves a comma-separated string of the values for a single header
-        $this->assertSame('', $message->getHeaderLine('foo'));
 
-        // Filled + emptied message
-        $message2 = $message
-            ->withHeader('foo', 'foo')
-            ->withoutHeader('foo')
-            ->withHeader('bar', 'bar')
-            ->withAddedHeader('bar', 'baz')
-            ->withoutHeader('bar')
-            ->withoutHeader('bar');
+        $message = $message->withHeader('foo', 'bar');
+        $this->assertTrue($message->hasHeader('foo'));
+        $this->assertTrue($message->hasHeader('FOO'));
+    }
 
-        // Retrieves all message header values.
-        $this->assertSame([], $message2->getHeaders());
-        // Checks if a header exists
-        $this->assertFalse($message2->hasHeader('foo'));
-        // Retrieves a message header value
-        $this->assertSame([], $message2->getHeader('foo'));
-        // Retrieves a comma-separated string of the values for a single header
-        $this->assertSame('', $message2->getHeaderLine('foo'));
+    /**
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * new and/or updated header and value.
+     */
+    public function testWithHeaderReturnsNewInstance()
+    {
+        $message = $this->getMessage();
 
+        $message2 = $message->withHeader('name', 'value');
+
+        $this->assertFalse($message->hasHeader('name'));
+        $this->assertSame('value', $message2->getHeaderLine('name'));
+    }
+
+    /**
+     * If the header given is the same as the Message's header, the same
+     * instance will be returned.
+     */
+    public function testWithHeaderReturnsSameInstanceOnSameValue()
+    {
+        $message = $this->getMessage()->withHeader('name', 'value');
+        $message2 = $message->withHeader('name', 'value');
+
+        $this->assertSame('value', $message->getHeaderLine('name'));
+        $this->assertSame($message, $message2);
+    }
+
+    /**
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * new and/or updated header and value.
+     */
+    public function testWithoutHeaderReturnsNewInstance()
+    {
+        $message = $this->getMessage()->withHeader('name', 'value');
+
+        $message2 = $message->withoutHeader('name');
+
+        $this->assertTrue($message->hasHeader('name'));
+        $this->assertFalse($message2->hasHeader('name'));
         $this->assertNotSame($message, $message2);
+    }
+
+    /**
+     * If the header is not in the Message, the same instance will be returned.
+     */
+    public function testWithoutHeaderReturnsSameInstanceOnSameValue()
+    {
+        $message = $this->getMessage();
+        $message2 = $message->withoutHeader('name');
+
+        $this->assertFalse($message->hasHeader('name'));
+        $this->assertSame($message, $message2);
     }
 
     /**
@@ -293,50 +449,34 @@ class MessageTest extends TestCase
         return $this->getHeadersInvalidValuesProvider();
     }
 
+    // ========================================== //
+    // Body                                       //
+    // ========================================== //
+
     /**
-     * manipulate a header's case-insensitivity
+     * The body MUST be a StreamInterface object.
      */
-    public function testHeadersCaseInsensitive()
-    {
-        $message = $this->getMessage()->withHeader('FOO', 'BAR');
-
-        // Retrieves all message header values.
-        $this->assertSame(['FOO' => ['BAR']], $message->getHeaders());
-        // Checks if a header exists
-        $this->assertTrue($message->hasHeader('foo'));
-        // Retrieves a message header value
-        $this->assertSame(['BAR'], $message->getHeader('foo'));
-        // Retrieves a comma-separated string of the values for a single header
-        $this->assertSame('BAR', $message->getHeaderLine('foo'));
-
-        // "Rename" the header name by removing it and replacing it
-        $message = $message->withoutHeader('foo')->withHeader('foo', 'BAR');
-        $this->assertSame(['foo' => ['BAR']], $message->getHeaders());
-    }
-
-    // ------------------------------------------
-    // Body
-    // ------------------------------------------
-
     public function testGetBody()
     {
         $message = $this->getMessage();
 
-        // Returns the body as a stream.
         $body = $message->getBody();
         $this->assertInstanceOf(StreamInterface::class, $body);
     }
 
+    /**
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return a new instance that has the
+     * new body stream.
+     */
     public function testWithBody()
     {
         $message = $this->getMessage();
         $mockStreamInterface = $this->getMockBuilder(StreamInterface::class)->getMock();
 
-        // Returns the body as a stream.
         $message2 = $message->withbody($mockStreamInterface);
         $this->assertSame($mockStreamInterface, $message2->getBody());
 
-        // Returns the body as a stream.
         $message3 = $message2->withbody($mockStreamInterface);
         $this->assertSame($message2, $message3);
     }
