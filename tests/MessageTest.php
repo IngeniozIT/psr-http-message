@@ -16,12 +16,14 @@ class MessageTest extends TestCase
 {
     /**
      * Implementation's default HTTP protocol.
+     *
      * @var string
      */
     protected $defaultProtocolVersion = '1.1';
 
     /**
      * Get a new MessageInterface instance.
+     *
      * @return MessageInterface
      */
     protected function getMessage()
@@ -44,10 +46,11 @@ class MessageTest extends TestCase
 
     /**
      * getProcotolVersion classic usage.
+     *
      * @dataProvider getProcotolVersionProvider
-     * @param  mixed  $newProtocol Protocol to give to the Message. null to
-     * disable giving a new protocol version.
-     * @param  string $expectedProtocol Expected protocol value.
+     * @param        mixed  $newProtocol      Protocol to give to the Message. null to
+     *                                        disable giving a new protocol version.
+     * @param        string $expectedProtocol Expected protocol value.
      */
     public function testProcotolVersion($newProtocol, $expectedProtocol)
     {
@@ -101,8 +104,9 @@ class MessageTest extends TestCase
 
     /**
      * getProcotolVersion with invalid values.
+     *
      * @dataProvider getProcotolVersionInvalidVersionProvider
-     * @param  mixed  $newProtocol Protocol to give to the Message.
+     * @param        mixed $newProtocol Protocol to give to the Message.
      */
     public function testProcotolVersionExceptions($newProtocol)
     {
@@ -189,12 +193,12 @@ class MessageTest extends TestCase
 
         // Filled + emptied message
         $message2 = $message
-        ->withHeader('foo', 'foo')
-        ->withoutHeader('foo')
-        ->withHeader('bar', 'bar')
-        ->withAddedHeader('bar', 'baz')
-        ->withoutHeader('bar')
-        ->withoutHeader('bar');
+            ->withHeader('foo', 'foo')
+            ->withoutHeader('foo')
+            ->withHeader('bar', 'bar')
+            ->withAddedHeader('bar', 'baz')
+            ->withoutHeader('bar')
+            ->withoutHeader('bar');
 
         // Retrieves all message header values.
         $this->assertSame([], $message2->getHeaders());
@@ -210,9 +214,10 @@ class MessageTest extends TestCase
 
     /**
      * headers classic usage.
+     *
      * @dataProvider getHeadersValuesProvider
-     * @param  mixed  $newValue Header to give to the Message.
-     * @param  array $expectedValue Expected header value.
+     * @param        mixed $newValue      Header to give to the Message.
+     * @param        array $expectedValue Expected header value.
      */
     public function testHeadersValues($newValue, $expectedValue)
     {
@@ -241,8 +246,9 @@ class MessageTest extends TestCase
 
     /**
      * headers with invalid values.
+     *
      * @dataProvider getHeadersInvalidValuesProvider
-     * @param  mixed  $value Value to give to the header.
+     * @param        mixed $value Value to give to the header.
      */
     public function testHeadersInvalidValues($value)
     {
@@ -255,8 +261,9 @@ class MessageTest extends TestCase
 
     /**
      * headers with invalid names.
+     *
      * @dataProvider getHeadersInvalidNamesProvider
-     * @param  mixed  $name Name to give to the header.
+     * @param        mixed $name Name to give to the header.
      */
     public function testHeadersInvalidNames($name)
     {
