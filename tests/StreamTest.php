@@ -12,9 +12,18 @@ use Psr\Http\Message\StreamInterface;
  */
 class StreamTest extends TestCase
 {
+    public static $fstat = false;
+    public static $ftell = false;
+    public static $seekable = true;
+
     protected function getStream()
     {
-        return new \IngeniozIT\Http\Message\Stream(fopen('php://temp', 'r+'));
+        return $this->getStreamWithHandle(fopen('php://temp', 'r+'));
+    }
+
+    protected function getStreamWithHandle($handle)
+    {
+        return new \IngeniozIT\Http\Message\Stream($handle);
     }
 
     public function testConstruct()
@@ -63,7 +72,7 @@ class StreamTest extends TestCase
     public function testClose()
     {
         $rs = fopen('php://temp', 'r+');
-        $stream = new \IngeniozIT\Http\Message\Stream($rs);
+        $stream = $this->getStreamWithHandle($rs);
 
         $this->assertTrue(is_resource($rs));
         $stream->close();
@@ -80,7 +89,7 @@ class StreamTest extends TestCase
     public function testDetach()
     {
         $rs = fopen('php://temp', 'r+');
-        $stream = new \IngeniozIT\Http\Message\Stream($rs);
+        $stream = $this->getStreamWithHandle($rs);
 
         $this->assertTrue(is_resource($rs));
 
@@ -207,7 +216,9 @@ class StreamTest extends TestCase
      */
     public function testEof()
     {
-        $stream = $this->getStream();
+        $rs = fopen('php://temp', 'w+');
+        $stream = $this->getStreamWithHandle($rs);
+
         $this->assertFalse($stream->eof());
 
         $stream->write('foo bar');
@@ -216,10 +227,16 @@ class StreamTest extends TestCase
         $stream->rewind();
         $this->assertFalse($stream->eof());
 
-        $stream->read(4);
+        $this->assertSame('foo ba', $stream->read(6));
         $this->assertFalse($stream->eof());
 
-        $stream->read(4242);
+        $this->assertSame('r', $stream->read(1));
+        $this->assertFalse($stream->eof());
+
+        $this->assertSame('', $stream->read(1));
+        $this->assertTrue($stream->eof());
+
+        $this->assertSame('', $stream->read(4242));
         $this->assertTrue($stream->eof());
     }
 
@@ -236,10 +253,6 @@ class StreamTest extends TestCase
         $this->assertFalse($stream->isSeekable());
         self::$seekable = true;
     }
-
-    public static $fstat = false;
-    public static $ftell = false;
-    public static $seekable = true;
 }
 
 // ========================================== //

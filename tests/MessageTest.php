@@ -28,6 +28,7 @@ class MessageTest extends TestCase
      */
     protected function getMessage()
     {
+        /** @var StreamInterface $mockStreamInterface */
         $mockStreamInterface = $this->getMockBuilder(StreamInterface::class)->getMock();
         return new \IngeniozIT\Http\Message\Message($mockStreamInterface);
     }
@@ -185,7 +186,7 @@ class MessageTest extends TestCase
     }
 
     /**
-     * Provider. Return valid headers.
+     * Provider. Return valid headers and the expected output of getHeaders().
      */
     public function getValidHeadersProvider(): array
     {
@@ -253,7 +254,7 @@ class MessageTest extends TestCase
     }
 
     /**
-     * Provider. Return valid headers.
+     * Provider. Return valid headers and the expected output of getHeaderLine().
      */
     public function getValidHeaderLinesProvider(): array
     {
