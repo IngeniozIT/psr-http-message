@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace IngeniozIT\Http\Tests\Message;
 
+use http\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 use Psr\Http\Message\StreamInterface;
@@ -44,6 +45,28 @@ class StreamTest extends TestCase
     protected function getStream()
     {
         return $this->getStreamWithHandle(fopen('php://temp', 'r+'));
+    }
+
+    /**
+     * Open a temporary file and return its resource.
+     *
+     * @param string $mode Mode to use while opening the file.
+     * @return string
+     */
+    protected function getFileDescriptor(string $mode)
+    {
+        $tmpFd = tmpfile();
+        $path = stream_get_meta_data($tmpFd)['uri'];
+
+        if ($mode[0] === 'x') {
+            fclose($tmpFd);
+            $fd = fopen($path, $mode);
+        } else {
+            $fd = fopen($path, $mode);
+            fclose($tmpFd);
+        }
+
+        return $fd;
     }
 
     // ========================================== //
@@ -296,6 +319,10 @@ class StreamTest extends TestCase
         $this->assertTrue($stream->eof());
     }
 
+    // ========================================== //
+    // Is Seekable                                //
+    // ========================================== //
+
     /**
      * Returns whether or not the stream is seekable.
      */
@@ -308,6 +335,178 @@ class StreamTest extends TestCase
         $stream = $this->getStream();
         $this->assertFalse($stream->isSeekable());
         self::$seekable = true;
+    }
+
+    // ========================================== //
+    // Is Writable                                //
+    // ========================================== //
+
+    /**
+     * Returns whether or not the stream is writable.
+     * Write data to the stream. @throws \RuntimeException on failure.
+     *
+     * @dataProvider getWritableProvider
+     * @param string $mode
+     * @param bool   $shouldBeWritable
+     */
+    public function testIsWritable(string $mode, bool $shouldBeWritable)
+    {
+        $stream = $this->getStreamWithHandle($this->getFileDescriptor($mode));
+
+        if ($shouldBeWritable) {
+            $this->assertTrue($stream->isWritable());
+            $stream->write('foo');
+        } else {
+            $this->assertFalse($stream->isWritable());
+            $this->expectException(\RuntimeException::class);
+            $stream->write('foo');
+        }
+    }
+
+    /**
+     * Provider. Return fopen modes and whether they are writable or not.
+     */
+    public function getWritableProvider(): array
+    {
+        return [
+            'r' => ['r', false],
+            'rb' => ['rb', false],
+            'rt' => ['rt', false],
+
+            'r+' => ['r+', true],
+            'r+b' => ['r+b', true],
+            'r+t' => ['r+t', true],
+
+            'w' => ['w', true],
+            'wb' => ['wb', true],
+            'wt' => ['wt', true],
+
+            'w+' => ['w+', true],
+            'w+b' => ['w+b', true],
+            'w+t' => ['w+t', true],
+
+            'a' => ['a', true],
+            'ab' => ['ab', true],
+            'at' => ['at', true],
+
+            'a+' => ['a+', true],
+            'a+b' => ['a+b', true],
+            'a+t' => ['a+t', true],
+
+            'x+' => ['x+', true],
+            'x+b' => ['x+b', true],
+            'x+t' => ['x+t', true],
+
+            'c' => ['c', true],
+            'cb' => ['cb', true],
+            'ct' => ['ct', true],
+
+            'c+' => ['c+', true],
+            'c+b' => ['c+b', true],
+            'c+t' => ['c+t', true],
+        ];
+    }
+
+    // ========================================== //
+    // Write                                      //
+    // ========================================== //
+
+    /**
+     * Write data to the stream. @throws \RuntimeException on failure.
+     */
+    public function testWriteFilesystemError()
+    {
+        $stream = $this->getStream();
+
+        self::$fwrite = true;
+        $this->expectException(\RuntimeException::class);
+        $stream->write('foo');
+    }
+
+    // ========================================== //
+    // Is Readable                                //
+    // ========================================== //
+
+    /**
+     * Returns whether or not the stream is readable.
+     * Read data from the stream. @throws \RuntimeException on failure.
+     *
+     * @dataProvider getReadableProvider
+     * @param string $mode
+     * @param bool   $shouldBeReadable
+     */
+    public function testIsReadable(string $mode, bool $shouldBeReadable)
+    {
+        $stream = $this->getStreamWithHandle($this->getFileDescriptor($mode));
+
+        if ($shouldBeReadable) {
+            $this->assertTrue($stream->isReadable());
+            $this->assertSame('', $stream->read(42));
+        } else {
+            $this->assertFalse($stream->isReadable());
+            $this->expectException(\RuntimeException::class);
+            $stream->read(42);
+        }
+    }
+
+    /**
+     * Provider. Return fopen modes and whether they are readable or not.
+     */
+    public function getReadableProvider(): array
+    {
+        return [
+            'r' => ['r', true],
+            'rb' => ['rb', true],
+            'rt' => ['rt', true],
+
+            'r+' => ['r+', true],
+            'r+b' => ['r+b', true],
+            'r+t' => ['r+t', true],
+
+            'w' => ['w', false],
+            'wb' => ['wb', false],
+            'wt' => ['wt', false],
+
+            'w+' => ['w+', true],
+            'w+b' => ['w+b', true],
+            'w+t' => ['w+t', true],
+
+            'a' => ['a', false],
+            'ab' => ['ab', false],
+            'at' => ['at', false],
+
+            'a+' => ['a+', true],
+            'a+b' => ['a+b', true],
+            'a+t' => ['a+t', true],
+
+            'x+' => ['x+', true],
+            'x+b' => ['x+b', true],
+            'x+t' => ['x+t', true],
+
+            'c' => ['c', false],
+            'cb' => ['cb', false],
+            'ct' => ['ct', false],
+
+            'c+' => ['c+', true],
+            'c+b' => ['c+b', true],
+            'c+t' => ['c+t', true],
+        ];
+    }
+
+    // ========================================== //
+    // Write                                      //
+    // ========================================== //
+
+    /**
+     * Read data from the stream. @throws \RuntimeException on failure.
+     */
+    public function testReadFilesystemError()
+    {
+        $stream = $this->getStream();
+
+        self::$fread = true;
+        $this->expectException(\RuntimeException::class);
+        $stream->read(42);
     }
 }
 

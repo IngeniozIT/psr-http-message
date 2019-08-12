@@ -31,8 +31,14 @@ class Stream implements StreamInterface
 
         $metadata = stream_get_meta_data($this->stream);
 
-        $this->readable = '+' === ($metadata['mode'][1] ?? null) || 'r' === $metadata['mode'][0];
-        $this->writable = '+' === ($metadata['mode'][1] ?? null) || 'w' === $metadata['mode'][0];
+        if ('+' === ($metadata['mode'][1] ?? null)) {
+            $this->readable = true;
+            $this->writable = true;
+        } else {
+            $this->readable = 'r' === $metadata['mode'][0];
+            $this->writable = 'w' === $metadata['mode'][0] || 'a' === $metadata['mode'][0] || 'x' === $metadata['mode'][0] || 'c' === $metadata['mode'][0];
+        }
+
         $this->seekable = $metadata['seekable'];
     }
 
