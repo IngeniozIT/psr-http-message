@@ -12,27 +12,63 @@ use Psr\Http\Message\StreamInterface;
  */
 class StreamTest extends TestCase
 {
+    /** @var bool True to make fstat fail. */
     public static $fstat = false;
+    /** @var bool True to make ftell fail. */
     public static $ftell = false;
+    /** @var bool True to make fread fail. */
+    public static $fread = false;
+    /** @var bool True to make fwrite fail. */
+    public static $fwrite = false;
+    /** @var bool False to make a stream unseekable. */
     public static $seekable = true;
 
-    protected function getStream()
+    protected function setUp(): void
     {
-        return $this->getStreamWithHandle(fopen('php://temp', 'r+'));
+        self::$fstat = false;
+        self::$ftell = false;
+        self::$fread = false;
+        self::$fwrite = false;
+        self::$seekable = true;
     }
+
+    // ========================================== //
+    // Implementation specific                    //
+    // ========================================== //
 
     protected function getStreamWithHandle($handle)
     {
         return new \IngeniozIT\Http\Message\Stream($handle);
     }
 
+    protected function getStream()
+    {
+        return $this->getStreamWithHandle(fopen('php://temp', 'r+'));
+    }
+
+    // ========================================== //
+    // Constructor                                //
+    // ========================================== //
+
+    /**
+     * Does getStream() return a StreamInterface ?
+     */
     public function testConstruct()
     {
         $this->assertInstanceOf(StreamInterface::class, $this->getStream());
     }
 
+    /**
+     * Call the constructor with a bad argument.
+     */
+    public function testConstructBadArgument()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->getStreamWithHandle('not a handle');
+    }
+
     // ========================================== //
-    // TO STRING                                  //
+    // To String                                  //
     // ========================================== //
 
     /**
@@ -62,8 +98,22 @@ class StreamTest extends TestCase
         $this->assertSame('bar baz', (string)$stream);
     }
 
+    /**
+     * This method MUST NOT raise an exception in order to conform with PHP's
+     * string casting operations.
+     */
+    public function testToStringException()
+    {
+        $stream = $this->getStream();
+        $stream->write('foo bar baz');
+        $stream->rewind();
+
+        self::$fread = true;
+        $this->assertSame('', (string)$stream);
+    }
+
     // ========================================== //
-    // CLOSE                                      //
+    // Close                                      //
     // ========================================== //
 
     /**
@@ -80,7 +130,7 @@ class StreamTest extends TestCase
     }
 
     // ========================================== //
-    // DETACH                                     //
+    // Detach                                     //
     // ========================================== //
 
     /**
@@ -112,6 +162,7 @@ class StreamTest extends TestCase
         $this->assertNull($stream->getSize());
         try {
             $stream->tell();
+            $this->assertTrue(false);
         } catch (\RunTimeException $e) {
             $this->assertTrue(true);
         }
@@ -119,28 +170,33 @@ class StreamTest extends TestCase
         $this->assertFalse($stream->isSeekable());
         try {
             $stream->seek(2);
+            $this->assertTrue(false);
         } catch (\RunTimeException $e) {
             $this->assertTrue(true);
         }
         try {
             $stream->rewind();
+            $this->assertTrue(false);
         } catch (\RunTimeException $e) {
             $this->assertTrue(true);
         }
         $this->assertFalse($stream->isWritable());
         try {
             $stream->write('foo');
+            $this->assertTrue(false);
         } catch (\RunTimeException $e) {
             $this->assertTrue(true);
         }
         $this->assertFalse($stream->isReadable());
         try {
             $stream->read(42);
+            $this->assertTrue(false);
         } catch (\RunTimeException $e) {
             $this->assertTrue(true);
         }
         try {
             $stream->getContents();
+            $this->assertTrue(false);
         } catch (\RunTimeException $e) {
             $this->assertTrue(true);
         }
@@ -148,7 +204,7 @@ class StreamTest extends TestCase
     }
 
     // ========================================== //
-    // GET SIZE                                   //
+    // Get Size                                   //
     // ========================================== //
 
     /**
@@ -172,7 +228,7 @@ class StreamTest extends TestCase
     }
 
     // ========================================== //
-    // TELL                                       //
+    // Tell                                       //
     // ========================================== //
 
     /**
@@ -208,7 +264,7 @@ class StreamTest extends TestCase
     }
 
     // ========================================== //
-    // EOF                                        //
+    // Eof                                        //
     // ========================================== //
 
     /**
@@ -256,10 +312,20 @@ class StreamTest extends TestCase
 }
 
 // ========================================== //
-// FILESYSTEM OVERRIDES                       //
+// Filesystem overrides                       //
 // ========================================== //
 
 namespace IngeniozIT\Http\Message;
+
+function fread($resource, $length)
+{
+    return \IngeniozIT\Http\Tests\Message\StreamTest::$fread ? false : \fread($resource, $length);
+}
+
+function fwrite($resource, $string)
+{
+    return \IngeniozIT\Http\Tests\Message\StreamTest::$fwrite ? false : \fwrite($resource, $string);
+}
 
 function fstat($resource)
 {

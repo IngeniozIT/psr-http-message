@@ -14,6 +14,10 @@ use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
  */
 class MessageTest extends TestCase
 {
+    // ========================================== //
+    // Implementation specific                    //
+    // ========================================== //
+
     /**
      * Implementation's default HTTP protocol.
      *
@@ -33,12 +37,16 @@ class MessageTest extends TestCase
         return new \IngeniozIT\Http\Message\Message($mockStreamInterface);
     }
 
+    // ========================================== //
+    // Constructor                                //
+    // ========================================== //
+
     /**
      * Does getMessage() return a MessageInterface ?
      */
     public function testConstruct()
     {
-        $this->assertInstanceOf(MessageInterface::class, $this->getMessage());
+        $this->assertInstanceOf(MessageInterface::class, $this->getMessage(), 'Constructor does not give a MessageInterface object.');
     }
 
     // ========================================== //
@@ -67,10 +75,10 @@ class MessageTest extends TestCase
 
         // Retrieves the HTTP protocol version as a string.
         $type = gettype($protocol);
-        $this->assertTrue(is_string($protocol), "Protocol version must be string, {$type} given");
+        $this->assertTrue(is_string($protocol), "Protocol version must be string, {$type} given.");
 
         // The string MUST contain only the HTTP version number (e.g., "1.1", "1.0").
-        $this->assertRegExp('/^\d+(\.\d+)?$/', $protocol, "Protocol version MUST contain only the HTTP version number (e.g., \"1.1\", \"1.0\")");
+        $this->assertRegExp('/^\d+(\.\d+)?$/', $protocol, "Protocol version MUST contain only the HTTP version number (e.g., \"1.1\", \"1.0\").");
 
         // The protocol version MUST match the expected value
         $this->assertSame($expectedProtocol, $protocol, "Expected protocol version '{$expectedProtocol}', got '{$protocol}' instead.");
@@ -79,10 +87,10 @@ class MessageTest extends TestCase
             // This method MUST be implemented in such a way as to retain the
             // immutability of the message, and MUST return an instance that has the
             // new protocol version.
-            $this->assertNotSame($message, $message2);
+            $this->assertNotSame($message, $message2, 'Protocol version is not immutable.');
         } else {
             // If nothing gets updated, the same instance is returned
-            $this->assertSame($message, $message2);
+            $this->assertSame($message, $message2, 'Protocol version is badly immutable.');
         }
     }
 
@@ -157,7 +165,7 @@ class MessageTest extends TestCase
             $message = $message->withAddedHeader($name, $value);
         }
 
-        $this->assertSame($expectedHeaders, $message->getHeaders());
+        $this->assertSame($expectedHeaders, $message->getHeaders(), 'withAddedHeader or getHeaders are not working.');
     }
 
     /**
@@ -177,11 +185,11 @@ class MessageTest extends TestCase
         }
 
         foreach ($expectedHeaders as $name => $expectedHeader) {
-            $this->assertSame($expectedHeader, $message->getHeader($name));
+            $this->assertSame($expectedHeader, $message->getHeader($name), 'withAddedHeader or getHeader are not working.');
         }
 
         if (empty($expectedHeaders)) {
-            $this->assertSame([], $message->getHeader('aNonExistingHeader'));
+            $this->assertSame([], $message->getHeader('aNonExistingHeader'), 'Non existing headers do not return [].');
         }
     }
 
@@ -249,7 +257,7 @@ class MessageTest extends TestCase
         }
 
         foreach ($expectedHeaderLines as $name => $expectedHeaderLine) {
-            $this->assertSame($expectedHeaderLine, $message->getHeaderLine($name));
+            $this->assertSame($expectedHeaderLine, $message->getHeaderLine($name), 'withAddedHeader or getHeaderLine are not working.');
         }
     }
 
@@ -306,11 +314,11 @@ class MessageTest extends TestCase
     {
         $message = $this->getMessage();
 
-        $this->assertFalse($message->hasHeader('foo'));
+        $this->assertFalse($message->hasHeader('foo'), 'hasHeader on a non existing header MUST return false.');
 
         $message = $message->withHeader('foo', 'bar');
-        $this->assertTrue($message->hasHeader('foo'));
-        $this->assertTrue($message->hasHeader('FOO'));
+        $this->assertTrue($message->hasHeader('foo'), 'withHeader or hasHeader are not working.');
+        $this->assertTrue($message->hasHeader('FOO'), 'hasHeader is not case insensitive.');
     }
 
     /**
@@ -324,8 +332,8 @@ class MessageTest extends TestCase
 
         $message2 = $message->withHeader('name', 'value');
 
-        $this->assertFalse($message->hasHeader('name'));
-        $this->assertSame('value', $message2->getHeaderLine('name'));
+        $this->assertFalse($message->hasHeader('name'), 'withHeader or hasHeader are not working.');
+        $this->assertNotSame($message, $message2, 'Headers are not immutable.');
     }
 
     /**
@@ -337,8 +345,7 @@ class MessageTest extends TestCase
         $message = $this->getMessage()->withHeader('name', 'value');
         $message2 = $message->withHeader('name', 'value');
 
-        $this->assertSame('value', $message->getHeaderLine('name'));
-        $this->assertSame($message, $message2);
+        $this->assertSame($message, $message2, 'Headers are badly immutable.');
     }
 
     /**
@@ -352,9 +359,9 @@ class MessageTest extends TestCase
 
         $message2 = $message->withoutHeader('name');
 
-        $this->assertTrue($message->hasHeader('name'));
-        $this->assertFalse($message2->hasHeader('name'));
-        $this->assertNotSame($message, $message2);
+        $this->assertTrue($message->hasHeader('name'), 'withHeader or hasHeader are not working.');
+        $this->assertFalse($message2->hasHeader('name'), 'withHeader or hasHeader are not working.');
+        $this->assertNotSame($message, $message2, 'Headers are not immutable.');
     }
 
     /**
@@ -365,8 +372,7 @@ class MessageTest extends TestCase
         $message = $this->getMessage();
         $message2 = $message->withoutHeader('name');
 
-        $this->assertFalse($message->hasHeader('name'));
-        $this->assertSame($message, $message2);
+        $this->assertSame($message, $message2, 'Headers are badly immutable.');
     }
 
     /**
@@ -383,7 +389,7 @@ class MessageTest extends TestCase
         $value = $message->getHeader('foo');
 
         // Values must be correctly converted to string[]
-        $this->assertSame($expectedValue, $value);
+        $this->assertSame($expectedValue, $value, 'Headers are not correctly converted to string.');
     }
 
     /**
@@ -462,7 +468,7 @@ class MessageTest extends TestCase
         $message = $this->getMessage();
 
         $body = $message->getBody();
-        $this->assertInstanceOf(StreamInterface::class, $body);
+        $this->assertInstanceOf(StreamInterface::class, $body, 'Message body MUST be a StreamInterface.');
     }
 
     /**
@@ -476,9 +482,9 @@ class MessageTest extends TestCase
         $mockStreamInterface = $this->getMockBuilder(StreamInterface::class)->getMock();
 
         $message2 = $message->withbody($mockStreamInterface);
-        $this->assertSame($mockStreamInterface, $message2->getBody());
+        $this->assertSame($mockStreamInterface, $message2->getBody(), 'Body is not immutable.');
 
         $message3 = $message2->withbody($mockStreamInterface);
-        $this->assertSame($message2, $message3);
+        $this->assertSame($message2, $message3, 'Body is not immutable.');
     }
 }
