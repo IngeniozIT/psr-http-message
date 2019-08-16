@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace IngeniozIT\Http\Tests\Message;
 
-use http\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 use Psr\Http\Message\StreamInterface;
@@ -493,12 +492,24 @@ class StreamTest extends TestCase
         ];
     }
 
+    /**
+     * @throws \RuntimeException if an error occurs.
+     */
+    public function testReadWithNegativeNumber()
+    {
+        $stream = $this->getStream();
+
+        $this->expectException(\RuntimeException::class);
+        $stream->read(-1);
+
+    }
+
     // ========================================== //
-    // Write                                      //
+    // Read                                       //
     // ========================================== //
 
     /**
-     * Read data from the stream. @throws \RuntimeException on failure.
+     * Read data from the stream. @throws \RuntimeException if an error occurs.
      */
     public function testReadFilesystemError()
     {
@@ -507,6 +518,17 @@ class StreamTest extends TestCase
         self::$fread = true;
         $this->expectException(\RuntimeException::class);
         $stream->read(42);
+    }
+
+    /**
+     * Read data from the stream. @throws \RuntimeException if an error occurs.
+     */
+    public function testReadNegativeLength()
+    {
+        $stream = $this->getStream();
+
+        $this->expectException(\RuntimeException::class);
+        $stream->read(-1);
     }
 }
 
