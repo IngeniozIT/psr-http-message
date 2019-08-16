@@ -7,7 +7,7 @@ before_script:
     - travis_retry composer install --no-interaction --prefer-source
 
 script:
-    - phpunit
+    - vendor/bin/phpunit
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
