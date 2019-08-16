@@ -530,6 +530,18 @@ class StreamTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $stream->read(-1);
     }
+
+    // ========================================== //
+    // Get Metadata                               //
+    // ========================================== //
+
+    public function testGetMetadata()
+    {
+        $fd = $this->getFileDescriptor('r+');
+        $stream = $this->getStreamWithHandle($fd);
+
+        $this->assertSame(stream_get_meta_data($fd), $stream->getMetadata());
+    }
 }
 
 // ========================================== //
