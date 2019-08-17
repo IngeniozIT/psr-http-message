@@ -55,6 +55,67 @@ class RequestTest extends MessageTest
         $this->assertInstanceOf(RequestInterface::class, $this->getRequest(), 'Constructor does not give a RequestInterface object.');
     }
 
+    /**
+     * During construction, implementations MUST attempt to set the Host header from
+     * a provided URI if no Host header is provided.
+     * Set the host with headers.
+     */
+    public function testConstructSetHostHeader()
+    {
+        $request = $this->getMessage(['Host' => 'hostname'], null, 'GET', null);
+
+        $this->assertSame('hostname', $request->getHeaderLine('Host'));
+    }
+
+    /**
+     * During construction, implementations MUST attempt to set the Host header from
+     * a provided URI if no Host header is provided.
+     * Set the host with a given Uri.
+     */
+    public function testConstructSetHostHeaderWithUri()
+    {
+        $mockUriInterface = $this->createMock(UriInterface::class);
+        $mockUriInterface->method('__toString')->willReturn('hostname');
+        $mockUriInterface->method('getHost')->willReturn('hostname');
+
+        $request = $this->getMessage([], null, 'GET', $mockUriInterface);
+
+        $this->assertSame('hostname', $request->getHeaderLine('Host'));
+    }
+
+    /**
+     * During construction, implementations MUST attempt to set the Host header from
+     * a provided URI if no Host header is provided.
+     * Give an Uri without host. Expect no host header.
+     */
+    public function testConstructSetHostHeaderWithUriWithNoHost()
+    {
+        $mockUriInterface = $this->createMock(UriInterface::class);
+        $mockUriInterface->method('__toString')->willReturn('');
+        $mockUriInterface->method('getHost')->willReturn('');
+
+        $request = $this->getMessage([], null, 'GET', $mockUriInterface);
+
+        $this->assertFalse($request->hasHeader('Host'));
+    }
+
+    /**
+     * During construction, implementations MUST attempt to set the Host header from
+     * a provided URI if no Host header is provided.
+     * Set the host with headers, give a Uri with a host. Expect the Uri does not
+     * override host.
+     */
+    public function testConstructSetHostHeaderAndGiveUri()
+    {
+        $mockUriInterface = $this->createMock(UriInterface::class);
+        $mockUriInterface->method('__toString')->willReturn('badhostname');
+        $mockUriInterface->method('getHost')->willReturn('badhostname');
+
+        $request = $this->getMessage(['Host' => 'hostname'], null, 'GET', $mockUriInterface);
+
+        $this->assertSame('hostname', $request->getHeaderLine('Host'));
+    }
+
     // ========================================== //
     // Request Target                             //
     // ========================================== //

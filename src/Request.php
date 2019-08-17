@@ -46,13 +46,12 @@ class Request extends Message implements RequestInterface
         parent::__construct($stream, $headers, $protocolVersion);
 
         $this->method = self::formatMethod($method);
-
         $this->uri = $uri ?? new Uri('/');
 
         // During construction, implementations MUST attempt to set the Host
         // header from a provided URI if no Host header is provided.
-        if (empty($this->getHeader('Host'))) {
-            return $this->withHeader('Host', $this->uri->getHost());
+        if (!$this->hasHeader('Host') && !empty($host = $this->uri->getHost())) {
+            $this->addHeader('Host', $host);
         }
     }
 
@@ -100,7 +99,7 @@ class Request extends Message implements RequestInterface
             $requestTarget = new Uri($requestTarget);
         }
 
-        if ($requestTarget === $this->uri) {
+        if ((string)$requestTarget === (string)$this->uri) {
             return $this;
         }
 
@@ -218,8 +217,12 @@ class Request extends Message implements RequestInterface
         return $request;
     }
 
-    protected static function formatMethod(string $method)
+    /**
+     * @todo
+     */
+    protected static function formatMethod(string $method): string
     {
 
+        return $method;
     }
 }

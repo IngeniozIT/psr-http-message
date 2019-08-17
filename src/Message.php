@@ -67,15 +67,7 @@ class Message implements MessageInterface
 
         // Add headers
         foreach ($headers as $name => $value) {
-            $parsedHeaderName = static::parseHeaderName($name);
-            $parsedHeaderValue = static::parseHeaderValue($value);
-
-            if (isset($this->headerNames[$parsedHeaderName])) {
-                unset($this->headers[$this->headerNames[$parsedHeaderName]]);
-            }
-
-            $this->headerNames[$parsedHeaderName] = $name;
-            $this->headers[$name] = $parsedHeaderValue;
+            $this->addHeader($name, $value);
         }
 
         $this->body = $stream;
@@ -337,6 +329,27 @@ class Message implements MessageInterface
     }
 
     // Internals
+
+    /**
+     * Add a header to the Message.
+     *
+     * @param  string          $name  Case-insensitive header field name to add.
+     * @param  string|string[] $value Header value(s).
+     * @return void
+     * @throws \InvalidArgumentException for invalid header names or values.
+     */
+    protected function addHeader($name, $value): void
+    {
+        $parsedHeaderName = static::parseHeaderName($name);
+        $parsedHeaderValue = static::parseHeaderValue($value);
+
+        if (isset($this->headerNames[$parsedHeaderName])) {
+            unset($this->headers[$this->headerNames[$parsedHeaderName]]);
+        }
+
+        $this->headerNames[$parsedHeaderName] = $name;
+        $this->headers[$name] = $parsedHeaderValue;
+    }
 
     /**
      * Parse and sanitize a header name.
