@@ -4,10 +4,11 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\UriInterface;
 use IngeniozIT\Http\Message\Message;
+
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriInterface;
 use IngeniozIT\Http\Message\Uri;
-use IngeniozIT\Http\Message\Stream;
 
 /**
  * Representation of an outgoing, client-side request.
@@ -30,29 +31,28 @@ use IngeniozIT\Http\Message\Stream;
  */
 class Request extends Message implements RequestInterface
 {
-    protected $method = 'GET';
+    protected $method;
     protected $uri;
 
-    public function __construct(?UriInterface $uri = null, ?StreamInterface $stream = null)
+    public function __construct(
+        StreamInterface $stream,
+        array $headers = [],
+        ?string $protocolVersion = null,
+        string $method = 'GET',
+        ?UriInterface $uri = null
+    )
     {
-        // Create Stream if none given
-        if ($stream === null) {
-            $rs = fopen('php://temp', 'r+');
-            if ($rs === false) {
-                throw new Exception('Could not fopen php://temp.');
-            }
-            $stream = new Stream($rs);
-        }
 
-        parent::__construct($stream);
+        parent::__construct($stream, $headers, $protocolVersion);
 
-        // Create Uri if not given
-        $this->uri = $uri ?? (new URI())->withPath('/');
+        $this->method = self::formatMethod($method);
+
+        $this->uri = $uri ?? new Uri('/');
 
         // During construction, implementations MUST attempt to set the Host
         // header from a provided URI if no Host header is provided.
-        if ($uri !== null) {
-            return $this->withHost($this->uri->getHost());
+        if (empty($this->getHeader('Host'))) {
+            return $this->withHeader('Host', $this->uri->getHost());
         }
     }
 
@@ -74,8 +74,7 @@ class Request extends Message implements RequestInterface
      */
     public function getRequestTarget()
     {
-        $query = $this->uri->getQuery();
-        return $this->uri->getPath().('' !== $query ? '?'.$query : '');
+        return (string)$this->uri;
     }
 
     /**
@@ -217,5 +216,10 @@ class Request extends Message implements RequestInterface
         $request->uri = $uri;
 
         return $request;
+    }
+
+    protected static function formatMethod(string $method)
+    {
+
     }
 }

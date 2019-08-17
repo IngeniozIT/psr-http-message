@@ -30,11 +30,44 @@ class MessageTest extends TestCase
      *
      * @return MessageInterface
      */
-    protected function getMessage()
+    protected function getMessage($headers = [], $protocolVersion = null)
     {
         /** @var StreamInterface $mockStreamInterface */
-        $mockStreamInterface = $this->getMockBuilder(StreamInterface::class)->getMock();
-        return new \IngeniozIT\Http\Message\Message($mockStreamInterface);
+        $mockStreamInterface = $this->createMock(StreamInterface::class);
+        return new \IngeniozIT\Http\Message\Message($mockStreamInterface, $headers, $protocolVersion);
+    }
+
+    /**
+     * Headers can be given in the constructor.
+     */
+    public function testConstructWithHeaders()
+    {
+        $headers = [
+            'string_header' => 'bar',
+            'array_header' => ['foo', 'bar'],
+            'override_header' => 'foo',
+            'Override_Header' => 'baz',
+        ];
+
+        $outputHeaders = [
+            'string_header' => ['bar'],
+            'array_header' => ['foo', 'bar'],
+            'Override_Header' => ['baz'],
+        ];
+
+        $message = $this->getMessage($headers);
+
+        $this->assertSame($outputHeaders, $message->getHeaders());
+    }
+
+    /**
+     * Protocol version can be given in the constructor.
+     */
+    public function testConstructWithProtocolVersion()
+    {
+        $message = $this->getMessage([], '42.0');
+
+        $this->assertSame('42.0', $message->getProtocolVersion());
     }
 
     // ========================================== //

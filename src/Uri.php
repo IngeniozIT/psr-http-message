@@ -29,7 +29,7 @@ use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 class Uri implements UriInterface
 {
     /**
-     * @var array[int]
+     * @var array[int] List of protocols and their default port.
      */
     protected static $ports = [
         "acap" => 674,
@@ -78,42 +78,42 @@ class Uri implements UriInterface
     ];
 
     /**
-     * @var string
+     * @var string Scheme part of the uri.
      */
     protected $scheme = '';
 
     /**
-     * @var string
+     * @var string Host part of the uri.
      */
     protected $host = '';
 
     /**
-     * @var ?int
+     * @var ?int Port part of the uri.
      */
     protected $port = null;
 
     /**
-     * @var string
+     * @var string User part of the uri.
      */
     protected $user = '';
 
     /**
-     * @var ?string
+     * @var ?string Password part of the uri.
      */
     protected $pass = null;
 
     /**
-     * @var string
+     * @var string Path part of the uri.
      */
     protected $path = '';
 
     /**
-     * @var string
+     * @var string Query part of the uri.
      */
     protected $query = '';
 
     /**
-     * @var string
+     * @var string Fragment part of the uri.
      */
     protected $fragment = '';
 
@@ -125,33 +125,35 @@ class Uri implements UriInterface
      */
     public function __construct(string $uri = '')
     {
-        $parsed = parse_url($uri);
+        if ($uri !== '') {
+            $parsed = parse_url($uri);
 
-        if (false === $parsed) {
-            throw new InvalidArgumentException('Uri could not be parsed.');
-        }
+            if (false === $parsed) {
+                throw new InvalidArgumentException('Uri could not be parsed.');
+            }
 
-        if (!empty($parsed['scheme'])) {
-            $this->scheme = $parsed['scheme'];
-        }
-        if (!empty($parsed['host'])) {
-            $this->host = $parsed['host'];
-        }
-        if (!empty($parsed['port'])) {
-            $this->port = $parsed['port'];
-        }
-        if (!empty($parsed['user'])) {
-            $this->user = $parsed['user'];
-            $this->pass = $parsed['pass'] ?? null;
-        }
-        if (!empty($parsed['path'])) {
-            $this->path = $parsed['path'];
-        }
-        if (!empty($parsed['query'])) {
-            $this->query = $parsed['query'];
-        }
-        if (!empty($parsed['fragment'])) {
-            $this->fragment = $parsed['fragment'];
+            if (!empty($parsed['scheme'])) {
+                $this->scheme = $parsed['scheme'];
+            }
+            if (!empty($parsed['host'])) {
+                $this->host = $parsed['host'];
+            }
+            if (!empty($parsed['port'])) {
+                $this->port = $parsed['port'];
+            }
+            if (!empty($parsed['user'])) {
+                $this->user = $parsed['user'];
+                $this->pass = $parsed['pass'] ?? null;
+            }
+            if (!empty($parsed['path'])) {
+                $this->path = $parsed['path'];
+            }
+            if (!empty($parsed['query'])) {
+                $this->query = $parsed['query'];
+            }
+            if (!empty($parsed['fragment'])) {
+                $this->fragment = $parsed['fragment'];
+            }
         }
     }
 

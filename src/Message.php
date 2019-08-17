@@ -4,7 +4,9 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\MessageInterface;
+
 use Psr\Http\Message\StreamInterface;
+
 use IngeniozIT\Http\Message\Exceptions\FileSystemException;
 use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 
@@ -22,12 +24,15 @@ use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
  */
 class Message implements MessageInterface
 {
+    /**
+     * @var string Default HTTP protocol version.
+     */
     const DEFAULT_PROTOCOL_VERSION = '1.1';
 
     /**
      * @var string HTTP protocol version.
      */
-    protected $protocolVersion = self::DEFAULT_PROTOCOL_VERSION;
+    protected $protocolVersion;
 
     /**
      * @var array HTTP headers.
@@ -48,9 +53,31 @@ class Message implements MessageInterface
      * Constructor.
      *
      * @param StreamInterface $stream The StreamInterface to be used as body.
+     * @param array (optional) $headers Headers to set.
+     * @param ?string (optional) $protocolVersion Protocol version.
      */
-    public function __construct(StreamInterface $stream)
+    public function __construct(StreamInterface $stream, array $headers = [], ?string $protocolVersion = null)
     {
+        // Add protocol version
+        if ($protocolVersion !== null) {
+            $this->protocolVersion = self::formatProtocolVersion($protocolVersion);
+        } else {
+            $this->protocolVersion = static::DEFAULT_PROTOCOL_VERSION;
+        }
+
+        // Add headers
+        foreach ($headers as $name => $value) {
+            $parsedHeaderName = static::parseHeaderName($name);
+            $parsedHeaderValue = static::parseHeaderValue($value);
+
+            if (isset($this->headerNames[$parsedHeaderName])) {
+                unset($this->headers[$this->headerNames[$parsedHeaderName]]);
+            }
+
+            $this->headerNames[$parsedHeaderName] = $name;
+            $this->headers[$name] = $parsedHeaderValue;
+        }
+
         $this->body = $stream;
     }
 
@@ -83,17 +110,7 @@ class Message implements MessageInterface
      */
     public function withProtocolVersion($version)
     {
-        // Check if $version can be converted to string.
-        if (!self::isToStringable($version)) {
-            throw new InvalidArgumentException("The version must be a string.");
-        }
-
-        $version = (string)$version;
-
-        // Check if $version has the right format
-        if (preg_match('/^\d+(\.\d+)?$/', $version) !== 1) {
-            throw new InvalidArgumentException("The version string MUST contain only the HTTP version number (e.g., \"1.1\", \"1.0\"), {$version} given.");
-        }
+        $version = self::formatProtocolVersion($version);
 
         if ($this->protocolVersion === $version) {
             return $this;
@@ -374,5 +391,29 @@ class Message implements MessageInterface
             is_scalar($value) ||
             (is_object($value) && method_exists($value, '__toString'))
         );
+    }
+
+    /**
+     * Format a protocol version.
+     *
+     * @param  mixed $version Protocol version.
+     * @return string The formatted protocol version.
+     * @throws InvalidArgumentException If $version is an invalid protocol version.
+     */
+    protected static function formatProtocolVersion($version): string
+    {
+        // Check if $version can be converted to string.
+        if (!self::isToStringable($version)) {
+           throw new InvalidArgumentException("The version must be a string.");
+        }
+
+        $version = (string)$version;
+
+        // Check if $version has the right format
+        if (preg_match('/^\d+(\.\d+)?$/', $version) !== 1) {
+           throw new InvalidArgumentException("The version string MUST contain only the HTTP version number (e.g., \"1.1\", \"1.0\"), {$version} given.");
+        }
+
+        return $version;
     }
 }
