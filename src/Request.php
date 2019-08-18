@@ -9,6 +9,9 @@ use IngeniozIT\Http\Message\Message;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use IngeniozIT\Http\Message\Uri;
+use IngeniozIT\Http\Message\Enums\Http;
+
+use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 
 /**
  * Representation of an outgoing, client-side request.
@@ -139,7 +142,9 @@ class Request extends Message implements RequestInterface
      */
     public function withMethod($method)
     {
-        $method = strtoupper($method);
+        if (!\in_array($method, Http::METHODS)) {
+            throw new InvalidArgumentException("Invalid HTTP method \"$method\".");
+        }
 
         if ($method === $this->method) {
             return $this;

@@ -211,5 +211,79 @@ class RequestTest extends MessageTest
         $this->assertSame($request, $request2, 'Request target is badly immutable.');
     }
 
+    // ========================================== //
+    // Method                                     //
+    // ========================================== //
 
+    /**
+     * Retrieves the HTTP method of the request.
+     *
+     * @dataProvider getValidHttpMethodsProvider
+     */
+    public function testGetMethod($method)
+    {
+        $request = $this->getRequest();
+        $request = $request->withMethod($method);
+        $this->assertSame($method, $request->getMethod());
+    }
+
+    /**
+     * Return an instance with the provided HTTP method.
+     * While HTTP method names are typically all uppercase characters, HTTP
+     * method names are case-sensitive and thus implementations SHOULD NOT
+     * modify the given string.
+     *
+     * @dataProvider getValidHttpMethodsProvider
+     */
+    public function testWithMethodCaseSensitive($method)
+    {
+        $method = strtolower($method);
+        $request = $this->getRequest();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $request->withMethod($method);
+    }
+
+    /**
+     * Provider. Gives valid methods.
+     */
+    public function getValidHttpMethodsProvider(): array
+    {
+        $validMethods = [
+            'GET',
+            'HEAD',
+            'POST',
+            'PUT',
+            'DELETE',
+            'CONNECT',
+            'OPTIONS',
+            'TRACE',
+        ];
+
+        $ret = [];
+        foreach ($validMethods as $validMethod) {
+            $ret[$validMethod] = [$validMethod];
+        }
+        return $ret;
+    }
+
+    /**
+     * Return an instance with the provided HTTP method.
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * changed request method.
+     */
+    public function testWithMethodImmutability()
+    {
+        $request = $this->getRequest('GET');
+        $request2 = $request->withMethod('GET');
+        $request3 = $request->withMethod('POST');
+
+        $this->assertSame('GET', $request->getMethod());
+        $this->assertSame('GET', $request2->getMethod());
+        $this->assertSame('POST', $request3->getMethod());
+
+        $this->assertNotSame($request3, $request, 'Method is not immutable.');
+        $this->assertSame($request, $request2, 'Method is badly immutable.');
+    }
 }
