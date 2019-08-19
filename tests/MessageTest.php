@@ -19,9 +19,7 @@ class MessageTest extends TestCase
     // ========================================== //
 
     /**
-     * Implementation's default HTTP protocol.
-     *
-     * @var string
+     * @var string Implementation's default HTTP protocol.
      */
     protected $defaultProtocolVersion = '1.1';
 

@@ -9,7 +9,7 @@ use IngeniozIT\Http\Message\Message;
 use IngeniozIT\Http\Message\Enums\Http;
 use Psr\Http\Message\StreamInterface;
 
-use IngeniozIT\Http\Exceptions\InvalidArgumentException;
+use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 
 /**
  * Representation of an outgoing, server-side response.
@@ -40,31 +40,26 @@ class Response extends Message implements ResponseInterface
      * @param StreamInterface $stream The StreamInterface to be used as body.
      * @param array (optional) $headers Headers to set.
      * @param ?string (optional) $protocolVersion Protocol version.
-     * @param ?int (optional) $statusCode HTTP status code.
-     * @param ?string (optional) $reasonPhrase HTTP reason phrase.
+     * @param int (optional) $statusCode HTTP status code.
+     * @param string (optional) $reasonPhrase HTTP reason phrase.
      */
     public function __construct(
         StreamInterface $stream,
         array $headers = [],
         ?string $protocolVersion = null,
-        ?int $statusCode = self::DEFAULT_STATUS_CODE,
-        ?string $reasonPhrase = self::DEFAULT_REASON_PHRASE
+        int $statusCode = self::DEFAULT_STATUS_CODE,
+        string $reasonPhrase = self::DEFAULT_REASON_PHRASE
     )
     {
-        // Add protocol version
-        if ($protocolVersion !== null) {
-            $this->protocolVersion = self::formatProtocolVersion($protocolVersion);
-        } else {
-            $this->protocolVersion = static::DEFAULT_PROTOCOL_VERSION;
-        }
+        $statusCode = self::formatStatusCode($statusCode);
 
-        // Add headers
-        foreach ($headers as $name => $value) {
-            $this->addHeader($name, $value);
-        }
+        parent::__construct($stream, $headers, $protocolVersion);
 
-        $this->body = $stream;
+        $this->statusCode = $statusCode;
+        $this->reasonPhrase = $reasonPhrase;
     }
+
+    // Interface
 
     /**
      * Gets the response status code.
@@ -76,7 +71,7 @@ class Response extends Message implements ResponseInterface
      */
     public function getStatusCode()
     {
-        return $this->code;
+        return $this->statusCode;
     }
 
     /**
@@ -101,12 +96,10 @@ class Response extends Message implements ResponseInterface
      */
     public function withStatus($code, $reasonPhrase = '')
     {
-        if (!isset(self::$reasonPhrases[$code])) {
-            throw new InvalidArgumentException('HTTP status code "'.$code.'" does not exist.');
-        }
+        $code = self::formatStatusCode($code);
 
         if ('' === $reasonPhrase) {
-            $reasonPhrase = self::$reasonPhrases[$code];
+            $reasonPhrase = Http::REASON_PHRASES[$code];
         }
 
         if ($this->getStatusCode() === $code && $this->getReasonPhrase() === $reasonPhrase) {
@@ -114,7 +107,7 @@ class Response extends Message implements ResponseInterface
         }
 
         $response = clone $this;
-        $response->code = $code;
+        $response->statusCode = $code;
         $response->reasonPhrase = $reasonPhrase;
         return $response;
     }
@@ -135,5 +128,23 @@ class Response extends Message implements ResponseInterface
     public function getReasonPhrase()
     {
         return $this->reasonPhrase;
+    }
+
+    // Internals
+
+    /**
+     * Validate and format a HTTP status code.
+     *
+     * @param  int $statusCode [description]
+     * @return int Formatted HTTP status code.
+     * @throws InvalidArgumentException If the status code is not valid.
+     */
+    protected static function formatStatusCode(int $statusCode): int
+    {
+        if (!isset(Http::REASON_PHRASES[$statusCode])) {
+            throw new InvalidArgumentException("Invalid status code $statusCode.");
+        }
+
+        return $statusCode;
     }
 }
