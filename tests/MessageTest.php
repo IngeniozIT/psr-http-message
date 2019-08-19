@@ -28,7 +28,7 @@ class MessageTest extends TestCase
     /**
      * Get a new MessageInterface instance.
      *
-     * @param array $headers Http headers.
+     * @param array (optional) $headers Http headers.
      * @param ?string $protocolVersion Http procol version.
      * @return MessageInterface
      */
@@ -36,7 +36,14 @@ class MessageTest extends TestCase
     {
         /** @var StreamInterface $mockStreamInterface */
         $mockStreamInterface = $this->createMock(StreamInterface::class);
-        return new \IngeniozIT\Http\Message\Message($mockStreamInterface, $headers, $protocolVersion);
+
+        if ($protocolVersion !== null) {
+            return new \IngeniozIT\Http\Message\Message($mockStreamInterface, $headers, $protocolVersion);
+        } elseif ($headers !== []) {
+            return new \IngeniozIT\Http\Message\Message($mockStreamInterface, $headers);
+        }
+
+        return new \IngeniozIT\Http\Message\Message($mockStreamInterface);
     }
 
     /**
@@ -81,7 +88,7 @@ class MessageTest extends TestCase
      */
     public function testConstruct()
     {
-        $this->assertInstanceOf(MessageInterface::class, $this->getMessage(), 'Constructor does not give a MessageInterface object.');
+        $this->assertInstanceOf(MessageInterface::class, $this->getMessage(), 'getMessage does not give a MessageInterface object.');
     }
 
     // ========================================== //
@@ -514,6 +521,8 @@ class MessageTest extends TestCase
     public function testWithBody()
     {
         $message = $this->getMessage();
+
+        /** @var StreamInterface $mockStreamInterface */
         $mockStreamInterface = $this->getMockBuilder(StreamInterface::class)->getMock();
 
         $message2 = $message->withbody($mockStreamInterface);

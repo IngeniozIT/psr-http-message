@@ -48,10 +48,10 @@ class Request extends Message implements RequestInterface
      * Constructor.
      *
      * @param StreamInterface $stream Steam of the body of the Request.
-     * @param array $headers HTTP headers.
-     * @param ?string $protocolVersion HTTP protocol version or null for default.
-     * @param string $method Case-sensitive HTTP method.
-     * @param ?UriInterface $uri Uri of the request.
+     * @param array $headers (optional) HTTP headers.
+     * @param ?string $protocolVersion (optional) HTTP protocol version or null for default.
+     * @param string $method (optional) Case-sensitive HTTP method.
+     * @param ?UriInterface $uri (optional) Uri of the request.
      */
     public function __construct(
         StreamInterface $stream,

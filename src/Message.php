@@ -53,8 +53,8 @@ class Message implements MessageInterface
      * Constructor.
      *
      * @param StreamInterface $stream The StreamInterface to be used as body.
-     * @param array (optional) $headers Headers to set.
-     * @param ?string (optional) $protocolVersion Protocol version.
+     * @param array $headers (optional) Headers to set.
+     * @param ?string $protocolVersion (optional) Protocol version.
      */
     public function __construct(StreamInterface $stream, array $headers = [], ?string $protocolVersion = null)
     {

@@ -5,6 +5,10 @@ namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\ResponseInterface;
 use IngeniozIT\Http\Message\Message;
+
+use IngeniozIT\Http\Message\Enums\Http;
+use Psr\Http\Message\StreamInterface;
+
 use IngeniozIT\Http\Exceptions\InvalidArgumentException;
 
 /**
@@ -24,8 +28,43 @@ use IngeniozIT\Http\Exceptions\InvalidArgumentException;
  */
 class Response extends Message implements ResponseInterface
 {
-    protected $code = 200;
-    protected $reasonPhrase = 'OK';
+    const DEFAULT_STATUS_CODE = 200;
+    const DEFAULT_REASON_PHRASE = Http::REASON_PHRASES[self::DEFAULT_STATUS_CODE];
+
+    protected $statusCode;
+    protected $reasonPhrase;
+
+    /**
+     * Constructor.
+     *
+     * @param StreamInterface $stream The StreamInterface to be used as body.
+     * @param array (optional) $headers Headers to set.
+     * @param ?string (optional) $protocolVersion Protocol version.
+     * @param ?int (optional) $statusCode HTTP status code.
+     * @param ?string (optional) $reasonPhrase HTTP reason phrase.
+     */
+    public function __construct(
+        StreamInterface $stream,
+        array $headers = [],
+        ?string $protocolVersion = null,
+        ?int $statusCode = self::DEFAULT_STATUS_CODE,
+        ?string $reasonPhrase = self::DEFAULT_REASON_PHRASE
+    )
+    {
+        // Add protocol version
+        if ($protocolVersion !== null) {
+            $this->protocolVersion = self::formatProtocolVersion($protocolVersion);
+        } else {
+            $this->protocolVersion = static::DEFAULT_PROTOCOL_VERSION;
+        }
+
+        // Add headers
+        foreach ($headers as $name => $value) {
+            $this->addHeader($name, $value);
+        }
+
+        $this->body = $stream;
+    }
 
     /**
      * Gets the response status code.
