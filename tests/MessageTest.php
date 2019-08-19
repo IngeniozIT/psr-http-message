@@ -28,9 +28,11 @@ class MessageTest extends TestCase
     /**
      * Get a new MessageInterface instance.
      *
+     * @param array $headers Http headers.
+     * @param ?string $protocolVersion Http procol version.
      * @return MessageInterface
      */
-    protected function getMessage($headers = [], $protocolVersion = null)
+    protected function getMessage(array $headers = [], ?string $protocolVersion = null)
     {
         /** @var StreamInterface $mockStreamInterface */
         $mockStreamInterface = $this->createMock(StreamInterface::class);

@@ -16,6 +16,11 @@ class UriTest extends TestCase
     // Implementation specific                    //
     // ========================================== //
 
+    /**
+     * Return a generic Uri.
+     *
+     * @return UriInterface
+     */
     protected function getUri()
     {
         return new \IngeniozIT\Http\Message\Uri();
@@ -25,6 +30,9 @@ class UriTest extends TestCase
     // Constructor                                //
     // ========================================== //
 
+    /**
+     * Does getUri() return a UriInterface ?
+     */
     public function testConstruct()
     {
         $this->assertInstanceOf(UriInterface::class, $this->getUri());

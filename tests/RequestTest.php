@@ -31,11 +31,15 @@ class RequestTest extends MessageTest
         return new \IngeniozIT\Http\Message\Request($mockStreamInterface, $headers, $protocolVersion, $method, $uri);
     }
 
-    protected function getRequest($method = 'GET', $uri = null)
+    protected function getRequest($method = 'GET', $uri = null, $host = null)
     {
         if ($uri !== null) {
             $mockUriInterface = $this->createMock(UriInterface::class);
             $mockUriInterface->method('__toString')->willReturn($uri);
+
+            if ($host !== null) {
+                $mockUriInterface->method('getHost')->willReturn($host);
+            }
 
             $uri = $mockUriInterface;
         }

@@ -23,6 +23,9 @@ class StreamTest extends TestCase
     /** @var bool False to make a stream unseekable. */
     public static $seekable = true;
 
+    /**
+     * Before each test, reset functions overrides.
+     */
     protected function setUp(): void
     {
         self::$fstat = false;
@@ -36,14 +39,25 @@ class StreamTest extends TestCase
     // Implementation specific                    //
     // ========================================== //
 
-    protected function getStreamWithHandle($handle)
-    {
-        return new \IngeniozIT\Http\Message\Stream($handle);
-    }
-
+    /**
+     * Get a generic StreamInterface object.
+     *
+     * @return StreamInterface
+     */
     protected function getStream()
     {
         return $this->getStreamWithHandle(fopen('php://temp', 'r+'));
+    }
+
+    /**
+     * Get a generic StreamInterface object with a specific stream.
+     *
+     * @param resource $handle {@see \fopen}.
+     * @return StreamInterface
+     */
+    protected function getStreamWithHandle($handle)
+    {
+        return new \IngeniozIT\Http\Message\Stream($handle);
     }
 
     /**
