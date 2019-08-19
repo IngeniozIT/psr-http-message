@@ -45,7 +45,6 @@ class Request extends Message implements RequestInterface
         ?UriInterface $uri = null
     )
     {
-
         parent::__construct($stream, $headers, $protocolVersion);
 
         $this->method = self::formatMethod($method);
@@ -142,9 +141,7 @@ class Request extends Message implements RequestInterface
      */
     public function withMethod($method)
     {
-        if (!\in_array($method, Http::METHODS)) {
-            throw new InvalidArgumentException("Invalid HTTP method \"$method\".");
-        }
+        $method = self::formatMethod($method);
 
         if ($method === $this->method) {
             return $this;
@@ -223,10 +220,17 @@ class Request extends Message implements RequestInterface
     }
 
     /**
-     * @todo
+     * Validate and format a HTTP method.
+     *
+     * @param  string $method HTTP method.
+     * @return string Formatted HTTP method.
+     * @throws InvalidArgumentException If the method is not valid.
      */
     protected static function formatMethod(string $method): string
     {
+        if (!\in_array($method, Http::METHODS)) {
+            throw new InvalidArgumentException("Invalid HTTP method \"$method\".");
+        }
 
         return $method;
     }
