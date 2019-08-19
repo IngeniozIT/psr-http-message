@@ -326,6 +326,7 @@ class RequestTest extends MessageTest
         $request = $request->withUri($mockUriInterface);
 
         $this->assertSame('hostname', $request->getUri()->getHost());
+        $this->assertSame('hostname', $request->getHeaderLine('Host'));
 
         $mockUriInterface3 = $this->createMock(UriInterface::class);
         $mockUriInterface3->method('__toString')->willReturn('hostname/bar');
@@ -339,7 +340,97 @@ class RequestTest extends MessageTest
         $request2 = $request->withUri($mockUriInterface2);
 
         $this->assertSame('hostname', $request2->getUri()->getHost());
+        $this->assertSame('hostname', $request2->getHeaderLine('Host'));
         $this->assertSame('hostname/bar', $request2->getRequestTarget());
+    }
+
+    /**
+     * Returns an instance with the provided URI.
+     * When `$preserveHost` is set to
+     * `true`, this method interacts with the Host header in the following ways:
+     * - If the Host header is missing or empty, and the new URI contains
+     *   a host component, this method MUST update the Host header in the returned
+     *   request.
+     */
+    public function testWithUriPreserveHostCase1()
+    {
+        // Setup
+        $request = $this->getRequest();
+
+        $mockUriInterface = $this->createMock(UriInterface::class);
+        $mockUriInterface->method('__toString')->willReturn('/foo');
+        $mockUriInterface->method('getHost')->willReturn('');
+
+        $request = $request->withUri($mockUriInterface);
+
+        $this->assertSame('', $request->getUri()->getHost());
+        $this->assertSame('', $request->getHeaderLine('Host'));
+
+        $mockUriInterface2 = $this->createMock(UriInterface::class);
+        $mockUriInterface2->method('__toString')->willReturn('hostname/foo');
+        $mockUriInterface2->method('getHost')->willReturn('hostname');
+
+        // Test
+        $request2 = $request->withUri($mockUriInterface2, true);
+
+        $this->assertSame('hostname', $request2->getUri()->getHost());
+        $this->assertSame('hostname', $request2->getHeaderLine('Host'));
+        $this->assertSame('hostname/foo', $request2->getRequestTarget());
+    }
+
+    /**
+     * Returns an instance with the provided URI.
+     * When `$preserveHost` is set to
+     * `true`, this method interacts with the Host header in the following ways:
+     * - If the Host header is missing or empty, and the new URI does not contain a
+     *   host component, this method MUST NOT update the Host header in the returned
+     *   request.
+     */
+    public function testWithUriPreserveHostCase2()
+    {
+        // Setup
+        $request = $this->getRequest();
+
+        $mockUriInterface = $this->createMock(UriInterface::class);
+        $mockUriInterface->method('__toString')->willReturn('/foo');
+        $mockUriInterface->method('getHost')->willReturn('');
+
+        $request = $request->withUri($mockUriInterface);
+
+        $mockUriInterface2 = $this->createMock(UriInterface::class);
+        $mockUriInterface2->method('__toString')->willReturn('/foo');
+        $mockUriInterface2->method('getHost')->willReturn('');
+
+        // Test
+        $request2 = $request
+            ->withHeader('Host', 'hostname')
+            ->withUri($mockUriInterface2, true);
+
+        $this->assertSame('', $request2->getUri()->getHost());
+        $this->assertSame('hostname', $request2->getHeaderLine('Host'));
+        $this->assertSame('/foo', $request2->getRequestTarget());
+    }
+
+    /**
+     * Returns an instance with the provided URI.
+     * When `$preserveHost` is set to
+     * `true`, this method interacts with the Host header in the following ways:
+     * - If a Host header is present and non-empty, this method MUST NOT update
+     *   the Host header in the returned request.
+     */
+    public function testWithUriPreserveHostCase3()
+    {
+        // Setup
+        $request = $this->getRequest()->withHeader('Host', 'hostname');
+
+        $mockUriInterface2 = $this->createMock(UriInterface::class);
+        $mockUriInterface2->method('__toString')->willReturn('badhostname/foo');
+        $mockUriInterface2->method('getHost')->willReturn('badhostname');
+
+        // Test
+        $request2 = $request->withUri($mockUriInterface2, true);
+
+        $this->assertSame('hostname', $request2->getHeaderLine('Host'));
     }
 
 

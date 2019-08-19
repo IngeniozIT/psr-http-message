@@ -220,12 +220,13 @@ class Request extends Message implements RequestInterface
             return $this;
         }
 
-        $currentHost = $this->uri->getHost();
+        $currentHost = $this->getHeaderLine('Host');
         $nextHost = $uri->getHost();
 
         $request = null;
         if (
             $nextHost !== '' &&
+            $nextHost !== $currentHost &&
             (
                 !$preserveHost ||
                 $currentHost === ''
@@ -236,7 +237,9 @@ class Request extends Message implements RequestInterface
         } else {
             // Host remains
             $request = clone $this;
-            $uri = $uri->withHost($currentHost);
+            if ($currentHost !== $nextHost) {
+                $uri = $uri->withHost($currentHost);
+            }
         }
 
         $request->uri = $uri;
