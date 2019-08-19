@@ -79,7 +79,7 @@ class RequestTest extends MessageTest
     public function testConstructSetHostHeaderWithUri()
     {
         $mockUriInterface = $this->createMock(UriInterface::class);
-        $mockUriInterface->method('__toString')->willReturn('hostname');
+        $mockUriInterface->method('__toString')->willReturn('hostname/foo');
         $mockUriInterface->method('getHost')->willReturn('hostname');
 
         $request = $this->getMessage([], null, 'GET', $mockUriInterface);
@@ -95,7 +95,7 @@ class RequestTest extends MessageTest
     public function testConstructSetHostHeaderWithUriWithNoHost()
     {
         $mockUriInterface = $this->createMock(UriInterface::class);
-        $mockUriInterface->method('__toString')->willReturn('');
+        $mockUriInterface->method('__toString')->willReturn('/');
         $mockUriInterface->method('getHost')->willReturn('');
 
         $request = $this->getMessage([], null, 'GET', $mockUriInterface);
@@ -290,4 +290,57 @@ class RequestTest extends MessageTest
         $this->assertNotSame($request3, $request, 'Method is not immutable.');
         $this->assertSame($request, $request2, 'Method is badly immutable.');
     }
+
+    // ========================================== //
+    // Uri                                        //
+    // ========================================== //
+
+    /**
+     * Retrieves the URI instance.
+     * This method MUST return a UriInterface instance.
+     */
+    public function testGetUriGivesUriInterface()
+    {
+        $request = $this->getRequest();
+
+        $this->assertInstanceOf(UriInterface::class, $request->getUri());
+    }
+
+    /**
+     * Returns an instance with the provided URI.
+     * This method MUST update the Host header of the returned request by
+     * default if the URI contains a host component.
+     *
+     * If the URI does not
+     * contain a host component, any pre-existing Host header MUST be carried
+     * over to the returned request.
+     */
+    public function testWithUriDefault()
+    {
+        $request = $this->getRequest();
+
+        $mockUriInterface = $this->createMock(UriInterface::class);
+        $mockUriInterface->method('__toString')->willReturn('hostname/foo');
+        $mockUriInterface->method('getHost')->willReturn('hostname');
+
+        $request = $request->withUri($mockUriInterface);
+
+        $this->assertSame('hostname', $request->getUri()->getHost());
+
+        $mockUriInterface3 = $this->createMock(UriInterface::class);
+        $mockUriInterface3->method('__toString')->willReturn('hostname/bar');
+        $mockUriInterface3->method('getHost')->willReturn('hostname');
+
+        $mockUriInterface2 = $this->createMock(UriInterface::class);
+        $mockUriInterface2->method('__toString')->willReturn('/bar');
+        $mockUriInterface2->method('getHost')->willReturn('');
+        $mockUriInterface2->method('withHost')->willReturn($mockUriInterface3);
+
+        $request2 = $request->withUri($mockUriInterface2);
+
+        $this->assertSame('hostname', $request2->getUri()->getHost());
+        $this->assertSame('hostname/bar', $request2->getRequestTarget());
+    }
+
+
 }

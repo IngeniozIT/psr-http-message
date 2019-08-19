@@ -34,9 +34,25 @@ use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
  */
 class Request extends Message implements RequestInterface
 {
+    /**
+     * @var string HTTP method.
+     */
     protected $method;
+
+    /**
+     * @var UriInterface Uri.
+     */
     protected $uri;
 
+    /**
+     * Constructor.
+     *
+     * @param StreamInterface $stream Steam of the body of the Request.
+     * @param array $headers HTTP headers.
+     * @param ?string $protocolVersion HTTP protocol version or null for default.
+     * @param string $method Case-sensitive HTTP method.
+     * @param ?UriInterface $uri Uri of the request.
+     */
     public function __construct(
         StreamInterface $stream,
         array $headers = [],
@@ -56,6 +72,8 @@ class Request extends Message implements RequestInterface
             $this->addHeader('Host', $host);
         }
     }
+
+    // Interface
 
     /**
      * Retrieves the message's request target.
@@ -202,22 +220,31 @@ class Request extends Message implements RequestInterface
             return $this;
         }
 
-        $currentHost = $this->getHeaderLine('Host');
-        $host = $uri->getHost();
+        $currentHost = $this->uri->getHost();
+        $nextHost = $uri->getHost();
 
         $request = null;
-        if (false === $preserveHost
-            || ('' !== $host && '' === $currentHost)
+        if (
+            $nextHost !== '' &&
+            (
+                !$preserveHost ||
+                $currentHost === ''
+            )
         ) {
-            $request = $this->withHeader('Host', $host);
+            // Host must be changed
+            $request = $this->withHeader('Host', $nextHost);
         } else {
+            // Host remains
             $request = clone $this;
+            $uri = $uri->withHost($currentHost);
         }
 
         $request->uri = $uri;
 
         return $request;
     }
+
+    // Internals
 
     /**
      * Validate and format a HTTP method.
