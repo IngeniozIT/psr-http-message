@@ -14,20 +14,36 @@ use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
  */
 class UploadedFileTest extends TestCase
 {
+    /** @var bool True to make fopen fail. */
+    public static $fopen = false;
 
-/**
- * Open a temporary file and return its resource.
- *
- * @param string $mode Mode to use while opening the file.
- * @return string
- */
-protected function getFilePath()
-{
-    $tmpFd = tmpfile();
-    $path = stream_get_meta_data($tmpFd)['uri'];
+    /**
+     * Before each test, reset functions overrides.
+     */
+    protected function setUp(): void
+    {
+        self::$fopen = false;
+    }
 
-    return $path;
-}
+    /**
+     * Open a temporary file and return its path.
+     *
+     * @return string
+     */
+    protected function getFilePath($withContent = false)
+    {
+        $tmpFd = tmpfile();
+        $path = stream_get_meta_data($tmpFd)['uri'];
+        fclose($tmpFd);
+
+        if ($withContent) {
+            file_put_contents($path, '');
+        } elseif (file_exists($path)) {
+            unlink($path);
+        }
+
+        return $path;
+    }
 
     // ========================================== //
     // Implementation specific                    //
@@ -41,30 +57,29 @@ protected function getFilePath()
      * @param  ?string $clientMediaType [description]
      * @return UploadedFileInterface
      */
-    protected function getUploadedFile(?StreamInterface $stream = null, ?int $size = null, ?int $error = null, ?string $clientFilename = null, ?string $clientMediaType = null)
+    protected function getUploadedFile(?string $path = null, ?int $size = null, ?int $error = null, ?string $clientFilename = null, ?string $clientMediaType = null)
     {
-        if ($stream === null) {
-            /** @var StreamInterface $mockStreamInterface */
-            $stream = $this->createMock(StreamInterface::class);
+        if ($path === null) {
+            $path = $this->getFilePath(true);
         }
 
         if ($clientMediaType !== null) {
-            return new \IngeniozIT\Http\Message\UploadedFile($stream, $size, $error, $clientFilename, $clientMediaType);
+            return new \IngeniozIT\Http\Message\UploadedFile($path, $size, $error, $clientFilename, $clientMediaType);
         }
 
         if ($clientFilename !== null) {
-            return new \IngeniozIT\Http\Message\UploadedFile($stream, $size, $error, $clientFilename);
+            return new \IngeniozIT\Http\Message\UploadedFile($path, $size, $error, $clientFilename);
         }
 
         if ($error !== null) {
-            return new \IngeniozIT\Http\Message\UploadedFile($stream, $size, $error);
+            return new \IngeniozIT\Http\Message\UploadedFile($path, $size, $error);
         }
 
         if ($size !== null) {
-            return new \IngeniozIT\Http\Message\UploadedFile($stream, $size);
+            return new \IngeniozIT\Http\Message\UploadedFile($path, $size);
         }
 
-        return new \IngeniozIT\Http\Message\UploadedFile($stream);
+        return new \IngeniozIT\Http\Message\UploadedFile($path);
     }
 
     // ========================================== //
@@ -79,6 +94,30 @@ protected function getFilePath()
         $this->assertInstanceOf(UploadedFileInterface::class, $this->getUploadedFile(), 'getUploadedFile does not give an UploadedFileInterface object.');
     }
 
+    /**
+     * Passing an invalid file path should throw an exception.
+     */
+    public function testConstructWithInvalidPath()
+    {
+        // Contains a path to a file that does not exist.
+        $nonExistantPath = $this->getFilePath(false);
+
+        $this->expectException(\RuntimeException::class);
+        $this->getUploadedFile($nonExistantPath);
+    }
+
+    /**
+     * A filesystem error should trigger an exception.
+     */
+    public function testConstructWithFilesystemError()
+    {
+        // Trigger a fopen failure
+        self::$fopen = true;
+
+        $this->expectException(\RuntimeException::class);
+        $this->getUploadedFile();
+    }
+
     // ========================================== //
     // Stream                                     //
     // ========================================== //
@@ -88,12 +127,9 @@ protected function getFilePath()
      */
     public function testGetStream()
     {
-        /** @var StreamInterface $mockStreamInterface */
-        $stream = $this->createMock(StreamInterface::class);
+        $uploadedFile = $this->getUploadedFile();
 
-        $uploadedFile = $this->getUploadedFile($stream);
-
-        $this->assertSame($stream, $uploadedFile->getStream());
+        $this->assertInstanceOf(\Psr\Http\Message\StreamInterface::class, $uploadedFile->getStream());
     }
 
     /**
@@ -108,6 +144,61 @@ protected function getFilePath()
 
         $this->expectException(\RunTimeException::class);
         $uploadedFile->getStream();
+    }
+
+    // ========================================== //
+    // Move To                                    //
+    // ========================================== //
+
+    /**
+     * Move the uploaded file to a new location.
+     */
+    public function testMoveTo()
+    {
+        $path = $this->getFilePath(true);
+        file_put_contents($path, 'foo bar baz !');
+
+        $uploadedFile = $this->getUploadedFile($path);
+
+        $targetPath = $this->getFilePath();
+        $uploadedFile->moveTo($targetPath);
+
+        $this->assertFileExists($targetPath);
+        $this->assertSame(file_get_contents($targetPath), 'foo bar baz !');
+    }
+
+    /**
+     * Move the uploaded file to a new location.
+     * If this method is called more than once, any subsequent calls MUST raise
+     * an exception.
+     */
+    public function testMoveToMoved()
+    {
+        $path = $this->getFilePath(true);
+
+        $uploadedFile = $this->getUploadedFile($path);
+
+        $targetPath = $this->getFilePath();
+        // Call moveTo a first time
+        $uploadedFile->moveTo($targetPath);
+
+        $this->expectException(\RunTimeException::class);
+        // Call moveTo a second time
+        $uploadedFile->moveTo($targetPath);
+    }
+
+    /**
+     * Move the uploaded file to a new location.
+     * If this method is called more than once, any subsequent calls MUST raise
+     * an exception.
+     */
+    public function testMoveToInvalidTargetPath()
+    {
+        $uploadedFile = $this->getUploadedFile();
+        $path = $this->getFilePath();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $uploadedFile->moveTo($path);
     }
 
     // ========================================== //
@@ -262,4 +353,15 @@ protected function getFilePath()
 
         $this->assertNull($uploadedFile->getClientMediaType());
     }
+}
+
+// ========================================== //
+// Filesystem overrides                       //
+// ========================================== //
+
+namespace IngeniozIT\Http\Message;
+
+function fopen(string $filename, string $mode)
+{
+    return \IngeniozIT\Http\Message\Tests\UploadedFileTest::$fopen ? false : \fopen($filename, $mode);
 }

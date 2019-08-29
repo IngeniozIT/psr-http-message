@@ -21,6 +21,7 @@ use IngeniozIT\Http\Message\Exceptions\RuntimeException;
  */
 class UploadedFile implements UploadedFileInterface
 {
+    protected $filePath;
     protected $stream;
     protected $size;
     protected $error;
@@ -28,7 +29,7 @@ class UploadedFile implements UploadedFileInterface
     protected $clientMediaType;
 
     public function __construct(
-        StreamInterface $stream,
+        string $filePath,
         ?int $size = null,
         int $error = \UPLOAD_ERR_OK,
         string $clientFilename = null,
@@ -36,7 +37,17 @@ class UploadedFile implements UploadedFileInterface
     ) {
         $this->validateError($error);
         $this->error = $error;
-        $this->stream = $stream;
+        $this->filePath = $filePath;
+
+        if (!file_exists($filePath) || is_dir($filePath)) {
+            throw new RunTimeException("$filePath does not exist.");
+        }
+
+        $fd = fopen($filePath, 'r');
+        if ($fd === false) {
+            throw new RunTimeException("Could not open file $filePath.");
+        }
+        $this->stream = new Stream($fd);
         $this->size = $size;
         $this->clientFilename = $clientFilename;
         $this->clientMediaType = $clientMediaType;
@@ -101,12 +112,22 @@ class UploadedFile implements UploadedFileInterface
      */
     public function moveTo($targetPath)
     {
+        // Already moved this object ?
         if (!($this->stream instanceof StreamInterface)) {
             throw new RuntimeException('Stream has been moved.');
         }
 
-        // $stream = (new StreamFactory())->createStreamFromFile($targetPath, 'w');
-        // $stream->write((string)$this->stream);
+        self::validateTargetPath($targetPath);
+
+        if (!(
+            php_sapi_name() == 'cli' ?
+                rename($this->filePath, $targetPath) :
+                is_uploaded_file($this->filePath) && move_uploaded_file($this->filePath, $targetPath)
+        )) {
+            throw new RuntimeException("Could not copy $this->filePath to $targetPath");
+        }
+
+        $this->stream->close();
         $this->stream = null;
     }
 
@@ -184,10 +205,29 @@ class UploadedFile implements UploadedFileInterface
      *
      * @throws InvalidArgumentException When $error is not valid.
      */
-    protected static function validateError(int $error)
+    protected static function validateError(int $error): void
     {
         if (!isset(File::ERROR_STATUS[$error])) {
             throw new InvalidArgumentException('Error status must be one of PHP\'s UPLOAD_ERR_XXX constants.');
+        }
+    }
+
+    /**
+     * Check if a file can be created at a target path.
+     *
+     * @param string $targetPath
+     */
+    protected static function validateTargetPath(string $targetPath): void
+    {
+        // Is $targetPath valid ?
+        $fullTargetPath = realpath(dirname($targetPath));
+        if ($fullTargetPath === false) {
+            throw new InvalidArgumentException("Target path $targetPath is invalid.");
+        }
+
+        // Is $targetPath free ?
+        if (file_exists($targetPath)) {
+            throw new InvalidArgumentException("Target path $targetPath already exists.");
         }
     }
 }
