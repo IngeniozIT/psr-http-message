@@ -4,10 +4,12 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\UploadedFileInterface;
-use IngeniozIT\Http\Message\StreamFactory;
+
 use Psr\Http\Message\StreamInterface;
-use IngeniozIT\Http\Exceptions\InvalidArgumentException;
-use IngeniozIT\Http\Exceptions\RuntimeException;
+use IngeniozIT\Http\Message\Enums\File;
+
+use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
+use IngeniozIT\Http\Message\Exceptions\RuntimeException;
 
 /**
  * Value object representing a file uploaded through an HTTP request.
@@ -27,18 +29,15 @@ class UploadedFile implements UploadedFileInterface
 
     public function __construct(
         StreamInterface $stream,
-        int $size = null,
+        ?int $size = null,
         int $error = \UPLOAD_ERR_OK,
         string $clientFilename = null,
         string $clientMediaType = null
     ) {
-        if (!$stream->isReadable()) {
-            throw new InvalidArgumentException('Stream is not readable.');
-        }
-
-        $this->stream = $stream;
-        $this->size = $size ?? $stream->getSize();
+        $this->validateError($error);
         $this->error = $error;
+        $this->stream = $stream;
+        $this->size = $size;
         $this->clientFilename = $clientFilename;
         $this->clientMediaType = $clientMediaType;
     }
@@ -106,8 +105,8 @@ class UploadedFile implements UploadedFileInterface
             throw new RuntimeException('Stream has been moved.');
         }
 
-        $stream = (new StreamFactory())->createStreamFromFile($targetPath, 'w');
-        $stream->write((string)$this->stream);
+        // $stream = (new StreamFactory())->createStreamFromFile($targetPath, 'w');
+        // $stream->write((string)$this->stream);
         $this->stream = null;
     }
 
@@ -178,5 +177,17 @@ class UploadedFile implements UploadedFileInterface
     public function getClientMediaType()
     {
         return $this->clientMediaType;
+    }
+
+    /**
+     * Validate the error associated with the uploaded file.
+     *
+     * @throws InvalidArgumentException When $error is not valid.
+     */
+    protected static function validateError(int $error)
+    {
+        if (!isset(File::ERROR_STATUS[$error])) {
+            throw new InvalidArgumentException('Error status must be one of PHP\'s UPLOAD_ERR_XXX constants.');
+        }
     }
 }

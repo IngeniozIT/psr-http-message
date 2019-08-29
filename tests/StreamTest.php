@@ -66,7 +66,7 @@ class StreamTest extends TestCase
      * @param string $mode Mode to use while opening the file.
      * @return string
      */
-    protected function getFileDescriptor(string $mode)
+    protected function getFileDescriptor(string $mode = 'r+')
     {
         $tmpFd = tmpfile();
         $path = stream_get_meta_data($tmpFd)['uri'];

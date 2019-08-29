@@ -5,6 +5,7 @@ namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\ServerRequestInterface;
 use IngeniozIT\Http\Message\Request;
+
 use IngeniozIT\Http\Exceptions\InvalidArgumentException;
 
 /**
