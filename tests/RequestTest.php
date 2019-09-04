@@ -26,9 +26,10 @@ class RequestTest extends MessageTest
      * @param ?string $protocolVersion (optional) HTTP procol version.
      * @param ?string $method (optional) HTTP method.
      * @param ?UriInterface $uri (optional) Uri.
-     * @return MessageInterface
+     * @return RequestInterface
      */
-    protected function getMessage($headers = [], $protocolVersion = null, $method = null, $uri = null)
+    protected function getMessage(array $headers = [], ?string $protocolVersion = null, ?string $method = null, $uri =
+    null)
     {
         /** @var StreamInterface $mockStreamInterface */
         $mockStreamInterface = $this->createMock(StreamInterface::class);

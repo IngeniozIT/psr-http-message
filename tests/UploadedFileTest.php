@@ -195,7 +195,7 @@ class UploadedFileTest extends TestCase
     public function testMoveToInvalidTargetPath()
     {
         $uploadedFile = $this->getUploadedFile();
-        $path = $this->getFilePath();
+        $path = $this->getFilePath(true);
 
         $this->expectException(\InvalidArgumentException::class);
         $uploadedFile->moveTo($path);
