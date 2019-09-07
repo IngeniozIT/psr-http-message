@@ -30,13 +30,15 @@ class ResponseTest extends MessageTest
     /**
      * Get a new MessageInterface instance.
      *
-     * @param array $headers Http headers.
-     * @param ?string $protocolVersion Http procol version.
+     * @param  array   $headers         Http headers.
+     * @param  ?string $protocolVersion Http procol version.
      * @return MessageInterface
      */
     protected function getMessage(array $headers = [], ?string $protocolVersion = null, int $statusCode = null, string $reasonPhrase = null)
     {
-        /** @var StreamInterface $mockStreamInterface */
+        /**
+ * @var StreamInterface $mockStreamInterface 
+*/
         $mockStreamInterface = $this->createMock(StreamInterface::class);
 
         if ($reasonPhrase !== null) {
@@ -54,7 +56,9 @@ class ResponseTest extends MessageTest
 
     protected function getResponse(int $statusCode = null, string $reasonPhrase = null)
     {
-        /** @var StreamInterface $mockStreamInterface */
+        /**
+ * @var StreamInterface $mockStreamInterface 
+*/
         $mockStreamInterface = $this->createMock(StreamInterface::class);
 
         if ($reasonPhrase !== null) {

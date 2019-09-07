@@ -119,11 +119,8 @@ class UploadedFile implements UploadedFileInterface
 
         self::validateTargetPath($targetPath);
 
-        if (!(
-            php_sapi_name() == 'cli' ?
-                rename($this->filePath, $targetPath) :
-                is_uploaded_file($this->filePath) && move_uploaded_file($this->filePath, $targetPath)
-        )) {
+        if (!(php_sapi_name() == 'cli' ?            rename($this->filePath, $targetPath) :            is_uploaded_file($this->filePath) && move_uploaded_file($this->filePath, $targetPath)            )
+        ) {
             throw new RuntimeException("Could not copy $this->filePath to $targetPath");
         }
 

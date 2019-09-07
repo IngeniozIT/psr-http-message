@@ -26,13 +26,15 @@ class MessageTest extends TestCase
     /**
      * Get a new MessageInterface instance.
      *
-     * @param array (optional) $headers Http headers.
-     * @param ?string $protocolVersion Http procol version.
+     * @param  array (optional) $headers         Http headers.
+     * @param  ?string          $protocolVersion Http procol version.
      * @return MessageInterface
      */
     protected function getMessage(array $headers = [], ?string $protocolVersion = null)
     {
-        /** @var StreamInterface $mockStreamInterface */
+        /**
+ * @var StreamInterface $mockStreamInterface 
+*/
         $mockStreamInterface = $this->createMock(StreamInterface::class);
 
         if ($protocolVersion !== null) {
@@ -520,7 +522,9 @@ class MessageTest extends TestCase
     {
         $message = $this->getMessage();
 
-        /** @var StreamInterface $mockStreamInterface */
+        /**
+ * @var StreamInterface $mockStreamInterface 
+*/
         $mockStreamInterface = $this->getMockBuilder(StreamInterface::class)->getMock();
 
         $message2 = $message->withbody($mockStreamInterface);

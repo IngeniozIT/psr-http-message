@@ -12,15 +12,25 @@ use Psr\Http\Message\StreamInterface;
  */
 class StreamTest extends TestCase
 {
-    /** @var bool True to make fstat fail. */
+    /**
+     * @var bool True to make fstat fail. 
+     */
     public static $fstat = false;
-    /** @var bool True to make ftell fail. */
+    /**
+     * @var bool True to make ftell fail. 
+     */
     public static $ftell = false;
-    /** @var bool True to make fread fail. */
+    /**
+     * @var bool True to make fread fail. 
+     */
     public static $fread = false;
-    /** @var bool True to make fwrite fail. */
+    /**
+     * @var bool True to make fwrite fail. 
+     */
     public static $fwrite = false;
-    /** @var bool False to make a stream unseekable. */
+    /**
+     * @var bool False to make a stream unseekable. 
+     */
     public static $seekable = true;
 
     /**
@@ -52,7 +62,7 @@ class StreamTest extends TestCase
     /**
      * Get a generic StreamInterface object with a specific stream.
      *
-     * @param resource $handle {@see \fopen}.
+     * @param  resource $handle {@see \fopen}.
      * @return StreamInterface
      */
     protected function getStreamWithHandle($handle)
@@ -63,7 +73,7 @@ class StreamTest extends TestCase
     /**
      * Open a temporary file and return its resource.
      *
-     * @param string $mode Mode to use while opening the file.
+     * @param  string $mode Mode to use while opening the file.
      * @return string
      */
     protected function getFileDescriptor(string $mode = 'r+')
@@ -359,8 +369,8 @@ class StreamTest extends TestCase
      * Write data to the stream. @throws \RuntimeException on failure.
      *
      * @dataProvider getWritableProvider
-     * @param string $mode
-     * @param bool   $shouldBeWritable
+     * @param        string $mode
+     * @param        bool   $shouldBeWritable
      */
     public function testIsWritable(string $mode, bool $shouldBeWritable)
     {
@@ -445,8 +455,8 @@ class StreamTest extends TestCase
      * Read data from the stream. @throws \RuntimeException on failure.
      *
      * @dataProvider getReadableProvider
-     * @param string $mode
-     * @param bool   $shouldBeReadable
+     * @param        string $mode
+     * @param        bool   $shouldBeReadable
      */
     public function testIsReadable(string $mode, bool $shouldBeReadable)
     {

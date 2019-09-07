@@ -14,8 +14,18 @@ use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
  */
 class UploadedFileTest extends TestCase
 {
-    /** @var bool True to make fopen fail. */
+    /**
+     * @var bool True to make fopen fail. 
+     */
     public static $fopen = false;
+    /**
+     * @var bool True to make rename and move_uploaded_file fail. 
+     */
+    public static $move = false;
+    /**
+     * @var bool True to make realpath fail. 
+     */
+    public static $realpath = false;
 
     /**
      * Before each test, reset functions overrides.
@@ -23,6 +33,8 @@ class UploadedFileTest extends TestCase
     protected function setUp(): void
     {
         self::$fopen = false;
+        self::$move = false;
+        self::$realpath = false;
     }
 
     /**
@@ -51,9 +63,10 @@ class UploadedFileTest extends TestCase
 
     /**
      * Get an UploadedFile instance.
-     * @param  ?int $size [description]
-     * @param  ?int $error [description]
-     * @param  ?string $clientFilename [description]
+     *
+     * @param  ?int    $size            [description]
+     * @param  ?int    $error           [description]
+     * @param  ?string $clientFilename  [description]
      * @param  ?string $clientMediaType [description]
      * @return UploadedFileInterface
      */
@@ -169,8 +182,7 @@ class UploadedFileTest extends TestCase
 
     /**
      * Move the uploaded file to a new location.
-     * If this method is called more than once, any subsequent calls MUST raise
-     * an exception.
+     * throws \RuntimeException on the second or subsequent call to the method.
      */
     public function testMoveToMoved()
     {
@@ -189,15 +201,43 @@ class UploadedFileTest extends TestCase
 
     /**
      * Move the uploaded file to a new location.
-     * If this method is called more than once, any subsequent calls MUST raise
-     * an exception.
+     * throws \InvalidArgumentException if the $targetPath specified is invalid.
      */
     public function testMoveToInvalidTargetPath()
+    {
+        $uploadedFile = $this->getUploadedFile();
+
+        $path = 'this will fail';
+        self::$realpath = true;
+
+        $this->expectException(\InvalidArgumentException::class);
+        $uploadedFile->moveTo($path);
+    }
+
+    /**
+     * Move the uploaded file to a new location.
+     * throws \InvalidArgumentException if the $targetPath specified already exists.
+     */
+    public function testMoveToExistingTargetPath()
     {
         $uploadedFile = $this->getUploadedFile();
         $path = $this->getFilePath(true);
 
         $this->expectException(\InvalidArgumentException::class);
+        $uploadedFile->moveTo($path);
+    }
+
+    /**
+     * Move the uploaded file to a new location.
+     * throws \RuntimeException on any error during the move operation
+     */
+    public function testMoveToFsError()
+    {
+        $uploadedFile = $this->getUploadedFile();
+        $path = $this->getFilePath();
+
+        self::$move = true;
+        $this->expectException(\RuntimeException::class);
         $uploadedFile->moveTo($path);
     }
 
@@ -305,7 +345,9 @@ class UploadedFileTest extends TestCase
      */
     public function testGetClientFileName()
     {
-        /** @var StreamInterface $mockStreamInterface */
+        /**
+ * @var StreamInterface $mockStreamInterface 
+*/
         $stream = $this->createMock(StreamInterface::class);
 
         $uploadedFile = $this->getUploadedFile(null, null, 0, 'fileName.test');
@@ -334,7 +376,9 @@ class UploadedFileTest extends TestCase
      */
     public function testGetClientMediaType()
     {
-        /** @var StreamInterface $mockStreamInterface */
+        /**
+ * @var StreamInterface $mockStreamInterface 
+*/
         $stream = $this->createMock(StreamInterface::class);
 
         $uploadedFile = $this->getUploadedFile(null, null, 0, null, 'MIME/TYPE');
@@ -364,4 +408,19 @@ namespace IngeniozIT\Http\Message;
 function fopen(string $filename, string $mode)
 {
     return \IngeniozIT\Http\Message\Tests\UploadedFileTest::$fopen ? false : \fopen($filename, $mode);
+}
+
+function rename(string $oldname, string $newname)
+{
+    return \IngeniozIT\Http\Message\Tests\UploadedFileTest::$move ? false : \rename($oldname, $newname);
+}
+
+function move_uploaded_file(string $filename, string $destination)
+{
+    return \IngeniozIT\Http\Message\Tests\UploadedFileTest::$move ? false : \move_uploaded_file($filename, $destination);
+}
+
+function realpath(string $path)
+{
+    return \IngeniozIT\Http\Message\Tests\UploadedFileTest::$realpath ? false : \realpath($path);
 }
