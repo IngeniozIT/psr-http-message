@@ -37,11 +37,11 @@ class Response extends Message implements ResponseInterface
     /**
      * Constructor.
      *
-     * @param StreamInterface $stream The StreamInterface to be used as body.
-     * @param array (optional) $headers Headers to set.
+     * @param StreamInterface    $stream          The StreamInterface to be used as body.
+     * @param array (optional)   $headers         Headers to set.
      * @param ?string (optional) $protocolVersion Protocol version.
-     * @param int (optional) $statusCode HTTP status code.
-     * @param string (optional) $reasonPhrase HTTP reason phrase.
+     * @param int (optional)     $statusCode      HTTP status code.
+     * @param string (optional)  $reasonPhrase    HTTP reason phrase.
      */
     public function __construct(
         StreamInterface $stream,
@@ -49,8 +49,7 @@ class Response extends Message implements ResponseInterface
         ?string $protocolVersion = null,
         int $statusCode = self::DEFAULT_STATUS_CODE,
         string $reasonPhrase = self::DEFAULT_REASON_PHRASE
-    )
-    {
+    ) {
         $statusCode = self::formatStatusCode($statusCode);
 
         parent::__construct($stream, $headers, $protocolVersion);

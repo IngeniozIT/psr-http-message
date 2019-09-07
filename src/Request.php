@@ -47,11 +47,11 @@ class Request extends Message implements RequestInterface
     /**
      * Constructor.
      *
-     * @param StreamInterface $stream Steam of the body of the Request.
-     * @param array $headers (optional) HTTP headers.
-     * @param ?string $protocolVersion (optional) HTTP protocol version or null for default.
-     * @param string $method (optional) Case-sensitive HTTP method.
-     * @param ?UriInterface $uri (optional) Uri of the request.
+     * @param StreamInterface $stream          Steam of the body of the Request.
+     * @param array           $headers         (optional) HTTP headers.
+     * @param ?string         $protocolVersion (optional) HTTP protocol version or null for default.
+     * @param string          $method          (optional) Case-sensitive HTTP method.
+     * @param ?UriInterface   $uri             (optional) Uri of the request.
      */
     public function __construct(
         StreamInterface $stream,
@@ -59,8 +59,7 @@ class Request extends Message implements RequestInterface
         ?string $protocolVersion = null,
         string $method = 'GET',
         ?UriInterface $uri = null
-    )
-    {
+    ) {
         parent::__construct($stream, $headers, $protocolVersion);
 
         $this->method = self::formatMethod($method);
@@ -224,13 +223,10 @@ class Request extends Message implements RequestInterface
         $nextHost = $uri->getHost();
 
         $request = null;
-        if (
-            $nextHost !== '' &&
-            $nextHost !== $currentHost &&
-            (
-                !$preserveHost ||
-                $currentHost === ''
-            )
+        if ($nextHost !== '' 
+            && $nextHost !== $currentHost 
+            && (            !$preserveHost 
+            || $currentHost === '')
         ) {
             // Host must be changed
             $request = $this->withHeader('Host', $nextHost);

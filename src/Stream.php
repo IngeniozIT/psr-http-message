@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\StreamInterface;
+
 use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 use IngeniozIT\Http\Message\Exceptions\RuntimeException;
 

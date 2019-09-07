@@ -52,9 +52,9 @@ class Message implements MessageInterface
     /**
      * Constructor.
      *
-     * @param StreamInterface $stream The StreamInterface to be used as body.
-     * @param array $headers (optional) Headers to set.
-     * @param ?string $protocolVersion (optional) Protocol version.
+     * @param StreamInterface $stream          The StreamInterface to be used as body.
+     * @param array           $headers         (optional) Headers to set.
+     * @param ?string         $protocolVersion (optional) Protocol version.
      */
     public function __construct(StreamInterface $stream, array $headers = [], ?string $protocolVersion = null)
     {
@@ -417,14 +417,14 @@ class Message implements MessageInterface
     {
         // Check if $version can be converted to string.
         if (!self::isToStringable($version)) {
-           throw new InvalidArgumentException("The version must be a string.");
+            throw new InvalidArgumentException("The version must be a string.");
         }
 
         $version = (string)$version;
 
         // Check if $version has the right format
         if (preg_match('/^\d+(\.\d+)?$/', $version) !== 1) {
-           throw new InvalidArgumentException("The version string MUST contain only the HTTP version number (e.g., \"1.1\", \"1.0\"), {$version} given.");
+            throw new InvalidArgumentException("The version string MUST contain only the HTTP version number, {$version} given.");
         }
 
         return $version;
