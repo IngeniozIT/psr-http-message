@@ -28,11 +28,14 @@ class RequestTest extends MessageTest
      * @param  ?UriInterface $uri             (optional) Uri.
      * @return RequestInterface
      */
-    protected function getMessage(array $headers = [], ?string $protocolVersion = null, ?string $method = null, $uri =
-        null
+    protected function getMessage(
+        array $headers = [],
+        ?string $protocolVersion = null,
+        ?string $method = null,
+        $uri = null
     ) {
         /**
- * @var StreamInterface $mockStreamInterface 
+ * @var StreamInterface $mockStreamInterface
 */
         $mockStreamInterface = $this->createMock(StreamInterface::class);
 
@@ -61,8 +64,8 @@ class RequestTest extends MessageTest
     {
         if ($uri !== null) {
             /**
- * @var UriInterface $mockUriInterface 
-*/
+             * @var UriInterface $mockUriInterface
+             */
             $mockUriInterface = $this->createMock(UriInterface::class);
             $mockUriInterface->method('__toString')->willReturn($uri);
 
@@ -109,7 +112,7 @@ class RequestTest extends MessageTest
     public function testConstructSetHostHeaderWithUri()
     {
         /**
- * @var UriInterface $mockUriInterface 
+ * @var UriInterface $mockUriInterface
 */
         $mockUriInterface = $this->createMock(UriInterface::class);
         $mockUriInterface->method('__toString')->willReturn('hostname/foo');
@@ -128,7 +131,7 @@ class RequestTest extends MessageTest
     public function testConstructSetHostHeaderWithUriWithNoHost()
     {
         /**
- * @var UriInterface $mockUriInterface 
+ * @var UriInterface $mockUriInterface
 */
         $mockUriInterface = $this->createMock(UriInterface::class);
         $mockUriInterface->method('__toString')->willReturn('/');
@@ -148,7 +151,7 @@ class RequestTest extends MessageTest
     public function testConstructSetHostHeaderAndGiveUri()
     {
         /**
- * @var UriInterface $mockUriInterface 
+ * @var UriInterface $mockUriInterface
 */
         $mockUriInterface = $this->createMock(UriInterface::class);
         $mockUriInterface->method('__toString')->willReturn('badhostname');
@@ -359,7 +362,7 @@ class RequestTest extends MessageTest
         $request = $this->getRequest();
 
         /**
- * @var UriInterface $mockUriInterface 
+ * @var UriInterface $mockUriInterface
 */
         $mockUriInterface = $this->createMock(UriInterface::class);
         $mockUriInterface->method('__toString')->willReturn('hostname/foo');
@@ -371,14 +374,14 @@ class RequestTest extends MessageTest
         $this->assertSame('hostname', $request->getHeaderLine('Host'));
 
         /**
- * @var UriInterface $mockUriInterface3 
+ * @var UriInterface $mockUriInterface3
 */
         $mockUriInterface3 = $this->createMock(UriInterface::class);
         $mockUriInterface3->method('__toString')->willReturn('hostname/bar');
         $mockUriInterface3->method('getHost')->willReturn('hostname');
 
         /**
- * @var UriInterface $mockUriInterface2 
+ * @var UriInterface $mockUriInterface2
 */
         $mockUriInterface2 = $this->createMock(UriInterface::class);
         $mockUriInterface2->method('__toString')->willReturn('/bar');
@@ -406,7 +409,7 @@ class RequestTest extends MessageTest
         $request = $this->getRequest();
 
         /**
- * @var UriInterface $mockUriInterface 
+ * @var UriInterface $mockUriInterface
 */
         $mockUriInterface = $this->createMock(UriInterface::class);
         $mockUriInterface->method('__toString')->willReturn('/foo');
@@ -418,7 +421,7 @@ class RequestTest extends MessageTest
         $this->assertSame('', $request->getHeaderLine('Host'));
 
         /**
- * @var UriInterface $mockUriInterface2 
+ * @var UriInterface $mockUriInterface2
 */
         $mockUriInterface2 = $this->createMock(UriInterface::class);
         $mockUriInterface2->method('__toString')->willReturn('hostname/foo');
@@ -446,7 +449,7 @@ class RequestTest extends MessageTest
         $request = $this->getRequest();
 
         /**
- * @var UriInterface $mockUriInterface 
+ * @var UriInterface $mockUriInterface
 */
         $mockUriInterface = $this->createMock(UriInterface::class);
         $mockUriInterface->method('__toString')->willReturn('/foo');
@@ -455,7 +458,7 @@ class RequestTest extends MessageTest
         $request = $request->withUri($mockUriInterface);
 
         /**
- * @var UriInterface $mockUriInterface2 
+ * @var UriInterface $mockUriInterface2
 */
         $mockUriInterface2 = $this->createMock(UriInterface::class);
         $mockUriInterface2->method('__toString')->willReturn('/foo');
@@ -484,7 +487,7 @@ class RequestTest extends MessageTest
         $request = $this->getRequest()->withHeader('Host', 'hostname');
 
         /**
- * @var UriInterface $mockUriInterface 
+ * @var UriInterface $mockUriInterface
 */
         $mockUriInterface = $this->createMock(UriInterface::class);
         $mockUriInterface->method('__toString')->willReturn('badhostname/foo');

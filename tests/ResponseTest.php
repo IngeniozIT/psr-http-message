@@ -37,8 +37,8 @@ class ResponseTest extends MessageTest
     protected function getMessage(array $headers = [], ?string $protocolVersion = null, int $statusCode = null, string $reasonPhrase = null)
     {
         /**
- * @var StreamInterface $mockStreamInterface 
-*/
+         * @var StreamInterface $mockStreamInterface
+         */
         $mockStreamInterface = $this->createMock(StreamInterface::class);
 
         if ($reasonPhrase !== null) {
@@ -57,8 +57,8 @@ class ResponseTest extends MessageTest
     protected function getResponse(int $statusCode = null, string $reasonPhrase = null)
     {
         /**
- * @var StreamInterface $mockStreamInterface 
-*/
+         * @var StreamInterface $mockStreamInterface
+         */
         $mockStreamInterface = $this->createMock(StreamInterface::class);
 
         if ($reasonPhrase !== null) {

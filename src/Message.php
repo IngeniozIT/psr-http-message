@@ -424,7 +424,7 @@ class Message implements MessageInterface
 
         // Check if $version has the right format
         if (preg_match('/^\d+(\.\d+)?$/', $version) !== 1) {
-            throw new InvalidArgumentException("The version string MUST contain only the HTTP version number (e.g., \"1.1\", \"1.0\"), {$version} given.");
+            throw new InvalidArgumentException("The version string MUST contain only the HTTP version number, {$version} given.");
         }
 
         return $version;

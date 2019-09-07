@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message\Enums;
 
 /**
- * List of statuses.
+ * List of file statuses.
  */
 class File
 {

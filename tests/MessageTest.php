@@ -33,8 +33,8 @@ class MessageTest extends TestCase
     protected function getMessage(array $headers = [], ?string $protocolVersion = null)
     {
         /**
- * @var StreamInterface $mockStreamInterface 
-*/
+         * @var StreamInterface $mockStreamInterface
+         */
         $mockStreamInterface = $this->createMock(StreamInterface::class);
 
         if ($protocolVersion !== null) {
@@ -523,7 +523,7 @@ class MessageTest extends TestCase
         $message = $this->getMessage();
 
         /**
- * @var StreamInterface $mockStreamInterface 
+ * @var StreamInterface $mockStreamInterface
 */
         $mockStreamInterface = $this->getMockBuilder(StreamInterface::class)->getMock();
 

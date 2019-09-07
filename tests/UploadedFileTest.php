@@ -15,15 +15,15 @@ use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 class UploadedFileTest extends TestCase
 {
     /**
-     * @var bool True to make fopen fail. 
+     * @var bool True to make fopen fail.
      */
     public static $fopen = false;
     /**
-     * @var bool True to make rename and move_uploaded_file fail. 
+     * @var bool True to make rename and move_uploaded_file fail.
      */
     public static $move = false;
     /**
-     * @var bool True to make realpath fail. 
+     * @var bool True to make realpath fail.
      */
     public static $realpath = false;
 
@@ -377,8 +377,8 @@ class UploadedFileTest extends TestCase
     public function testGetClientMediaType()
     {
         /**
- * @var StreamInterface $mockStreamInterface 
-*/
+         * @var StreamInterface $mockStreamInterface
+        */
         $stream = $this->createMock(StreamInterface::class);
 
         $uploadedFile = $this->getUploadedFile(null, null, 0, null, 'MIME/TYPE');
