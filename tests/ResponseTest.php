@@ -6,7 +6,6 @@ namespace IngeniozIT\Http\Message\Tests;
 use IngeniozIT\Http\Message\Tests\MessageTest;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * @coversDefaultClass \IngeniozIT\Http\Message\Response
@@ -28,18 +27,17 @@ class ResponseTest extends MessageTest
     protected $defaultReasonPhrase = 'OK';
 
     /**
-     * Get a new MessageInterface instance.
+     * Get a new ResponseInterface instance.
      *
-     * @param  array   $headers         Http headers.
-     * @param  ?string $protocolVersion Http procol version.
-     * @return MessageInterface
+     * @param  array   (optional) $headers         Http headers.
+     * @param  string (optional)  $protocolVersion Http procol version.
+     * @param  int (optional)     $statusCode      HTTP status code.
+     * @param  string (optional)  $reasonPhrase    HTTP reason phrase.
+     * @return ResponseInterface
      */
     protected function getMessage(array $headers = [], ?string $protocolVersion = null, int $statusCode = null, string $reasonPhrase = null)
     {
-        /**
-         * @var StreamInterface $mockStreamInterface
-         */
-        $mockStreamInterface = $this->createMock(StreamInterface::class);
+        $mockStreamInterface = $this->getMockStream();
 
         if ($reasonPhrase !== null) {
             return new \IngeniozIT\Http\Message\Response($mockStreamInterface, $headers, $protocolVersion, $statusCode, $reasonPhrase);
@@ -54,12 +52,16 @@ class ResponseTest extends MessageTest
         return new \IngeniozIT\Http\Message\Response($mockStreamInterface);
     }
 
+    /**
+     * Get a new ResponseInterface instance.
+     *
+     * @param  int (optional)    $statusCode   HTTP status code.
+     * @param  string (optional) $reasonPhrase HTTP reason phrase.
+     * @return ResponseInterface
+     */
     protected function getResponse(int $statusCode = null, string $reasonPhrase = null)
     {
-        /**
-         * @var StreamInterface $mockStreamInterface
-         */
-        $mockStreamInterface = $this->createMock(StreamInterface::class);
+        $mockStreamInterface = $this->getMockStream();
 
         if ($reasonPhrase !== null) {
             return $this->getMessage([], null, $statusCode, $reasonPhrase);

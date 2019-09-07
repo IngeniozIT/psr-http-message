@@ -13,23 +13,23 @@ use Psr\Http\Message\StreamInterface;
 class StreamTest extends TestCase
 {
     /**
-     * @var bool True to make fstat fail. 
+     * @var bool True to make fstat fail.
      */
     public static $fstat = false;
     /**
-     * @var bool True to make ftell fail. 
+     * @var bool True to make ftell fail.
      */
     public static $ftell = false;
     /**
-     * @var bool True to make fread fail. 
+     * @var bool True to make fread fail.
      */
     public static $fread = false;
     /**
-     * @var bool True to make fwrite fail. 
+     * @var bool True to make fwrite fail.
      */
     public static $fwrite = false;
     /**
-     * @var bool False to make a stream unseekable. 
+     * @var bool False to make a stream unseekable.
      */
     public static $seekable = true;
 
@@ -73,7 +73,7 @@ class StreamTest extends TestCase
     /**
      * Open a temporary file and return its resource.
      *
-     * @param  string $mode Mode to use while opening the file.
+     * @param  string $mode (optional) Mode to use while opening the file.
      * @return string
      */
     protected function getFileDescriptor(string $mode = 'r+')

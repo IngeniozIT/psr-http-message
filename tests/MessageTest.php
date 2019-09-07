@@ -26,16 +26,13 @@ class MessageTest extends TestCase
     /**
      * Get a new MessageInterface instance.
      *
-     * @param  array (optional) $headers         Http headers.
-     * @param  ?string          $protocolVersion Http procol version.
+     * @param  array (optional)  $headers         Http headers.
+     * @param  string (optional) $protocolVersion Http procol version.
      * @return MessageInterface
      */
     protected function getMessage(array $headers = [], ?string $protocolVersion = null)
     {
-        /**
-         * @var StreamInterface $mockStreamInterface
-         */
-        $mockStreamInterface = $this->createMock(StreamInterface::class);
+        $mockStreamInterface = $this->getMockStream();
 
         if ($protocolVersion !== null) {
             return new \IngeniozIT\Http\Message\Message($mockStreamInterface, $headers, $protocolVersion);
@@ -44,6 +41,23 @@ class MessageTest extends TestCase
         }
 
         return new \IngeniozIT\Http\Message\Message($mockStreamInterface);
+    }
+
+    protected function getMockStream(): StreamInterface
+    {
+        return $this->createMock(StreamInterface::class);
+    }
+
+    // ========================================== //
+    // Constructor                                //
+    // ========================================== //
+
+    /**
+     * Does getMessage() return a MessageInterface ?
+     */
+    public function testConstruct()
+    {
+        $this->assertInstanceOf(MessageInterface::class, $this->getMessage(), 'getMessage does not give a MessageInterface object.');
     }
 
     /**
@@ -77,18 +91,6 @@ class MessageTest extends TestCase
         $message = $this->getMessage([], '42.0');
 
         $this->assertSame('42.0', $message->getProtocolVersion());
-    }
-
-    // ========================================== //
-    // Constructor                                //
-    // ========================================== //
-
-    /**
-     * Does getMessage() return a MessageInterface ?
-     */
-    public function testConstruct()
-    {
-        $this->assertInstanceOf(MessageInterface::class, $this->getMessage(), 'getMessage does not give a MessageInterface object.');
     }
 
     // ========================================== //
@@ -522,10 +524,7 @@ class MessageTest extends TestCase
     {
         $message = $this->getMessage();
 
-        /**
- * @var StreamInterface $mockStreamInterface
-*/
-        $mockStreamInterface = $this->getMockBuilder(StreamInterface::class)->getMock();
+        $mockStreamInterface = $this->getMockStream();
 
         $message2 = $message->withbody($mockStreamInterface);
         $this->assertSame($mockStreamInterface, $message2->getBody(), 'Body is not immutable.');

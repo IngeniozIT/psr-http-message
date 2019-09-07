@@ -6,6 +6,9 @@ namespace IngeniozIT\Http\Message;
 use Psr\Http\Message\ServerRequestInterface;
 use IngeniozIT\Http\Message\Request;
 
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriInterface;
+
 use IngeniozIT\Http\Exceptions\InvalidArgumentException;
 
 /**
@@ -48,17 +51,32 @@ use IngeniozIT\Http\Exceptions\InvalidArgumentException;
  */
 class ServerRequest extends Request implements ServerRequestInterface
 {
-    protected $serverParams = [];
-    protected $cookieParams = [];
-    protected $queryParams = [];
-    protected $uploadedFiles = [];
-    protected $parsedBody = null;
-    protected $attributes = [];
+    protected $serverParams;
+    protected $cookieParams;
+    protected $queryParams;
+    protected $uploadedFiles;
+    protected $parsedBody;
+    protected $attributes;
 
-    public function __construct(array $serverParams = [])
-    {
-        parent::__construct();
+    public function __construct(
+        StreamInterface $stream,
+        array $headers = [],
+        ?string $protocolVersion = null,
+        string $method = 'GET',
+        ?UriInterface $uri = null,
+        array $serverParams = [],
+        array $cookieParams = [],
+        array $queryParams = [],
+        array $uploadedFiles = [],
+        array $parsedBody = [],
+        array $attributes = []
+    ) {
+        parent::__construct($stream, $headers, $protocolVersion, $method, $uri);
+
         $this->serverParams = $serverParams;
+        $this->cookieParams = $cookieParams;
+        $this->queryParams = $queryParams;
+        $this->uploadedFiles = $uploadedFiles;
     }
 
     /**
@@ -227,7 +245,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getParsedBody()
     {
-        return $this->parsedBody;
+
     }
 
     /**
@@ -260,18 +278,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withParsedBody($data)
     {
-        if ($this->parsedBody === $data) {
-            return $this;
-        }
 
-        if (null !== $data && !\is_array($data) && !\is_object($data)) {
-            throw new InvalidArgumentException('Parsed body must be array, object or null.');
-        }
-
-        $serverRequest = clone $this;
-        $serverRequest->parsedBody = $data;
-
-        return $serverRequest;
     }
 
     /**
@@ -287,7 +294,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getAttributes()
     {
-        return $this->attributes;
+
     }
 
     /**
@@ -307,7 +314,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getAttribute($name, $default = null)
     {
-        return $this->attributes[$name] ?? $default;
+
     }
 
     /**
@@ -327,13 +334,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withAttribute($name, $value)
     {
-        if (array_key_exists($name, $this->attributes) && $this->attributes[$name] === $value) {
-            return $this;
-        }
 
-        $serverRequest = clone $this;
-        $serverRequest->attributes[$name] = $value;
-        return $serverRequest;
     }
 
     /**
@@ -352,12 +353,6 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withoutAttribute($name)
     {
-        if (false === array_key_exists($name, $this->attributes)) {
-            return $this;
-        }
 
-        $serverRequest = clone $this;
-        unset($serverRequest->attributes[$name]);
-        return $serverRequest;
     }
 }
