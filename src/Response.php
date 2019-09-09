@@ -37,11 +37,11 @@ class Response extends Message implements ResponseInterface
     /**
      * Constructor.
      *
-     * @param StreamInterface    $stream          The StreamInterface to be used as body.
-     * @param array (optional)   $headers         Headers to set.
-     * @param ?string (optional) $protocolVersion Protocol version.
-     * @param int (optional)     $statusCode      HTTP status code.
-     * @param string (optional)  $reasonPhrase    HTTP reason phrase.
+     * @param StreamInterface $stream          The StreamInterface to be used as body.
+     * @param array           $headers         (optional) Headers to set.
+     * @param ?string         $protocolVersion (optional) Protocol version.
+     * @param int             $statusCode      (optional) HTTP status code.
+     * @param string          $reasonPhrase    (optional) HTTP reason phrase.
      */
     public function __construct(
         StreamInterface $stream,
@@ -68,7 +68,7 @@ class Response extends Message implements ResponseInterface
      *
      * @return int Status code.
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
@@ -93,7 +93,7 @@ class Response extends Message implements ResponseInterface
      * @return static
      * @throws \InvalidArgumentException For invalid status code arguments.
      */
-    public function withStatus($code, $reasonPhrase = '')
+    public function withStatus($code, $reasonPhrase = ''): self
     {
         $code = self::formatStatusCode($code);
 
@@ -124,7 +124,7 @@ class Response extends Message implements ResponseInterface
      * @link   http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
      * @return string Reason phrase; must return an empty string if none present.
      */
-    public function getReasonPhrase()
+    public function getReasonPhrase(): string
     {
         return $this->reasonPhrase;
     }

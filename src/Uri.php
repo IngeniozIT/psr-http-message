@@ -125,7 +125,7 @@ class Uri implements UriInterface
      * @see    https://tools.ietf.org/html/rfc3986#section-3.1
      * @return string The URI scheme.
      */
-    public function getScheme()
+    public function getScheme(): string
     {
         return $this->scheme;
     }
@@ -148,7 +148,7 @@ class Uri implements UriInterface
      * @see    https://tools.ietf.org/html/rfc3986#section-3.2
      * @return string The URI authority, in "[user-info@]host[:port]" format.
      */
-    public function getAuthority()
+    public function getAuthority(): string
     {
         $userInfo = $this->getUserInfo();
         $port = $this->getPort();
@@ -171,7 +171,7 @@ class Uri implements UriInterface
      *
      * @return string The URI user information, in "username[:password]" format.
      */
-    public function getUserInfo()
+    public function getUserInfo(): string
     {
         return $this->user.$this->getUriUserPassword();
     }
@@ -187,7 +187,7 @@ class Uri implements UriInterface
      * @see    http://tools.ietf.org/html/rfc3986#section-3.2.2
      * @return string The URI host.
      */
-    public function getHost()
+    public function getHost(): string
     {
         return $this->host;
     }
@@ -207,7 +207,7 @@ class Uri implements UriInterface
      *
      * @return null|int The URI port.
      */
-    public function getPort()
+    public function getPort(): ?int
     {
         $scheme = $this->getScheme();
 
@@ -247,7 +247,7 @@ class Uri implements UriInterface
      * @see    https://tools.ietf.org/html/rfc3986#section-3.3
      * @return string The URI path.
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
@@ -293,7 +293,7 @@ class Uri implements UriInterface
      * @see    https://tools.ietf.org/html/rfc3986#section-3.5
      * @return string The URI fragment.
      */
-    public function getFragment()
+    public function getFragment(): string
     {
         return $this->fragment;
     }
@@ -313,7 +313,7 @@ class Uri implements UriInterface
      * @return static A new instance with the specified scheme.
      * @throws \InvalidArgumentException for invalid or unsupported schemes.
      */
-    public function withScheme($scheme)
+    public function withScheme($scheme): self
     {
         if (!is_string($scheme)) {
             throw new InvalidArgumentException('Scheme must be a string.');
@@ -350,7 +350,7 @@ class Uri implements UriInterface
      * @param  null|string $password The password associated with $user.
      * @return static A new instance with the specified user information.
      */
-    public function withUserInfo($user, $password = null)
+    public function withUserInfo($user, $password = null): self
     {
         // If the user is empty, empty the password too
         $password = ('' === $user) ? null : $password;
@@ -377,7 +377,7 @@ class Uri implements UriInterface
      * @return static A new instance with the specified host.
      * @throws \InvalidArgumentException for invalid hostnames.
      */
-    public function withHost($host)
+    public function withHost($host): self
     {
         // Sanitize value
         $host = strtolower(trim(''.$host));
@@ -408,7 +408,7 @@ class Uri implements UriInterface
      * @return static A new instance with the specified port.
      * @throws \InvalidArgumentException for invalid ports.
      */
-    public function withPort($port)
+    public function withPort($port): self
     {
         // Validate port.
         // TCP/UDP port range goes from 1 to 65536
@@ -447,7 +447,7 @@ class Uri implements UriInterface
      * @return static A new instance with the specified path.
      * @throws \InvalidArgumentException for invalid paths.
      */
-    public function withPath($path)
+    public function withPath($path): self
     {
         $parsedPath = static::percentEncode($path, '/');
 
@@ -491,7 +491,7 @@ class Uri implements UriInterface
      * @return static A new instance with the specified query string.
      * @throws \InvalidArgumentException for invalid query strings.
      */
-    public function withQuery($query)
+    public function withQuery($query): self
     {
         $parts = explode('&', $query);
         foreach ($parts as &$part) {
@@ -522,7 +522,7 @@ class Uri implements UriInterface
      * @param  string $fragment The fragment to use with the new instance.
      * @return static A new instance with the specified fragment.
      */
-    public function withFragment($fragment)
+    public function withFragment($fragment): self
     {
         $parsedFragment = static::percentEncode($fragment);
 
@@ -558,7 +558,7 @@ class Uri implements UriInterface
      * @see    http://tools.ietf.org/html/rfc3986#section-4.1
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getUriScheme().
             $this->getUriAuthority().

@@ -72,6 +72,11 @@ class RequestTest extends MessageTest
         return $this->getMessage([], null, $method, $uri);
     }
 
+    /**
+     * Get a \Psr\Http\Message\UriInterface mock.
+     *
+     * @return UriInterface
+     */
     protected function getMockUri(): UriInterface
     {
         return $this->createMock(UriInterface::class);
@@ -126,7 +131,7 @@ class RequestTest extends MessageTest
     public function testConstructSetHostHeaderWithUriWithNoHost()
     {
         /**
- * @var UriInterface $mockUriInterface
+ * @var UriInterface $mockUriInterface 
 */
         $mockUriInterface = $this->getMockUri();
         $mockUriInterface->method('__toString')->willReturn('/');
@@ -146,7 +151,7 @@ class RequestTest extends MessageTest
     public function testConstructSetHostHeaderAndGiveUri()
     {
         /**
- * @var UriInterface $mockUriInterface
+ * @var UriInterface $mockUriInterface 
 */
         $mockUriInterface = $this->getMockUri();
         $mockUriInterface->method('__toString')->willReturn('badhostname');

@@ -7,6 +7,7 @@ use Psr\Http\Message\StreamInterface;
 
 use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 use IngeniozIT\Http\Message\Exceptions\RuntimeException;
+use IngeniozIT\Http\Message\Exceptions\FileSystemException;
 
 /**
  * Describes a data stream.
@@ -18,7 +19,7 @@ use IngeniozIT\Http\Message\Exceptions\RuntimeException;
 class Stream implements StreamInterface
 {
     /**
-     * @var resource Resource wrapped by the class.
+     * @var ?resource Resource wrapped by the class.
      */
     protected $resource;
 
@@ -87,7 +88,7 @@ class Stream implements StreamInterface
      * @see    http://php.net/manual/en/language.oop5.magic.php#object.tostring
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         try {
             return $this->getContents();
@@ -101,7 +102,7 @@ class Stream implements StreamInterface
      *
      * @return void
      */
-    public function close()
+    public function close(): void
     {
         $rs = $this->detach();
 
@@ -137,7 +138,7 @@ class Stream implements StreamInterface
      *
      * @return int|null Returns the size in bytes if known, or null if unknown.
      */
-    public function getSize()
+    public function getSize(): ?int
     {
         return \is_resource($this->resource) ? (fstat($this->resource)['size'] ?? null) : null;
     }
@@ -148,7 +149,7 @@ class Stream implements StreamInterface
      * @return int Position of the file pointer
      * @throws \RuntimeException on error.
      */
-    public function tell()
+    public function tell(): int
     {
         if (!\is_resource($this->resource)) {
             throw new RuntimeException('Stream is detached.');
@@ -157,7 +158,7 @@ class Stream implements StreamInterface
         $tell = ftell($this->resource);
 
         if (false === $tell) {
-            throw new RuntimeException('Cound not find pointer position.');
+            throw new FileSystemException('Cound not find pointer position.');
         }
 
         return $tell;
@@ -168,7 +169,7 @@ class Stream implements StreamInterface
      *
      * @return bool
      */
-    public function eof()
+    public function eof(): bool
     {
         return !\is_resource($this->resource) || feof($this->resource);
     }
@@ -178,7 +179,7 @@ class Stream implements StreamInterface
      *
      * @return bool
      */
-    public function isSeekable()
+    public function isSeekable(): bool
     {
         return \is_resource($this->resource) && $this->seekable;
     }
@@ -195,7 +196,7 @@ class Stream implements StreamInterface
      *                     SEEK_END: Set position to end-of-stream plus offset.
      * @throws \RuntimeException on failure.
      */
-    public function seek($offset, $whence = SEEK_SET)
+    public function seek($offset, $whence = SEEK_SET): void
     {
         if (!$this->isSeekable() || -1 === fseek($this->resource, $offset, $whence)) {
             throw new RuntimeException('Could not seek stream (offset "'.$offset.'", whence "'.$whence.'").');
@@ -212,7 +213,7 @@ class Stream implements StreamInterface
      * @link   http://www.php.net/manual/en/function.fseek.php
      * @throws \RuntimeException on failure.
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->seek(0);
     }
@@ -222,7 +223,7 @@ class Stream implements StreamInterface
      *
      * @return bool
      */
-    public function isWritable()
+    public function isWritable(): bool
     {
         return \is_resource($this->resource) && $this->writable;
     }
@@ -234,7 +235,7 @@ class Stream implements StreamInterface
      * @return int Returns the number of bytes written to the stream.
      * @throws \RuntimeException on failure.
      */
-    public function write($string)
+    public function write($string): int
     {
         if (!\is_resource($this->resource)) {
             throw new RuntimeException('Stream is detached.');
@@ -258,7 +259,7 @@ class Stream implements StreamInterface
      *
      * @return bool
      */
-    public function isReadable()
+    public function isReadable(): bool
     {
         return \is_resource($this->resource) && $this->readable;
     }
@@ -273,7 +274,7 @@ class Stream implements StreamInterface
      *     if no bytes are available.
      * @throws \RuntimeException if an error occurs.
      */
-    public function read($length)
+    public function read($length): string
     {
         if (!$this->isReadable()) {
             throw new RuntimeException('Stream is not readable.');
@@ -303,7 +304,7 @@ class Stream implements StreamInterface
      * @throws \RuntimeException if unable to read or an error occurs while
      *     reading.
      */
-    public function getContents()
+    public function getContents(): string
     {
         return $this->read($this->getSize());
     }

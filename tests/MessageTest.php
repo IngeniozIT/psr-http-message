@@ -19,7 +19,7 @@ class MessageTest extends TestCase
     // ========================================== //
 
     /**
-     * @var string Implementation's default HTTP protocol.
+     * @var string Implementation's default HTTP protocol. 
      */
     protected $defaultProtocolVersion = '1.1';
 
@@ -43,6 +43,11 @@ class MessageTest extends TestCase
         return new \IngeniozIT\Http\Message\Message($mockStreamInterface);
     }
 
+    /**
+     * Get a \Psr\Http\Message\StreamInterface mock.
+     *
+     * @return StreamInterface
+     */
     protected function getMockStream(): StreamInterface
     {
         return $this->createMock(StreamInterface::class);

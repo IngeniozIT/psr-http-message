@@ -90,7 +90,7 @@ class Request extends Message implements RequestInterface
      *
      * @return string
      */
-    public function getRequestTarget()
+    public function getRequestTarget(): string
     {
         return (string)$this->uri;
     }
@@ -112,7 +112,7 @@ class Request extends Message implements RequestInterface
      * @param  mixed $requestTarget
      * @return static
      */
-    public function withRequestTarget($requestTarget)
+    public function withRequestTarget($requestTarget): self
     {
         if (\is_string($requestTarget)) {
             $requestTarget = new Uri($requestTarget);
@@ -136,7 +136,7 @@ class Request extends Message implements RequestInterface
      *
      * @return string Returns the request method.
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -156,7 +156,7 @@ class Request extends Message implements RequestInterface
      * @return static
      * @throws \InvalidArgumentException for invalid HTTP methods.
      */
-    public function withMethod($method)
+    public function withMethod($method): self
     {
         $method = self::formatMethod($method);
 
@@ -178,7 +178,7 @@ class Request extends Message implements RequestInterface
      * @return UriInterface Returns a UriInterface instance
      *     representing the URI of the request.
      */
-    public function getUri()
+    public function getUri(): UriInterface
     {
         return $this->uri;
     }
@@ -213,7 +213,7 @@ class Request extends Message implements RequestInterface
      * @param  bool         $preserveHost Preserve the original state of the Host header.
      * @return static
      */
-    public function withUri(UriInterface $uri, $preserveHost = false)
+    public function withUri(UriInterface $uri, $preserveHost = false): self
     {
         if ((string)$uri === (string)$this->uri) {
             return $this;
@@ -223,9 +223,9 @@ class Request extends Message implements RequestInterface
         $nextHost = $uri->getHost();
 
         $request = null;
-        if ($nextHost !== '' 
-            && $nextHost !== $currentHost 
-            && (            !$preserveHost 
+        if ($nextHost !== ''
+            && $nextHost !== $currentHost
+            && (            !$preserveHost
             || $currentHost === '')
         ) {
             // Host must be changed

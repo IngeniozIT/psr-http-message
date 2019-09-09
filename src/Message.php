@@ -7,7 +7,6 @@ use Psr\Http\Message\MessageInterface;
 
 use Psr\Http\Message\StreamInterface;
 
-use IngeniozIT\Http\Message\Exceptions\FileSystemException;
 use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 
 /**
@@ -45,7 +44,7 @@ class Message implements MessageInterface
     protected $headerNames = [];
 
     /**
-     * @var StreamInterface Body of the message.
+     * @var StreamInterface Body of the message. 
      */
     protected $body = null;
 
@@ -82,7 +81,7 @@ class Message implements MessageInterface
      *
      * @return string HTTP protocol version.
      */
-    public function getProtocolVersion()
+    public function getProtocolVersion(): string
     {
         return $this->protocolVersion;
     }
@@ -100,7 +99,7 @@ class Message implements MessageInterface
      * @param  string $version HTTP protocol version
      * @return static
      */
-    public function withProtocolVersion($version)
+    public function withProtocolVersion($version): self
     {
         $version = self::formatProtocolVersion($version);
 
@@ -138,7 +137,7 @@ class Message implements MessageInterface
      *     key MUST be a header name, and each value MUST be an array of strings
      *     for that header.
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
@@ -151,7 +150,7 @@ class Message implements MessageInterface
      *     name using a case-insensitive string comparison. Returns false if
      *     no matching header name is found in the message.
      */
-    public function hasHeader($name)
+    public function hasHeader($name): bool
     {
         return isset($this->headerNames[static::parseHeaderName($name)]);
     }
@@ -170,7 +169,7 @@ class Message implements MessageInterface
      *    header. If the header does not appear in the message, this method MUST
      *    return an empty array.
      */
-    public function getHeader($name)
+    public function getHeader($name): array
     {
         $parsedHeaderName = static::parseHeaderName($name);
         return isset($this->headerNames[$parsedHeaderName]) ?
@@ -197,7 +196,7 @@ class Message implements MessageInterface
      *    concatenated together using a comma. If the header does not appear in
      *    the message, this method MUST return an empty string.
      */
-    public function getHeaderLine($name)
+    public function getHeaderLine($name): string
     {
         $parsedHeaderName = static::parseHeaderName($name);
         return isset($this->headerNames[$parsedHeaderName]) ?
@@ -220,7 +219,7 @@ class Message implements MessageInterface
      * @return static
      * @throws \InvalidArgumentException for invalid header names or values.
      */
-    public function withHeader($name, $value)
+    public function withHeader($name, $value): self
     {
         $parsedHeaderName = static::parseHeaderName($name);
         $parsedHeaderValue = static::parseHeaderValue($value);
@@ -258,7 +257,7 @@ class Message implements MessageInterface
      * @return static
      * @throws \InvalidArgumentException for invalid header names or values.
      */
-    public function withAddedHeader($name, $value)
+    public function withAddedHeader($name, $value): self
     {
         $parsedHeaderName = static::parseHeaderName($name);
         $parsedHeaderValue = static::parseHeaderValue($value);
@@ -280,7 +279,7 @@ class Message implements MessageInterface
      * @param  string $name Case-insensitive header field name to remove.
      * @return static
      */
-    public function withoutHeader($name)
+    public function withoutHeader($name): self
     {
         $parsedHeaderName = static::parseHeaderName($name);
 
@@ -299,7 +298,7 @@ class Message implements MessageInterface
      *
      * @return StreamInterface Returns the body as a stream.
      */
-    public function getBody()
+    public function getBody(): StreamInterface
     {
         return $this->body;
     }
@@ -317,7 +316,7 @@ class Message implements MessageInterface
      * @return static
      * @throws \InvalidArgumentException When the body is not valid.
      */
-    public function withBody(StreamInterface $body)
+    public function withBody(StreamInterface $body): self
     {
         if ($this->body === $body) {
             return $this;
