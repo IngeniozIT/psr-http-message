@@ -8,6 +8,9 @@ composer.lock
 vendor/
 log/
 
+# phpunit
+.phpunit.result.cache
+
 # IntelliJ - PhpStorm and PyCharm
 .idea
 .idea/
