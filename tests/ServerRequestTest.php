@@ -388,4 +388,130 @@ class ServerRequestTest extends RequestTest
 
         $this->assertSame($serverRequest, $serverRequest2);
     }
+
+    // ========================================== //
+    // Parsed Body                                //
+    // ========================================== //
+
+    // ========================================== //
+    // Attributes                                 //
+    // ========================================== //
+
+    /**
+     * Retrieve attributes derived from the request.
+     */
+    public function testGetAttributesDefault()
+    {
+        $serverRequest = $this->getServerRequest();
+
+        $this->assertSame([], $serverRequest->getAttributes());
+    }
+
+    /**
+     * Retrieve attributes derived from the request.
+     */
+    public function testGetAttributes()
+    {
+        $serverRequest = $this
+            ->getServerRequest()
+            ->withAttribute('foo', 'bar baz')
+            ->withAttribute('baz?', ['this', 'is', 'baz!'])
+            ->withAttribute('that one is null', null);
+
+        $this->assertSame(
+            [
+            'foo' => 'bar baz',
+            'baz?' => ['this', 'is', 'baz!'],
+            'that one is null' => null
+            ], $serverRequest->getAttributes()
+        );
+    }
+
+    /**
+     * Return an instance with the specified derived request attribute.
+     */
+    public function testWithAttribute()
+    {
+        $serverRequest = $this->getServerRequest();
+
+        $serverRequest = $serverRequest->withAttribute('foo', 'bar baz');
+
+        $this->assertSame('bar baz', $serverRequest->getAttribute('foo'));
+    }
+
+    /**
+     * Return an instance with the specified derived request attribute.
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * updated attribute.
+     */
+    public function testWithAttributeReturnsNewInstance()
+    {
+        $serverRequest = $this->getServerRequest();
+        $serverRequest2 = $serverRequest->withAttribute('foo', 'bar baz');
+
+        $this->assertNotSame($serverRequest, $serverRequest2);
+    }
+
+    /**
+     * Return an instance with the specified derived request attribute.
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * updated attribute.
+     */
+    public function testWithAttributeReturnsSameInstanceOnSameValue()
+    {
+        $serverRequest = $this
+            ->getServerRequest()
+            ->withAttribute('foo', 'bar baz');
+        $serverRequest2 = $serverRequest->withAttribute('foo', 'bar baz');
+
+        $this->assertSame($serverRequest, $serverRequest2);
+    }
+
+    /**
+     * Return an instance that removes the specified derived request attribute.
+     */
+    public function testWithoutAttribute()
+    {
+        $serverRequest = $this
+            ->getServerRequest()
+            ->withAttribute('foo', 'bar baz');
+
+        $serverRequest2 = $serverRequest->withoutAttribute('foo');
+
+        $this->assertNull($serverRequest2->getAttribute('foo'));
+    }
+
+    /**
+     * Return an instance that removes the specified derived request attribute.
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that removes
+     * the attribute.
+     */
+    public function testWithoutAttributeReturnsNewInstance()
+    {
+        $serverRequest = $this
+            ->getServerRequest()
+            ->withAttribute('foo', 'bar baz');
+
+        $serverRequest2 = $serverRequest->withoutAttribute('foo');
+
+        $this->assertNotSame($serverRequest, $serverRequest2);
+    }
+
+    /**
+     * Return an instance that removes the specified derived request attribute.
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that removes
+     * the attribute.
+     */
+    public function testWithoutAttributeReturnsSameInstanceOnSameValue()
+    {
+        $serverRequest = $this->getServerRequest();
+
+        $serverRequest2 = $serverRequest->withoutAttribute('foo');
+
+        $this->assertSame($serverRequest, $serverRequest2);
+    }
 }

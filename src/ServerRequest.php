@@ -90,6 +90,7 @@ class ServerRequest extends Request implements ServerRequestInterface
         $this->cookieParams = $cookieParams;
         $this->queryParams = $queryParams;
         $this->uploadedFiles = $uploadedFiles;
+        $this->attributes = $attributes;
     }
 
     /**
@@ -307,7 +308,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getAttributes(): array
     {
-        return [];
+        return $this->attributes;
     }
 
     /**
@@ -327,7 +328,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getAttribute($name, $default = null)
     {
-        return null;
+        return $this->attributes[$name] ?? $default;
     }
 
     /**
@@ -347,7 +348,17 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withAttribute($name, $value): self
     {
-        return $this;
+        if ((            isset($this->attributes[$name]) 
+            || array_key_exists($name, $this->attributes)) 
+            && $this->attributes[$name] === $value
+        ) {
+            return $this;
+        }
+
+        $serverRequest = clone $this;
+        $serverRequest->attributes[$name] = $value;
+
+        return $serverRequest;
     }
 
     /**
@@ -366,6 +377,15 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withoutAttribute($name): self
     {
-        return $this;
+        if (!isset($this->attributes[$name]) 
+            && !array_key_exists($name, $this->attributes)
+        ) {
+            return $this;
+        }
+
+        $serverRequest = clone $this;
+        unset($serverRequest->attributes[$name]);
+
+        return $serverRequest;
     }
 }
