@@ -154,7 +154,7 @@ class Stream implements StreamInterface
 
         $tell = ftell($this->resource);
 
-        if (false === $tell) {
+        if ($tell === false) {
             throw new FileSystemException('Cound not find pointer position.');
         }
 
@@ -196,7 +196,7 @@ class Stream implements StreamInterface
     public function seek($offset, $whence = SEEK_SET): void
     {
         if (!$this->isSeekable() || -1 === fseek($this->resource, $offset, $whence)) {
-            throw new RuntimeException('Could not seek stream (offset "'.$offset.'", whence "'.$whence.'").');
+            throw new RuntimeException("Could not seek stream (offset \"$offset\", whence \"$whence\").");
         }
     }
 
@@ -244,7 +244,7 @@ class Stream implements StreamInterface
 
         $bytes = fwrite($this->resource, $string);
 
-        if (false === $bytes) {
+        if ($bytes === false) {
             throw new RuntimeException('Could not write to stream.');
         }
 
@@ -323,6 +323,6 @@ class Stream implements StreamInterface
         $metadata = \is_resource($this->resource) ?
             stream_get_meta_data($this->resource) :
             [];
-        return null === $key ? $metadata : ($metadata[$key] ?? null);
+        return $key === null ? $metadata : ($metadata[$key] ?? null);
     }
 }

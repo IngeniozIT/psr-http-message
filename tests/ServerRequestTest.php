@@ -485,10 +485,11 @@ class ServerRequestTest extends RequestTest
 
         $this->assertSame(
             [
-            'foo' => 'bar baz',
-            'baz?' => ['this', 'is', 'baz!'],
-            'that one is null' => null
-            ], $serverRequest->getAttributes()
+                'foo' => 'bar baz',
+                'baz?' => ['this', 'is', 'baz!'],
+                'that one is null' => null
+            ],
+            $serverRequest->getAttributes()
         );
     }
 

@@ -46,34 +46,22 @@ use IngeniozIT\Http\Message\Request;
  */
 class ServerRequest extends Request implements ServerRequestInterface
 {
-    /**
-     * @var array 
-     */
+    /** @var array */
     protected $serverParams;
 
-    /**
-     * @var array 
-     */
+    /** @var array */
     protected $cookieParams;
 
-    /**
-     * @var array 
-     */
+    /** @var array */
     protected $queryParams;
 
-    /**
-     * @var array 
-     */
+    /** @var array */
     protected $uploadedFiles;
 
-    /**
-     * @var null|array 
-     */
+    /** @var null|array */
     protected $parsedBody;
 
-    /**
-     * @var array 
-     */
+    /** @var array */
     protected $attributes;
 
     /**
@@ -375,7 +363,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withAttribute($name, $value): self
     {
-        if ((            isset($this->attributes[$name])
+        if ((isset($this->attributes[$name])
             || array_key_exists($name, $this->attributes))
             && $this->attributes[$name] === $value
         ) {

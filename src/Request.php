@@ -218,10 +218,12 @@ class Request extends Message implements RequestInterface
         $nextHost = $uri->getHost();
 
         $request = null;
-        if ($nextHost !== ''
-            && $nextHost !== $currentHost
-            && (            !$preserveHost
-            || $currentHost === '')
+        if ($nextHost !== '' &&
+            $nextHost !== $currentHost &&
+            (
+                !$preserveHost
+                || $currentHost === ''
+            )
         ) {
             // Host must be changed
             $request = $this->withHeader('Host', $nextHost);

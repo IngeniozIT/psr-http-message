@@ -16,9 +16,10 @@ class MessageTest extends TestCase
     // Implementation specific                    //
     // ========================================== //
 
-    /**
-     * @var string Implementation's default HTTP protocol.
-     */
+    /** @var string Class name of the tested class */
+    protected $className = \IngeniozIT\Http\Message\Message::class;
+
+    /** @var string Implementation's default HTTP protocol. */
     protected $defaultProtocolVersion = '1.1';
 
     /**
@@ -56,17 +57,18 @@ class MessageTest extends TestCase
     // ========================================== //
 
     /**
-     * Does getMessage() return a MessageInterface ?
+     * MessageInterface can be instantiated.
      */
-    public function testConstruct()
+    public function testCanBeInstantiated()
     {
-        $this->assertInstanceOf(MessageInterface::class, $this->getMessage(), 'getMessage does not give a MessageInterface object.');
+        $message = new $this->className($this->getMockStream());
+        $this->assertInstanceOf(MessageInterface::class, $message);
     }
 
     /**
-     * Headers can be given in the constructor.
+     * MessageInterface can be instantiated with headers passed in construtor.
      */
-    public function testConstructWithHeaders()
+    public function testCanBeInstantiatedWithHeaders()
     {
         $headers = [
             'string_header' => 'bar',
@@ -81,17 +83,17 @@ class MessageTest extends TestCase
             'Override_Header' => ['baz'],
         ];
 
-        $message = $this->getMessage($headers);
+        $message = new $this->className($this->getMockStream(), $headers);
 
         $this->assertSame($outputHeaders, $message->getHeaders());
     }
 
     /**
-     * Protocol version can be given in the constructor.
+     * MessageInterface can be instantiated with protocol version passed in construtor.
      */
-    public function testConstructWithProtocolVersion()
+    public function testCanBeInstantiatedWithProtocolVersion()
     {
-        $message = $this->getMessage([], '42.0');
+        $message = new $this->className($this->getMockStream(), [], '42.0');
 
         $this->assertSame('42.0', $message->getProtocolVersion());
     }

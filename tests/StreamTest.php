@@ -528,7 +528,6 @@ class StreamTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
         $stream->read(-1);
-
     }
 
     // ========================================== //

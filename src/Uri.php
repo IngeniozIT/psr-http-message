@@ -151,7 +151,7 @@ class Uri implements UriInterface
         $userInfo = $this->getUserInfo();
         $port = $this->getPort();
 
-        return $this->getUriUserInfo().$this->gethost().(null === $port ? '' : ':'.$port);
+        return $this->getUriUserInfo() . $this->gethost() . ($port === null ? '' : ":$port");
     }
 
     /**
@@ -171,7 +171,7 @@ class Uri implements UriInterface
      */
     public function getUserInfo(): string
     {
-        return $this->user.$this->getUriUserPassword();
+        return $this->user . $this->getUriUserPassword();
     }
 
     /**
@@ -209,10 +209,12 @@ class Uri implements UriInterface
     {
         $scheme = $this->getScheme();
 
-        if (null === $this->port
-            || (            '' !== $scheme
-            && isset(Protocol::PORTS[$scheme])
-            && Protocol::PORTS[$scheme] === $this->port)
+        if ($this->port === null
+            || (
+                $scheme !== ''
+                && isset(Protocol::PORTS[$scheme])
+                && Protocol::PORTS[$scheme] === $this->port
+            )
         ) {
             return null;
         }
@@ -318,7 +320,7 @@ class Uri implements UriInterface
         }
 
         // Sanitize scheme
-        $parsedScheme = strtolower(trim(''.$scheme));
+        $parsedScheme = strtolower(trim("$scheme"));
 
         // Supported schemes
         if ($parsedScheme !== '' && !isset(Protocol::PORTS[$parsedScheme])) {
@@ -351,7 +353,7 @@ class Uri implements UriInterface
     public function withUserInfo($user, $password = null): self
     {
         // If the user is empty, empty the password too
-        $password = ('' === $user) ? null : $password;
+        $password = ($user === '') ? null : $password;
 
         if ($this->user === $user && $this->pass === $password) {
             return $this;
@@ -378,7 +380,7 @@ class Uri implements UriInterface
     public function withHost($host): self
     {
         // Sanitize value
-        $host = strtolower(trim(''.$host));
+        $host = strtolower(trim("$host"));
 
         if ($this->host === $host) {
             return $this;
@@ -410,7 +412,7 @@ class Uri implements UriInterface
     {
         // Validate port.
         // TCP/UDP port range goes from 1 to 65536
-        if (null !== $port && (!\is_int($port) || $port < 1 || $port > 65536)) {
+        if ($port !== null && (!\is_int($port) || $port < 1 || $port > 65536)) {
             throw new InvalidArgumentException('Port must be null or int between 1 and 65536');
         }
 
@@ -558,10 +560,10 @@ class Uri implements UriInterface
      */
     public function __toString(): string
     {
-        return $this->getUriScheme().
-            $this->getUriAuthority().
-            $this->getUriPath().
-            $this->getUriQuery().
+        return $this->getUriScheme() .
+            $this->getUriAuthority() .
+            $this->getUriPath() .
+            $this->getUriQuery() .
             $this->getUriFragment();
     }
 
@@ -575,7 +577,7 @@ class Uri implements UriInterface
         $scheme = $this->getScheme();
 
         // If a scheme is present, it MUST be suffixed by ":"
-        return $scheme === '' ? '' : $scheme.':';
+        return $scheme === '' ? '' : "$scheme:";
     }
 
     /**
@@ -588,7 +590,7 @@ class Uri implements UriInterface
         $authority = $this->getAuthority();
 
         // If an authority is present, it MUST be prefixed by "//"
-        return $authority === '' ? '' : '//'.$authority;
+        return $authority === '' ? '' : "//$authority";
     }
 
     /**
@@ -607,10 +609,10 @@ class Uri implements UriInterface
         // If the path is rootless and an authority is present, the path MUST be
         // prefixed by "/"
         if ($path[0] !== '/' && $this->getAuthority() !== '') {
-            $path = '/'.$path;
+            $path = "/$path";
         }
 
-        return $path === '' ? '' : $path;
+        return $path;
     }
 
     /**
@@ -621,7 +623,7 @@ class Uri implements UriInterface
     protected function getUriQuery(): string
     {
         $query = $this->getQuery();
-        return $query === '' ? '' : '?'.$query;
+        return $query === '' ? '' : "?$query";
     }
 
     /**
@@ -632,7 +634,7 @@ class Uri implements UriInterface
     protected function getUriFragment(): string
     {
         $fragment = $this->getFragment();
-        return $fragment === '' ? '' : '#'.$fragment;
+        return $fragment === '' ? '' : "#$fragment";
     }
 
     /**
@@ -642,7 +644,7 @@ class Uri implements UriInterface
      */
     protected function getUriUserPassword(): string
     {
-        return ($this->pass === null ? '' : ':'.$this->pass);
+        return ($this->pass === null ? '' : ":$this->pass");
     }
 
     /**
@@ -653,7 +655,7 @@ class Uri implements UriInterface
     protected function getUriUserInfo(): string
     {
         $userInfo = $this->getUserInfo();
-        return ($userInfo === '' ? '' : $userInfo.'@');
+        return ($userInfo === '' ? '' : "$userInfo@");
     }
 
     /**
@@ -672,12 +674,12 @@ class Uri implements UriInterface
         }
 
         // Detect already encoded strings
-        if (preg_match('/^[a-zA-Z0-9-_~%'.($ignoreChar ? '\\'.$ignoreChar : '').']+$/', $str)) {
+        if (preg_match('/^[a-zA-Z0-9-_~%' . ($ignoreChar ? "\\$ignoreChar" : '') . ']+$/', $str)) {
             return $str;
         }
 
         // Encode string
-        if (null === $ignoreChar) {
+        if ($ignoreChar === null) {
             // No character to ignore
             $str = urlencode($str);
         } elseif ($str !== $ignoreChar) {

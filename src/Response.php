@@ -97,7 +97,7 @@ class Response extends Message implements ResponseInterface
     {
         $code = self::formatStatusCode($code);
 
-        if ('' === $reasonPhrase) {
+        if ($reasonPhrase === '') {
             $reasonPhrase = Http::REASON_PHRASES[$code];
         }
 
