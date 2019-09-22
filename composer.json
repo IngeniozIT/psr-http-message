@@ -1,9 +1,9 @@
 {
     "name": "ingenioz-it/http-message",
     "type": "library",
-    "description": "Implementation of the PSR-7: HTTP message",
+    "description": "PSR-7 HTTP message implementation",
     "keywords": ["PSR-7", "HTTP", "message"],
-    "homepage": "https://github.com/IngeniozIT/http-message",
+    "homepage": "https://github.com/IngeniozIT/psr-http-message",
     "license": "MIT",
     "authors": [
         {
