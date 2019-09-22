@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message\Tests;
 
 use IngeniozIT\Http\Message\Tests\MessageTest;
-
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -17,12 +16,12 @@ class ResponseTest extends MessageTest
     // ========================================== //
 
     /**
-     * @var int Implementation's default HTTP status code. 
+     * @var int Implementation's default HTTP status code.
      */
     protected $defaultStatusCode = 200;
 
     /**
-     * @var string Implementation's default HTTP reason phrase. 
+     * @var string Implementation's default HTTP reason phrase.
      */
     protected $defaultReasonPhrase = 'OK';
 

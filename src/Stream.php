@@ -4,10 +4,7 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\StreamInterface;
-
-use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
-use IngeniozIT\Http\Message\Exceptions\RuntimeException;
-use IngeniozIT\Http\Message\Exceptions\FileSystemException;
+use IngeniozIT\Http\Message\Exceptions\{InvalidArgumentException, RuntimeException, FileSystemException};
 
 /**
  * Describes a data stream.

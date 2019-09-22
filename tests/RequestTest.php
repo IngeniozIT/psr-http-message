@@ -4,10 +4,7 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message\Tests;
 
 use IngeniozIT\Http\Message\Tests\MessageTest;
-
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\MessageInterface;
-use Psr\Http\Message\UriInterface;
+use Psr\Http\Message\{RequestInterface, MessageInterface, UriInterface};
 
 /**
  * @coversDefaultClass \IngeniozIT\Http\Message\Request
@@ -131,7 +128,7 @@ class RequestTest extends MessageTest
     public function testConstructSetHostHeaderWithUriWithNoHost()
     {
         /**
- * @var UriInterface $mockUriInterface 
+ * @var UriInterface $mockUriInterface
 */
         $mockUriInterface = $this->getMockUri();
         $mockUriInterface->method('__toString')->willReturn('/');
@@ -151,7 +148,7 @@ class RequestTest extends MessageTest
     public function testConstructSetHostHeaderAndGiveUri()
     {
         /**
- * @var UriInterface $mockUriInterface 
+ * @var UriInterface $mockUriInterface
 */
         $mockUriInterface = $this->getMockUri();
         $mockUriInterface->method('__toString')->willReturn('badhostname');

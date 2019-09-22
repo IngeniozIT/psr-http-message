@@ -3,11 +3,8 @@ declare(strict_types = 1);
 
 namespace IngeniozIT\Http\Message;
 
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\{ServerRequestInterface, StreamInterface, UriInterface};
 use IngeniozIT\Http\Message\Request;
-
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UriInterface;
 
 /**
  * Representation of an incoming, server-side HTTP request.
@@ -49,11 +46,34 @@ use Psr\Http\Message\UriInterface;
  */
 class ServerRequest extends Request implements ServerRequestInterface
 {
+    /**
+     * @var array 
+     */
     protected $serverParams;
+
+    /**
+     * @var array 
+     */
     protected $cookieParams;
+
+    /**
+     * @var array 
+     */
     protected $queryParams;
+
+    /**
+     * @var array 
+     */
     protected $uploadedFiles;
+
+    /**
+     * @var null|array 
+     */
     protected $parsedBody;
+
+    /**
+     * @var array 
+     */
     protected $attributes;
 
     /**
@@ -259,7 +279,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getParsedBody()
     {
-        return null;
+        return $this->parsedBody;
     }
 
     /**
@@ -292,7 +312,14 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withParsedBody($data): self
     {
-        return $this;
+        if ($data === $this->parsedBody) {
+            return $this;
+        }
+
+        $serverRequest = clone $this;
+        $serverRequest->parsedBody = $data;
+
+        return $serverRequest;
     }
 
     /**
@@ -348,8 +375,8 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withAttribute($name, $value): self
     {
-        if ((            isset($this->attributes[$name]) 
-            || array_key_exists($name, $this->attributes)) 
+        if ((            isset($this->attributes[$name])
+            || array_key_exists($name, $this->attributes))
             && $this->attributes[$name] === $value
         ) {
             return $this;
@@ -377,7 +404,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withoutAttribute($name): self
     {
-        if (!isset($this->attributes[$name]) 
+        if (!isset($this->attributes[$name])
             && !array_key_exists($name, $this->attributes)
         ) {
             return $this;

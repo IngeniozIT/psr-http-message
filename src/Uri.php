@@ -4,9 +4,7 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\UriInterface;
-
 use IngeniozIT\Http\Message\Enums\Protocol;
-
 use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 
 /**

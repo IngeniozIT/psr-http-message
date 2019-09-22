@@ -4,9 +4,7 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message\Tests;
 
 use IngeniozIT\Http\Message\Tests\RequestTest;
-
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UploadedFileInterface;
+use Psr\Http\Message\{ServerRequestInterface, UploadedFileInterface};
 
 /**
  * @coversDefaultClass \IngeniozIT\Http\Message\ServerRequest
@@ -392,6 +390,73 @@ class ServerRequestTest extends RequestTest
     // ========================================== //
     // Parsed Body                                //
     // ========================================== //
+
+    /**
+     * Retrieve any parameters provided in the request body.
+     */
+    public function testGetParsedBodyDefault()
+    {
+        $serverRequest = $this->getServerRequest();
+
+        $this->assertNull($serverRequest->getParsedBody());
+    }
+
+    /**
+     * Return an instance with the specified body parameters.
+     */
+    public function testWithParsedBody()
+    {
+        $parsedBody = [
+            'foo' => 42,
+            'bar' => ['foobar'],
+            'baz' => null,
+        ];
+
+        $serverRequest = $this->getServerRequest()->withParsedBody($parsedBody);
+
+        $this->assertSame($parsedBody, $serverRequest->getParsedBody());
+    }
+
+    /**
+     * Return an instance with the specified body parameters.
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * updated body parameters.
+     */
+    public function testWithParsedBodyReturnsNewInstance()
+    {
+        $parsedBody = [
+            'foo' => 42,
+            'bar' => ['foobar'],
+            'baz' => null,
+        ];
+        $serverRequest = $this->getServerRequest();
+        $serverRequest2 = $serverRequest->withParsedBody($parsedBody);
+
+        $this->assertNotSame($serverRequest, $serverRequest2);
+    }
+
+    /**
+     * Return an instance with the specified body parameters.
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * updated body parameters.
+     */
+    public function testWithParsedBodyReturnsSameInstanceOnSameValue()
+    {
+        $parsedBody = [
+            'foo' => 42,
+            'bar' => ['foobar'],
+            'baz' => null,
+        ];
+
+        $serverRequest = $this
+            ->getServerRequest()
+            ->withParsedBody($parsedBody);
+        $serverRequest2 = $serverRequest->withParsedBody($parsedBody);
+
+        $this->assertSame($serverRequest, $serverRequest2);
+    }
 
     // ========================================== //
     // Attributes                                 //

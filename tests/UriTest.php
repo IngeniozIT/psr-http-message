@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Tests\Message;
 
 use PHPUnit\Framework\TestCase;
-
 use Psr\Http\Message\UriInterface;
 
 /**

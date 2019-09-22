@@ -3,14 +3,9 @@ declare(strict_types = 1);
 
 namespace IngeniozIT\Http\Message;
 
-use Psr\Http\Message\UploadedFileInterface;
-
-use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\{UploadedFileInterface, StreamInterface};
 use IngeniozIT\Http\Message\Enums\File;
-
-use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
-use IngeniozIT\Http\Message\Exceptions\RuntimeException;
-use IngeniozIT\Http\Message\Exceptions\FileSystemException;
+use IngeniozIT\Http\Message\Exceptions\{InvalidArgumentException, RuntimeException, FileSystemException};
 
 /**
  * Value object representing a file uploaded through an HTTP request.

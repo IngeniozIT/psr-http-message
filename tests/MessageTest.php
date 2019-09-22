@@ -4,9 +4,7 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message\Tests;
 
 use PHPUnit\Framework\TestCase;
-
-use Psr\Http\Message\MessageInterface;
-use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\{MessageInterface, StreamInterface};
 use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 
 /**
@@ -19,7 +17,7 @@ class MessageTest extends TestCase
     // ========================================== //
 
     /**
-     * @var string Implementation's default HTTP protocol. 
+     * @var string Implementation's default HTTP protocol.
      */
     protected $defaultProtocolVersion = '1.1';
 

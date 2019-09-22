@@ -3,14 +3,9 @@ declare(strict_types = 1);
 
 namespace IngeniozIT\Http\Message;
 
-use Psr\Http\Message\RequestInterface;
-use IngeniozIT\Http\Message\Message;
-
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UriInterface;
-use IngeniozIT\Http\Message\Uri;
+use Psr\Http\Message\{RequestInterface, StreamInterface, UriInterface};
+use IngeniozIT\Http\Message\{Message, Uri};
 use IngeniozIT\Http\Message\Enums\Http;
-
 use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 
 /**

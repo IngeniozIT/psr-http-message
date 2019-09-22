@@ -4,9 +4,7 @@ declare(strict_types = 1);
 namespace IngeniozIT\Http\Message\Tests;
 
 use PHPUnit\Framework\TestCase;
-
-use Psr\Http\Message\UploadedFileInterface;
-use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\{UploadedFileInterface, StreamInterface};
 use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 
 /**
@@ -15,17 +13,17 @@ use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 class UploadedFileTest extends TestCase
 {
     /**
-     * @var bool True to make fopen fail. 
+     * @var bool True to make fopen fail.
      */
     public static $fopen = false;
 
     /**
-     * @var bool True to make rename and move_uploaded_file fail. 
+     * @var bool True to make rename and move_uploaded_file fail.
      */
     public static $move = false;
 
     /**
-     * @var bool True to make realpath fail. 
+     * @var bool True to make realpath fail.
      */
     public static $realpath = false;
 
@@ -348,7 +346,7 @@ class UploadedFileTest extends TestCase
     public function testGetClientFileName()
     {
         /**
- * @var StreamInterface $mockStreamInterface 
+ * @var StreamInterface $mockStreamInterface
 */
         $stream = $this->createMock(StreamInterface::class);
 

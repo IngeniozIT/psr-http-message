@@ -3,10 +3,7 @@ declare(strict_types = 1);
 
 namespace IngeniozIT\Http\Message;
 
-use Psr\Http\Message\MessageInterface;
-
-use Psr\Http\Message\StreamInterface;
-
+use Psr\Http\Message\{MessageInterface, StreamInterface};
 use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 
 /**
@@ -44,7 +41,7 @@ class Message implements MessageInterface
     protected $headerNames = [];
 
     /**
-     * @var StreamInterface Body of the message. 
+     * @var StreamInterface Body of the message.
      */
     protected $body = null;
 
