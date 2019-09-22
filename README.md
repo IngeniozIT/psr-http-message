@@ -1,4 +1,4 @@
-# Psr 7 : HTTP Message
+# PSR-7 : HTTP Message
 
 This repository contains a full [PSR-7](http://www.php-fig.org/psr/psr-7/) implementation.
 
