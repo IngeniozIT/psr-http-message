@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
@@ -15,6 +16,9 @@ class ResponseTest extends MessageTest
     // Implementation specific                    //
     // ========================================== //
 
+    /** @var string $className Class name of the tested class */
+    protected $className = \IngeniozIT\Http\Message\Response::class;
+
     /**
      * @var int Implementation's default HTTP status code.
      */
@@ -26,50 +30,17 @@ class ResponseTest extends MessageTest
     protected $defaultReasonPhrase = 'OK';
 
     /**
-     * Get a new ResponseInterface instance.
-     *
-     * @param  array   (optional) $headers         Http headers.
-     * @param  string (optional)  $protocolVersion Http procol version.
-     * @param  int (optional)     $statusCode      HTTP status code.
-     * @param  string (optional)  $reasonPhrase    HTTP reason phrase.
+     * Get an instance of the tested Response object.
      * @return ResponseInterface
      */
-    protected function getMessage(array $headers = [], ?string $protocolVersion = null, int $statusCode = null, string $reasonPhrase = null)
+    protected function getResponse(): ResponseInterface
     {
-        $mockStreamInterface = $this->getMockStream();
-
-        if ($reasonPhrase !== null) {
-            return new \IngeniozIT\Http\Message\Response($mockStreamInterface, $headers, $protocolVersion, $statusCode, $reasonPhrase);
-        } elseif ($statusCode !== null) {
-            return new \IngeniozIT\Http\Message\Response($mockStreamInterface, $headers, $protocolVersion, $statusCode);
-        } elseif ($protocolVersion !== null) {
-            return new \IngeniozIT\Http\Message\Response($mockStreamInterface, $headers, $protocolVersion);
-        } elseif ($headers !== []) {
-            return new \IngeniozIT\Http\Message\Response($mockStreamInterface, $headers);
-        }
-
-        return new \IngeniozIT\Http\Message\Response($mockStreamInterface);
-    }
-
-    /**
-     * Get a new ResponseInterface instance.
-     *
-     * @param  int (optional)    $statusCode   HTTP status code.
-     * @param  string (optional) $reasonPhrase HTTP reason phrase.
-     * @return ResponseInterface
-     */
-    protected function getResponse(int $statusCode = null, string $reasonPhrase = null)
-    {
-        $mockStreamInterface = $this->getMockStream();
-
-        if ($reasonPhrase !== null) {
-            return $this->getMessage([], null, $statusCode, $reasonPhrase);
-        } elseif ($statusCode !== null) {
-            return $this->getMessage([], null, $statusCode);
-        }
-
         return $this->getMessage();
     }
+
+    // ========================================== //
+    // Defaults                                   //
+    // ========================================== //
 
     /**
      * Check default status code and reason phrase.
@@ -80,19 +51,6 @@ class ResponseTest extends MessageTest
 
         $this->assertSame($this->defaultStatusCode, $response->getStatusCode());
         $this->assertSame($this->defaultReasonPhrase, $response->getReasonPhrase());
-    }
-
-    // ========================================== //
-    // Constructor                                //
-    // ========================================== //
-
-    /**
-     * Does getMessage() and getResponse() return a ResponseInterface ?
-     */
-    public function testConstruct()
-    {
-        $this->assertInstanceOf(ResponseInterface::class, $this->getMessage(), 'getMessage does not give a RequestInterface object.');
-        $this->assertInstanceOf(ResponseInterface::class, $this->getResponse(), 'getResponse does not give a RequestInterface object.');
     }
 
     // ========================================== //
@@ -145,7 +103,7 @@ class ResponseTest extends MessageTest
      */
     public function testWithStatusIsImmutable()
     {
-        $response = $this->getResponse(200);
+        $response = $this->getResponse()->withStatus(200);
         $response2 = $response->withStatus(200);
         $response3 = $response->withStatus(404);
 
@@ -165,7 +123,7 @@ class ResponseTest extends MessageTest
      */
     public function testWithStatusAndReasonPhraseIsImmutable()
     {
-        $response = $this->getResponse(200, 'Reason phrase');
+        $response = $this->getResponse()->withStatus(200, 'Reason phrase');
         $response2 = $response->withStatus(200, 'Reason phrase');
         $response3 = $response->withStatus(200, 'Another reason phrase');
         $response4 = $response->withStatus(404, 'Reason phrase');

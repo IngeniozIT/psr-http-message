@@ -1,11 +1,11 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\{UploadedFileInterface, StreamInterface};
-use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 
 /**
  * @coversDefaultClass \IngeniozIT\Http\Message\UploadedFile

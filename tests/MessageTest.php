@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
@@ -16,30 +17,20 @@ class MessageTest extends TestCase
     // Implementation specific                    //
     // ========================================== //
 
-    /** @var string Class name of the tested class */
+    /** @var string $className Class name of the tested class */
     protected $className = \IngeniozIT\Http\Message\Message::class;
 
-    /** @var string Implementation's default HTTP protocol. */
+    /** @var string $defaultProtocolVersion Implementation's default HTTP protocol. */
     protected $defaultProtocolVersion = '1.1';
 
     /**
      * Get a new MessageInterface instance.
      *
-     * @param  array (optional)  $headers         Http headers.
-     * @param  string (optional) $protocolVersion Http procol version.
      * @return MessageInterface
      */
-    protected function getMessage(array $headers = [], ?string $protocolVersion = null)
+    protected function getMessage()
     {
-        $mockStreamInterface = $this->getMockStream();
-
-        if ($protocolVersion !== null) {
-            return new \IngeniozIT\Http\Message\Message($mockStreamInterface, $headers, $protocolVersion);
-        } elseif ($headers !== []) {
-            return new \IngeniozIT\Http\Message\Message($mockStreamInterface, $headers);
-        }
-
-        return new \IngeniozIT\Http\Message\Message($mockStreamInterface);
+        return new $this->className($this->getMockStream());
     }
 
     /**
@@ -63,39 +54,6 @@ class MessageTest extends TestCase
     {
         $message = new $this->className($this->getMockStream());
         $this->assertInstanceOf(MessageInterface::class, $message);
-    }
-
-    /**
-     * MessageInterface can be instantiated with headers passed in construtor.
-     */
-    public function testCanBeInstantiatedWithHeaders()
-    {
-        $headers = [
-            'string_header' => 'bar',
-            'array_header' => ['foo', 'bar'],
-            'override_header' => 'foo',
-            'Override_Header' => 'baz',
-        ];
-
-        $outputHeaders = [
-            'string_header' => ['bar'],
-            'array_header' => ['foo', 'bar'],
-            'Override_Header' => ['baz'],
-        ];
-
-        $message = new $this->className($this->getMockStream(), $headers);
-
-        $this->assertSame($outputHeaders, $message->getHeaders());
-    }
-
-    /**
-     * MessageInterface can be instantiated with protocol version passed in construtor.
-     */
-    public function testCanBeInstantiatedWithProtocolVersion()
-    {
-        $message = new $this->className($this->getMockStream(), [], '42.0');
-
-        $this->assertSame('42.0', $message->getProtocolVersion());
     }
 
     // ========================================== //

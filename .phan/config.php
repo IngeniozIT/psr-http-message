@@ -11,7 +11,7 @@ return [
     // If this is set to `null`,
     // then Phan assumes the PHP version which is closest to the minor version
     // of the php executable used to execute Phan.
-    "target_php_version" => null,
+    "target_php_version" => '7.3',
 
     // A list of directories that should be parsed for class and
     // method information. After excluding the directories
@@ -21,7 +21,9 @@ return [
     // Thus, both first-party and third-party code being used by
     // your application should be included in this list.
     'directory_list' => [
-        'src'
+        'src/',
+        'tests/',
+        'vendor/',
     ],
 
     // A directory list that defines files that will be excluded

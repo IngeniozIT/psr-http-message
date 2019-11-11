@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
@@ -15,91 +16,18 @@ class ServerRequestTest extends RequestTest
     // Implementation specific                    //
     // ========================================== //
 
-    /**
-     * Get a new ServerRequestInterface instance.
-     *
-     * @param  array         (optional) $headers         (optional) HTTP headers.
-     * @param  string       (optional)  $protocolVersion (optional) HTTP procol version.
-     * @param  string       (optional)  $method          (optional) HTTP method.
-     * @param  UriInterface (optional)  $uri             (optional) Uri.
-     * @return ServerRequestInterface
-     */
-    protected function getMessage(
-        array $headers = [],
-        ?string $protocolVersion = null,
-        ?string $method = null,
-        $uri = null,
-        ?array $serverParams = null,
-        ?array $cookieParams = null,
-        ?array $queryParams = null,
-        ?array $uploadedFiles = null
-    ) {
-        $mockStreamInterface = $this->getMockStream();
-
-        if ($uploadedFiles !== null) {
-            return new \IngeniozIT\Http\Message\ServerRequest($mockStreamInterface, $headers, $protocolVersion, $method ?? 'POST', $uri, $serverParams ?? [], $cookieParams ?? [], $queryParams ?? [], $uploadedFiles);
-        } elseif ($queryParams !== null) {
-            return new \IngeniozIT\Http\Message\ServerRequest($mockStreamInterface, $headers, $protocolVersion, $method ?? 'POST', $uri, $serverParams ?? [], $cookieParams ?? [], $queryParams);
-        } elseif ($cookieParams !== null) {
-            return new \IngeniozIT\Http\Message\ServerRequest($mockStreamInterface, $headers, $protocolVersion, $method ?? 'POST', $uri, $serverParams ?? [], $cookieParams);
-        } elseif ($serverParams !== null) {
-            return new \IngeniozIT\Http\Message\ServerRequest($mockStreamInterface, $headers, $protocolVersion, $method ?? 'POST', $uri, $serverParams);
-        } elseif ($uri !== null) {
-            return new \IngeniozIT\Http\Message\ServerRequest($mockStreamInterface, $headers, $protocolVersion, $method ?? 'POST', $uri);
-        } elseif ($method !== null) {
-            return new \IngeniozIT\Http\Message\ServerRequest($mockStreamInterface, $headers, $protocolVersion, $method ?? 'POST');
-        } elseif ($protocolVersion !== null) {
-            return new \IngeniozIT\Http\Message\ServerRequest($mockStreamInterface, $headers, $protocolVersion);
-        } elseif ($headers !== []) {
-            return new \IngeniozIT\Http\Message\ServerRequest($mockStreamInterface, $headers);
-        }
-
-        return new \IngeniozIT\Http\Message\ServerRequest($mockStreamInterface);
-    }
+    /** @var string $className Class name of the tested class */
+    protected $className = \IngeniozIT\Http\Message\ServerRequest::class;
 
     /**
      * Get a new ServerRequestInterface instance.
      *
-     * @param  ?string $method (optional) HTTP method.
-     * @param  ?string $uri    (optional) Uri.
-     * @param  ?string $host   (optional) Return of $uri->getHost().
+     * @param array $headers (optional) HTTP headers.
      * @return ServerRequestInterface
      */
-    protected function getRequest($method = null, $uri = null, $host = null)
+    protected function getMessage(array $headers = [])
     {
-        if ($uri !== null) {
-            $mockUriInterface = $this->getMockUri();
-            $mockUriInterface->method('__toString')->willReturn($uri);
-
-            if ($host !== null) {
-                $mockUriInterface->method('getHost')->willReturn($host);
-            }
-
-            $uri = $mockUriInterface;
-        }
-
-        return $this->getMessage([], null, $method, $uri);
-    }
-
-    /**
-     * Get a new ServerRequestInterface instance.
-     */
-    protected function getServerRequest(?array $serverParams = null, ?array $cookieParams = null, ?array $queryParams = null, ?array $uploadedFiles = null)
-    {
-        return $this->getMessage([], null, null, null, $serverParams, $cookieParams, $queryParams, $uploadedFiles);
-    }
-
-    // ========================================== //
-    // Constructor                                //
-    // ========================================== //
-
-    /**
-     * Does getMessage() and getRequest() return a ServerRequestInterface ?
-     */
-    public function testConstruct()
-    {
-        $this->assertInstanceOf(ServerRequestInterface::class, $this->getMessage(), 'getMessage does not give a ServerRequestInterface object.');
-        $this->assertInstanceOf(ServerRequestInterface::class, $this->getRequest(), 'getRequest does not give a ServerRequestInterface object.');
+        return new $this->className($this->getMockStream(), $headers);
     }
 
     // ========================================== //
@@ -111,7 +39,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testGetServerParamsDefault()
     {
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
 
         $this->assertSame([], $serverRequest->getServerParams());
     }
@@ -127,7 +55,7 @@ class ServerRequestTest extends RequestTest
             'param3' => 'value3',
             'param4' => 'value4'
         ];
-        $serverRequest = $this->getServerRequest($serverParams);
+        $serverRequest = $this->getMessage($serverParams);
 
         $this->assertSame($serverParams, $serverRequest->getServerParams());
     }
@@ -141,7 +69,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testGetCookieParamsDefault()
     {
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
 
         $this->assertSame([], $serverRequest->getCookieParams());
     }
@@ -157,7 +85,7 @@ class ServerRequestTest extends RequestTest
             'param3' => 'value3',
             'param4' => 'value4'
         ];
-        $serverRequest = $this->getServerRequest(null, $cookieParams);
+        $serverRequest = $this->getMessage()->withCookieParams($cookieParams);
 
         $this->assertSame($cookieParams, $serverRequest->getCookieParams());
     }
@@ -173,7 +101,7 @@ class ServerRequestTest extends RequestTest
             'param3' => 'value3',
             'param4' => 'value4'
         ];
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
         $serverRequest2 = $serverRequest->withCookieParams($cookieParams);
         $this->assertSame($cookieParams, $serverRequest2->getCookieParams());
     }
@@ -192,7 +120,7 @@ class ServerRequestTest extends RequestTest
             'param3' => 'value3',
             'param4' => 'value4'
         ];
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
         $serverRequest2 = $serverRequest->withCookieParams($cookieParams);
 
         $this->assertNotSame($serverRequest, $serverRequest2);
@@ -211,7 +139,7 @@ class ServerRequestTest extends RequestTest
             'param3' => 'value3',
             'param4' => 'value4'
         ];
-        $serverRequest = $this->getServerRequest(null, $cookieParams);
+        $serverRequest = $this->getMessage()->withCookieParams($cookieParams);
         $serverRequest2 = $serverRequest->withCookieParams($cookieParams);
 
         $this->assertSame($serverRequest, $serverRequest2);
@@ -226,7 +154,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testGetQueryParamsDefault()
     {
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
 
         $this->assertSame([], $serverRequest->getQueryParams());
     }
@@ -242,7 +170,8 @@ class ServerRequestTest extends RequestTest
             'param3' => 'value3',
             'param4' => 'value4'
         ];
-        $serverRequest = $this->getServerRequest(null, null, $queryParams);
+
+        $serverRequest = $this->getMessage()->withQueryParams($queryParams);
 
         $this->assertSame($queryParams, $serverRequest->getQueryParams());
     }
@@ -258,7 +187,7 @@ class ServerRequestTest extends RequestTest
             'param3' => 'value3',
             'param4' => 'value4'
         ];
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
         $serverRequest2 = $serverRequest->withQueryParams($cookieParams);
         $this->assertSame($cookieParams, $serverRequest2->getQueryParams());
     }
@@ -277,7 +206,7 @@ class ServerRequestTest extends RequestTest
             'param3' => 'value3',
             'param4' => 'value4'
         ];
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
         $serverRequest2 = $serverRequest->withQueryParams($queryParams);
 
         $this->assertNotSame($serverRequest, $serverRequest2);
@@ -296,7 +225,7 @@ class ServerRequestTest extends RequestTest
             'param3' => 'value3',
             'param4' => 'value4'
         ];
-        $serverRequest = $this->getServerRequest(null, null, $queryParams);
+        $serverRequest = $this->getMessage()->withQueryParams($queryParams);
         $serverRequest2 = $serverRequest->withQueryParams($queryParams);
 
         $this->assertSame($serverRequest, $serverRequest2);
@@ -311,7 +240,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testGetUploadedFilesDefault()
     {
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
 
         $this->assertSame([], $serverRequest->getUploadedFiles());
     }
@@ -327,7 +256,7 @@ class ServerRequestTest extends RequestTest
             'param3' => $this->createMock(UploadedFileInterface::class),
             'param4' => $this->createMock(UploadedFileInterface::class)
         ];
-        $serverRequest = $this->getServerRequest(null, null, null, $uploadedFiles);
+        $serverRequest = $this->getMessage()->withUploadedFiles($uploadedFiles);
 
         $this->assertSame($uploadedFiles, $serverRequest->getUploadedFiles());
     }
@@ -343,7 +272,7 @@ class ServerRequestTest extends RequestTest
             'param3' => $this->createMock(UploadedFileInterface::class),
             'param4' => $this->createMock(UploadedFileInterface::class)
         ];
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
         $serverRequest2 = $serverRequest->withUploadedFiles($uploadedFiles);
         $this->assertSame($uploadedFiles, $serverRequest2->getUploadedFiles());
     }
@@ -362,7 +291,7 @@ class ServerRequestTest extends RequestTest
             'param3' => $this->createMock(UploadedFileInterface::class),
             'param4' => $this->createMock(UploadedFileInterface::class)
         ];
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
         $serverRequest2 = $serverRequest->withUploadedFiles($uploadedFiles);
 
         $this->assertNotSame($serverRequest, $serverRequest2);
@@ -381,7 +310,8 @@ class ServerRequestTest extends RequestTest
             'param3' => $this->createMock(UploadedFileInterface::class),
             'param4' => $this->createMock(UploadedFileInterface::class)
         ];
-        $serverRequest = $this->getServerRequest(null, null, null, $uploadedFiles);
+
+        $serverRequest = $this->getMessage()->withUploadedFiles($uploadedFiles);
         $serverRequest2 = $serverRequest->withUploadedFiles($uploadedFiles);
 
         $this->assertSame($serverRequest, $serverRequest2);
@@ -396,7 +326,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testGetParsedBodyDefault()
     {
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
 
         $this->assertNull($serverRequest->getParsedBody());
     }
@@ -412,7 +342,7 @@ class ServerRequestTest extends RequestTest
             'baz' => null,
         ];
 
-        $serverRequest = $this->getServerRequest()->withParsedBody($parsedBody);
+        $serverRequest = $this->getMessage()->withParsedBody($parsedBody);
 
         $this->assertSame($parsedBody, $serverRequest->getParsedBody());
     }
@@ -430,7 +360,7 @@ class ServerRequestTest extends RequestTest
             'bar' => ['foobar'],
             'baz' => null,
         ];
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
         $serverRequest2 = $serverRequest->withParsedBody($parsedBody);
 
         $this->assertNotSame($serverRequest, $serverRequest2);
@@ -450,9 +380,7 @@ class ServerRequestTest extends RequestTest
             'baz' => null,
         ];
 
-        $serverRequest = $this
-            ->getServerRequest()
-            ->withParsedBody($parsedBody);
+        $serverRequest = $this->getMessage()->withParsedBody($parsedBody);
         $serverRequest2 = $serverRequest->withParsedBody($parsedBody);
 
         $this->assertSame($serverRequest, $serverRequest2);
@@ -467,7 +395,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testGetAttributesDefault()
     {
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
 
         $this->assertSame([], $serverRequest->getAttributes());
     }
@@ -478,7 +406,7 @@ class ServerRequestTest extends RequestTest
     public function testGetAttributes()
     {
         $serverRequest = $this
-            ->getServerRequest()
+            ->getMessage()
             ->withAttribute('foo', 'bar baz')
             ->withAttribute('baz?', ['this', 'is', 'baz!'])
             ->withAttribute('that one is null', null);
@@ -498,7 +426,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testWithAttribute()
     {
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
 
         $serverRequest = $serverRequest->withAttribute('foo', 'bar baz');
 
@@ -513,7 +441,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testWithAttributeReturnsNewInstance()
     {
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
         $serverRequest2 = $serverRequest->withAttribute('foo', 'bar baz');
 
         $this->assertNotSame($serverRequest, $serverRequest2);
@@ -527,9 +455,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testWithAttributeReturnsSameInstanceOnSameValue()
     {
-        $serverRequest = $this
-            ->getServerRequest()
-            ->withAttribute('foo', 'bar baz');
+        $serverRequest = $this->getMessage()->withAttribute('foo', 'bar baz');
         $serverRequest2 = $serverRequest->withAttribute('foo', 'bar baz');
 
         $this->assertSame($serverRequest, $serverRequest2);
@@ -540,9 +466,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testWithoutAttribute()
     {
-        $serverRequest = $this
-            ->getServerRequest()
-            ->withAttribute('foo', 'bar baz');
+        $serverRequest = $this->getMessage()->withAttribute('foo', 'bar baz');
 
         $serverRequest2 = $serverRequest->withoutAttribute('foo');
 
@@ -557,9 +481,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testWithoutAttributeReturnsNewInstance()
     {
-        $serverRequest = $this
-            ->getServerRequest()
-            ->withAttribute('foo', 'bar baz');
+        $serverRequest = $this->getMessage()->withAttribute('foo', 'bar baz');
 
         $serverRequest2 = $serverRequest->withoutAttribute('foo');
 
@@ -574,7 +496,7 @@ class ServerRequestTest extends RequestTest
      */
     public function testWithoutAttributeReturnsSameInstanceOnSameValue()
     {
-        $serverRequest = $this->getServerRequest();
+        $serverRequest = $this->getMessage();
 
         $serverRequest2 = $serverRequest->withoutAttribute('foo');
 

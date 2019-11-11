@@ -1,14 +1,13 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\ResponseInterface;
 use IngeniozIT\Http\Message\Message;
-
 use IngeniozIT\Http\Message\Enums\Http;
 use Psr\Http\Message\StreamInterface;
-
 use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 
 /**
@@ -31,8 +30,8 @@ class Response extends Message implements ResponseInterface
     const DEFAULT_STATUS_CODE = 200;
     const DEFAULT_REASON_PHRASE = Http::REASON_PHRASES[self::DEFAULT_STATUS_CODE];
 
-    protected $statusCode;
-    protected $reasonPhrase;
+    protected $statusCode = self::DEFAULT_STATUS_CODE;
+    protected $reasonPhrase = self::DEFAULT_REASON_PHRASE;
 
     /**
      * Constructor.
@@ -52,7 +51,7 @@ class Response extends Message implements ResponseInterface
     ) {
         $statusCode = self::formatStatusCode($statusCode);
 
-        parent::__construct($stream, $headers, $protocolVersion);
+        parent::__construct($stream);
 
         $this->statusCode = $statusCode;
         $this->reasonPhrase = $reasonPhrase;

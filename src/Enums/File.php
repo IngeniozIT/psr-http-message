@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Enums;
 
@@ -9,7 +10,7 @@ namespace IngeniozIT\Http\Message\Enums;
 class File
 {
     /**
-     * @var array[] List of file error statuses.
+     * @var array List of file error statuses.
      */
     const ERROR_STATUS = [
         \UPLOAD_ERR_OK => true, // 0

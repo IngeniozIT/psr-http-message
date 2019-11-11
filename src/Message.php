@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
@@ -28,7 +29,7 @@ class Message implements MessageInterface
     /**
      * @var string HTTP protocol version.
      */
-    protected $protocolVersion;
+    protected $protocolVersion = self::DEFAULT_PROTOCOL_VERSION;
 
     /**
      * @var array HTTP headers.
@@ -43,29 +44,15 @@ class Message implements MessageInterface
     /**
      * @var StreamInterface Body of the message.
      */
-    protected $body = null;
+    protected $body;
 
     /**
      * Constructor.
      *
-     * @param StreamInterface $stream          The StreamInterface to be used as body.
-     * @param array           $headers         (optional) Headers to set.
-     * @param ?string         $protocolVersion (optional) Protocol version.
+     * @param StreamInterface $stream The StreamInterface to be used as body.
      */
-    public function __construct(StreamInterface $stream, array $headers = [], ?string $protocolVersion = null)
+    public function __construct(StreamInterface $stream)
     {
-        // Add protocol version
-        if ($protocolVersion !== null) {
-            $this->protocolVersion = self::formatProtocolVersion($protocolVersion);
-        } else {
-            $this->protocolVersion = static::DEFAULT_PROTOCOL_VERSION;
-        }
-
-        // Add headers
-        foreach ($headers as $name => $value) {
-            $this->addHeader($name, $value);
-        }
-
         $this->body = $stream;
     }
 
@@ -325,27 +312,6 @@ class Message implements MessageInterface
     }
 
     // Internals
-
-    /**
-     * Add a header to the Message.
-     *
-     * @param  string          $name  Case-insensitive header field name to add.
-     * @param  string|string[] $value Header value(s).
-     * @return void
-     * @throws \InvalidArgumentException for invalid header names or values.
-     */
-    protected function addHeader($name, $value): void
-    {
-        $parsedHeaderName = static::parseHeaderName($name);
-        $parsedHeaderValue = static::parseHeaderValue($value);
-
-        if (isset($this->headerNames[$parsedHeaderName])) {
-            unset($this->headers[$this->headerNames[$parsedHeaderName]]);
-        }
-
-        $this->headerNames[$parsedHeaderName] = $name;
-        $this->headers[$name] = $parsedHeaderValue;
-    }
 
     /**
      * Parse and sanitize a header name.

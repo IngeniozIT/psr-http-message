@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Tests\Message;
 
@@ -1032,6 +1033,7 @@ class UriTest extends TestCase
      */
     public function testReturnsExpectedStringWhenPassingUriInConstructor(string $str)
     {
+        /** @var UriInterface */
         $uri = new $this->className($str);
 
         $this->assertSame($str, (string)$uri, "Expected {$str}, got {$uri} instead.");

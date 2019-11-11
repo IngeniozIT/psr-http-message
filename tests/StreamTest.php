@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Tests\Message;
 
@@ -77,7 +78,7 @@ class StreamTest extends TestCase
      * Open a temporary file and return its resource.
      *
      * @param  string $mode (optional) Mode to use while opening the file.
-     * @return string
+     * @return resource
      */
     protected function getFileDescriptor(string $mode = 'r+')
     {

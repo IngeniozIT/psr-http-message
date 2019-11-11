@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
@@ -30,9 +31,14 @@ use IngeniozIT\Http\Message\Exceptions\InvalidArgumentException;
 class Request extends Message implements RequestInterface
 {
     /**
+     * @var string Default HTTP method.
+     */
+    const DEFAULT_METHOD = 'GET';
+
+    /**
      * @var string HTTP method.
      */
-    protected $method;
+    protected $method = self::DEFAULT_METHOD;
 
     /**
      * @var UriInterface Uri.
@@ -42,29 +48,14 @@ class Request extends Message implements RequestInterface
     /**
      * Constructor.
      *
-     * @param StreamInterface $stream          Steam of the body of the Request.
-     * @param array           $headers         (optional) HTTP headers.
-     * @param ?string         $protocolVersion (optional) HTTP protocol version or null for default.
-     * @param string          $method          (optional) Case-sensitive HTTP method.
-     * @param ?UriInterface   $uri             (optional) Uri of the request.
+     * @param StreamInterface $stream Stream of the body of the Request.
+     * @param ?UriInterface $uri (optional) Uri of the request.
      */
-    public function __construct(
-        StreamInterface $stream,
-        array $headers = [],
-        ?string $protocolVersion = null,
-        string $method = 'GET',
-        ?UriInterface $uri = null
-    ) {
-        parent::__construct($stream, $headers, $protocolVersion);
+    public function __construct(StreamInterface $stream, ?UriInterface $uri = null)
+    {
+        parent::__construct($stream);
 
-        $this->method = self::formatMethod($method);
         $this->uri = $uri ?? new Uri('/');
-
-        // During construction, implementations MUST attempt to set the Host
-        // header from a provided URI if no Host header is provided.
-        if (!$this->hasHeader('Host') && !empty($host = $this->uri->getHost())) {
-            $this->addHeader('Host', $host);
-        }
     }
 
     // Interface
@@ -221,8 +212,8 @@ class Request extends Message implements RequestInterface
         if ($nextHost !== '' &&
             $nextHost !== $currentHost &&
             (
-                !$preserveHost
-                || $currentHost === ''
+                !$preserveHost ||
+                $currentHost === ''
             )
         ) {
             // Host must be changed

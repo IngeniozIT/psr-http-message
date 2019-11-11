@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
@@ -33,7 +34,6 @@ class UploadedFile implements UploadedFileInterface
     ) {
         $this->validateError($error);
         $this->error = $error;
-        $this->filePath = $filePath;
 
         if (!file_exists($filePath) || is_dir($filePath)) {
             throw new RunTimeException("$filePath does not exist.");
@@ -43,6 +43,8 @@ class UploadedFile implements UploadedFileInterface
         if ($fd === false) {
             throw new RunTimeException("Could not open file $filePath.");
         }
+        $this->filePath = $filePath;
+        
         $this->stream = new Stream($fd);
         $this->size = $size;
         $this->clientFilename = $clientFilename;

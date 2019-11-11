@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
@@ -50,55 +51,35 @@ class ServerRequest extends Request implements ServerRequestInterface
     protected $serverParams;
 
     /** @var array */
-    protected $cookieParams;
+    protected $cookieParams = [];
 
     /** @var array */
-    protected $queryParams;
+    protected $queryParams = [];
 
     /** @var array */
-    protected $uploadedFiles;
+    protected $uploadedFiles = [];
 
-    /** @var null|array */
+    /** @var ?array */
     protected $parsedBody;
 
     /** @var array */
-    protected $attributes;
+    protected $attributes = [];
 
     /**
      * Constructor.
      *
-     * @param StreamInterface $stream          The StreamInterface to be used as body.
-     * @param array           $headers         (optional) Headers to set.
-     * @param ?string         $protocolVersion (optional) HTTP protocol version or null for default.
-     * @param string          $method          (optional) Case-sensitive HTTP method.
-     * @param ?UriInterface   $uri             (optional) Uri of the request.
-     * @param array           $serverParams    (optional)
-     * @param array           $cookieParams    (optional)
-     * @param array           $queryParams     (optional)
-     * @param array           $uploadedFiles   (optional)
-     * @param array           $parsedBody      (optional)
-     * @param array           $attributes      (optional)
+     * @param StreamInterface $stream The StreamInterface to be used as body.
+     * @param array $serverParams (optional)
+     * @param ?UriInterface $uri (optional) Uri of the request.
      */
     public function __construct(
         StreamInterface $stream,
-        array $headers = [],
-        ?string $protocolVersion = null,
-        string $method = 'GET',
-        ?UriInterface $uri = null,
         array $serverParams = [],
-        array $cookieParams = [],
-        array $queryParams = [],
-        array $uploadedFiles = [],
-        array $parsedBody = [],
-        array $attributes = []
+        ?UriInterface $uri = null
     ) {
-        parent::__construct($stream, $headers, $protocolVersion, $method, $uri);
+        parent::__construct($stream, $uri);
 
         $this->serverParams = $serverParams;
-        $this->cookieParams = $cookieParams;
-        $this->queryParams = $queryParams;
-        $this->uploadedFiles = $uploadedFiles;
-        $this->attributes = $attributes;
     }
 
     /**

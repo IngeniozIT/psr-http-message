@@ -1,10 +1,11 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
 use IngeniozIT\Http\Message\Tests\MessageTest;
-use Psr\Http\Message\{RequestInterface, MessageInterface, UriInterface};
+use Psr\Http\Message\{RequestInterface, UriInterface};
 
 /**
  * @coversDefaultClass \IngeniozIT\Http\Message\Request
@@ -15,107 +16,54 @@ class RequestTest extends MessageTest
     // Implementation specific                    //
     // ========================================== //
 
-    /**
-     * Get a new RequestInterface instance.
-     *
-     * @param  array         (optional) $headers         (optional) HTTP headers.
-     * @param  string       (optional)  $protocolVersion (optional) HTTP procol version.
-     * @param  string       (optional)  $method          (optional) HTTP method.
-     * @param  UriInterface (optional)  $uri             (optional) Uri.
-     * @return RequestInterface
-     */
-    protected function getMessage(
-        array $headers = [],
-        ?string $protocolVersion = null,
-        ?string $method = null,
-        $uri = null
-    ) {
-        $mockStreamInterface = $this->getMockStream();
+    /** @var string $className Class name of the tested class */
+    protected $className = \IngeniozIT\Http\Message\Request::class;
 
-        if ($uri !== null) {
-            return new \IngeniozIT\Http\Message\Request($mockStreamInterface, $headers, $protocolVersion, $method, $uri);
-        } elseif ($method !== null) {
-            return new \IngeniozIT\Http\Message\Request($mockStreamInterface, $headers, $protocolVersion, $method);
-        } elseif ($protocolVersion !== null) {
-            return new \IngeniozIT\Http\Message\Request($mockStreamInterface, $headers, $protocolVersion);
-        } elseif ($headers !== []) {
-            return new \IngeniozIT\Http\Message\Request($mockStreamInterface, $headers);
-        }
-
-        return new \IngeniozIT\Http\Message\Request($mockStreamInterface);
-    }
 
     /**
-     * Get a new RequestInterface instance.
-     *
-     * @param  string $method (optional) HTTP method.
-     * @param  string $uri    (optional) Uri.
-     * @param  string $host   (optional) Return of $uri->getHost().
+     * Get an instance of the tested Request object.
      * @return RequestInterface
      */
-    protected function getRequest($method = null, $uri = null, $host = null)
+    public function getRequest(): RequestInterface
     {
-        if ($uri !== null) {
-            $mockUriInterface = $this->getMockUri();
-            $mockUriInterface->method('__toString')->willReturn($uri);
-
-            if ($host !== null) {
-                $mockUriInterface->method('getHost')->willReturn($host);
-            }
-
-            $uri = $mockUriInterface;
-        }
-
-        return $this->getMessage([], null, $method, $uri);
+        return $this->getMessage();
     }
 
     /**
      * Get a \Psr\Http\Message\UriInterface mock.
+     * @param array $methods (optional) Methods to mock.
      *
      * @return UriInterface
      */
-    protected function getMockUri(): UriInterface
+    protected function getMockUri($methods = []): UriInterface
     {
-        return $this->createMock(UriInterface::class);
+        $mockUriInterface = $this->createMock(UriInterface::class);
+
+        foreach ($methods as $methodName => $returnValue) {
+            $mockUriInterface
+                ->method($methodName)
+                ->willReturn($returnValue);
+        }
+
+        return $mockUriInterface;
     }
 
     // ========================================== //
-    // Constructor                                //
+    // Host                                       //
     // ========================================== //
-
-    /**
-     * Does getMessage() and getRequest() return a RequestInterface ?
-     */
-    public function testConstruct()
-    {
-        $this->assertInstanceOf(RequestInterface::class, $this->getMessage(), 'getMessage does not give a RequestInterface object.');
-        $this->assertInstanceOf(RequestInterface::class, $this->getRequest(), 'getRequest does not give a RequestInterface object.');
-    }
 
     /**
      * During construction, implementations MUST attempt to set the Host header from
      * a provided URI if no Host header is provided.
-     * Set the host with headers.
      */
-    public function testConstructSetHostHeader()
+    public function testCanSetHostWithUri()
     {
-        $request = $this->getMessage(['Host' => 'hostname'], null, 'GET', null);
+        $mockUriInterface = $this->getMockUri([
+            '__toString' => 'hostname/foo',
+            'getHost' => 'hostname',
+        ]);
 
-        $this->assertSame('hostname', $request->getHeaderLine('Host'));
-    }
-
-    /**
-     * During construction, implementations MUST attempt to set the Host header from
-     * a provided URI if no Host header is provided.
-     * Set the host with a given Uri.
-     */
-    public function testConstructSetHostHeaderWithUri()
-    {
-        $mockUriInterface = $this->getMockUri();
-        $mockUriInterface->method('__toString')->willReturn('hostname/foo');
-        $mockUriInterface->method('getHost')->willReturn('hostname');
-
-        $request = $this->getMessage([], null, 'GET', $mockUriInterface);
+        $request = $this->getRequest()->withUri($mockUriInterface);
 
         $this->assertSame('hostname', $request->getHeaderLine('Host'));
     }
@@ -127,36 +75,14 @@ class RequestTest extends MessageTest
      */
     public function testConstructSetHostHeaderWithUriWithNoHost()
     {
-        /**
- * @var UriInterface $mockUriInterface
-*/
-        $mockUriInterface = $this->getMockUri();
-        $mockUriInterface->method('__toString')->willReturn('/');
-        $mockUriInterface->method('getHost')->willReturn('');
+        $mockUriInterface = $this->getMockUri([
+            '__toString' => '/',
+            'getHost' => '',
+        ]);
 
-        $request = $this->getMessage([], null, 'GET', $mockUriInterface);
+        $request = $this->getRequest()->withUri($mockUriInterface);
 
         $this->assertFalse($request->hasHeader('Host'));
-    }
-
-    /**
-     * During construction, implementations MUST attempt to set the Host header from
-     * a provided URI if no Host header is provided.
-     * Set the host with headers, give a Uri with a host. Expect the Uri does not
-     * override host.
-     */
-    public function testConstructSetHostHeaderAndGiveUri()
-    {
-        /**
- * @var UriInterface $mockUriInterface
-*/
-        $mockUriInterface = $this->getMockUri();
-        $mockUriInterface->method('__toString')->willReturn('badhostname');
-        $mockUriInterface->method('getHost')->willReturn('badhostname');
-
-        $request = $this->getMessage(['Host' => 'hostname'], null, 'GET', $mockUriInterface);
-
-        $this->assertSame('hostname', $request->getHeaderLine('Host'));
     }
 
     // ========================================== //
@@ -183,7 +109,7 @@ class RequestTest extends MessageTest
     {
         $uri = 'http://example.com/path?query=yes#fragment';
 
-        $request = $this->getRequest('GET', $uri);
+        $request = $this->getRequest()->withRequestTarget($uri);
 
         $this->assertSame($uri, $request->getRequestTarget());
     }
@@ -318,7 +244,7 @@ class RequestTest extends MessageTest
      */
     public function testWithMethodImmutability()
     {
-        $request = $this->getRequest('GET');
+        $request = $this->getRequest();
         $request2 = $request->withMethod('GET');
         $request3 = $request->withMethod('POST');
 
@@ -358,23 +284,26 @@ class RequestTest extends MessageTest
     {
         $request = $this->getRequest();
 
-        $mockUriInterface = $this->getMockUri();
-        $mockUriInterface->method('__toString')->willReturn('hostname/foo');
-        $mockUriInterface->method('getHost')->willReturn('hostname');
+        $mockUriInterface = $this->getMockUri([
+            '__toString' => 'hostname/foo',
+            'getHost' => 'hostname',
+        ]);
 
         $request = $request->withUri($mockUriInterface);
 
         $this->assertSame('hostname', $request->getUri()->getHost());
         $this->assertSame('hostname', $request->getHeaderLine('Host'));
 
-        $mockUriInterface3 = $this->getMockUri();
-        $mockUriInterface3->method('__toString')->willReturn('hostname/bar');
-        $mockUriInterface3->method('getHost')->willReturn('hostname');
+        $mockUriInterface3 = $this->getMockUri([
+            '__toString' => 'hostname/bar',
+            'getHost' => 'hostname',
+        ]);
 
-        $mockUriInterface2 = $this->getMockUri();
-        $mockUriInterface2->method('__toString')->willReturn('/bar');
-        $mockUriInterface2->method('getHost')->willReturn('');
-        $mockUriInterface2->method('withHost')->willReturn($mockUriInterface3);
+        $mockUriInterface2 = $this->getMockUri([
+            '__toString' => '/bar',
+            'getHost' => '',
+            'withHost' => $mockUriInterface3,
+        ]);
 
         $request2 = $request->withUri($mockUriInterface2);
 
@@ -396,18 +325,20 @@ class RequestTest extends MessageTest
         // Setup
         $request = $this->getRequest();
 
-        $mockUriInterface = $this->getMockUri();
-        $mockUriInterface->method('__toString')->willReturn('/foo');
-        $mockUriInterface->method('getHost')->willReturn('');
+        $mockUriInterface = $this->getMockUri([
+            '__toString' => '/foo',
+            'getHost' => '',
+        ]);
 
         $request = $request->withUri($mockUriInterface);
 
         $this->assertSame('', $request->getUri()->getHost());
         $this->assertSame('', $request->getHeaderLine('Host'));
 
-        $mockUriInterface2 = $this->getMockUri();
-        $mockUriInterface2->method('__toString')->willReturn('hostname/foo');
-        $mockUriInterface2->method('getHost')->willReturn('hostname');
+        $mockUriInterface2 = $this->getMockUri([
+            '__toString' => 'hostname/foo',
+            'getHost' => 'hostname',
+        ]);
 
         // Test
         $request2 = $request->withUri($mockUriInterface2, true);
@@ -430,15 +361,17 @@ class RequestTest extends MessageTest
         // Setup
         $request = $this->getRequest();
 
-        $mockUriInterface = $this->getMockUri();
-        $mockUriInterface->method('__toString')->willReturn('/foo');
-        $mockUriInterface->method('getHost')->willReturn('');
+        $mockUriInterface = $this->getMockUri([
+            '__toString' => '/foo',
+            'getHost' => '',
+        ]);
 
         $request = $request->withUri($mockUriInterface);
 
-        $mockUriInterface2 = $this->getMockUri();
-        $mockUriInterface2->method('__toString')->willReturn('/foo');
-        $mockUriInterface2->method('getHost')->willReturn('');
+        $mockUriInterface2 = $this->getMockUri([
+            '__toString' => '/foo',
+            'getHost' => '',
+        ]);
 
         // Test
         $request2 = $request
@@ -462,9 +395,10 @@ class RequestTest extends MessageTest
         // Setup
         $request = $this->getRequest()->withHeader('Host', 'hostname');
 
-        $mockUriInterface = $this->getMockUri();
-        $mockUriInterface->method('__toString')->willReturn('badhostname/foo');
-        $mockUriInterface->method('getHost')->willReturn('badhostname');
+        $mockUriInterface = $this->getMockUri([
+            '__toString' => 'badhostname/foo',
+            'getHost' => 'badhostname',
+        ]);
 
         // Test
         $request2 = $request->withUri($mockUriInterface, true);
