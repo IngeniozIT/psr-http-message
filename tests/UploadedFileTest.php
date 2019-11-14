@@ -12,29 +12,28 @@ use Psr\Http\Message\{UploadedFileInterface, StreamInterface};
  */
 class UploadedFileTest extends TestCase
 {
-    /**
-     * @var bool True to make fopen fail.
-     */
-    public static $fopen = false;
-
-    /**
-     * @var bool True to make rename and move_uploaded_file fail.
-     */
-    public static $move = false;
-
-    /**
-     * @var bool True to make realpath fail.
-     */
-    public static $realpath = false;
+    public static $rename = null;
+    public static $is_uploaded_file = null;
+    public static $move_uploaded_file = null;
+    public static $file_put_contents = null;
+    public static $fopen = null;
+    public static $realpath = null;
+    public static $php_sapi_name = null;
+    public static $is_resource = null;
 
     /**
      * Before each test, reset functions overrides.
      */
     protected function setUp(): void
     {
-        self::$fopen = false;
-        self::$move = false;
-        self::$realpath = false;
+        self::$rename = null;
+        self::$is_uploaded_file = null;
+        self::$move_uploaded_file = null;
+        self::$file_put_contents = null;
+        self::$fopen = null;
+        self::$realpath = null;
+        self::$php_sapi_name = null;
+        self::$is_resource = null;
     }
 
     /**
@@ -42,19 +41,37 @@ class UploadedFileTest extends TestCase
      *
      * @return string
      */
-    protected function getFilePath($withContent = false)
+    protected function getFilePath(): string
     {
-        $tmpFd = tmpfile();
-        $path = stream_get_meta_data($tmpFd)['uri'];
-        fclose($tmpFd);
+        $path = $this->getEmptyPath();
+        touch($path);
+        return $path;
+    }
 
-        if ($withContent) {
-            file_put_contents($path, '');
-        } elseif (file_exists($path)) {
-            unlink($path);
+    protected function getEmptyPath(): string
+    {
+        return sys_get_temp_dir() . '/' . uniqid('UploadedFileTest', true);
+    }
+
+    protected function getTempFilePath(): string
+    {
+        return tempnam(sys_get_temp_dir(), 'UploadedFileTest');
+    }
+
+    protected function getStreamMock(?string $path = null, $methods = []): StreamInterface
+    {
+        if ($path === null) {
+            $path = $this->getTempFilePath();
         }
 
-        return $path;
+        /** @var StreamInterface */
+        $streamMock = $this->createMock(StreamInterface::class);
+
+        foreach ($methods as $name => $returnValue) {
+            $streamMock->method($name)->willReturn($returnValue);
+        }
+
+        return $streamMock;
     }
 
     // ========================================== //
@@ -72,27 +89,28 @@ class UploadedFileTest extends TestCase
      */
     protected function getUploadedFile(?string $path = null, ?int $size = null, ?int $error = null, ?string $clientFilename = null, ?string $clientMediaType = null)
     {
-        if ($path === null) {
-            $path = $this->getFilePath(true);
-        }
+        $mockStream = $this->getStreamMock($path);
+        $mockStream
+            ->method('getContents')
+            ->willReturn('foo bar baz !');
 
         if ($clientMediaType !== null) {
-            return new \IngeniozIT\Http\Message\UploadedFile($path, $size, $error, $clientFilename, $clientMediaType);
+            return new \IngeniozIT\Http\Message\UploadedFile($mockStream, $size, $error, $clientFilename, $clientMediaType);
         }
 
         if ($clientFilename !== null) {
-            return new \IngeniozIT\Http\Message\UploadedFile($path, $size, $error, $clientFilename);
+            return new \IngeniozIT\Http\Message\UploadedFile($mockStream, $size, $error, $clientFilename);
         }
 
         if ($error !== null) {
-            return new \IngeniozIT\Http\Message\UploadedFile($path, $size, $error);
+            return new \IngeniozIT\Http\Message\UploadedFile($mockStream, $size, $error);
         }
 
         if ($size !== null) {
-            return new \IngeniozIT\Http\Message\UploadedFile($path, $size);
+            return new \IngeniozIT\Http\Message\UploadedFile($mockStream, $size);
         }
 
-        return new \IngeniozIT\Http\Message\UploadedFile($path);
+        return new \IngeniozIT\Http\Message\UploadedFile($mockStream);
     }
 
     // ========================================== //
@@ -105,30 +123,6 @@ class UploadedFileTest extends TestCase
     public function testConstruct()
     {
         $this->assertInstanceOf(UploadedFileInterface::class, $this->getUploadedFile(), 'getUploadedFile does not give an UploadedFileInterface object.');
-    }
-
-    /**
-     * Passing an invalid file path should throw an exception.
-     */
-    public function testConstructWithInvalidPath()
-    {
-        // Contains a path to a file that does not exist.
-        $nonExistantPath = $this->getFilePath(false);
-
-        $this->expectException(\RuntimeException::class);
-        $this->getUploadedFile($nonExistantPath);
-    }
-
-    /**
-     * A filesystem error should trigger an exception.
-     */
-    public function testConstructWithFilesystemError()
-    {
-        // Trigger a fopen failure
-        self::$fopen = true;
-
-        $this->expectException(\RuntimeException::class);
-        $this->getUploadedFile();
     }
 
     // ========================================== //
@@ -153,7 +147,7 @@ class UploadedFileTest extends TestCase
     {
         $uploadedFile = $this->getUploadedFile();
 
-        $uploadedFile->moveTo($this->getFilePath());
+        $uploadedFile->moveTo($this->getEmptyPath());
 
         $this->expectException(\RunTimeException::class);
         $uploadedFile->getStream();
@@ -168,12 +162,12 @@ class UploadedFileTest extends TestCase
      */
     public function testMoveTo()
     {
-        $path = $this->getFilePath(true);
+        $path = $this->getFilePath();
         file_put_contents($path, 'foo bar baz !');
 
         $uploadedFile = $this->getUploadedFile($path);
 
-        $targetPath = $this->getFilePath();
+        $targetPath = $this->getEmptyPath();
         $uploadedFile->moveTo($targetPath);
 
         $this->assertFileExists($targetPath);
@@ -186,11 +180,11 @@ class UploadedFileTest extends TestCase
      */
     public function testMoveToMoved()
     {
-        $path = $this->getFilePath(true);
+        $path = $this->getFilePath();
 
         $uploadedFile = $this->getUploadedFile($path);
 
-        $targetPath = $this->getFilePath();
+        $targetPath = $this->getEmptyPath();
         // Call moveTo a first time
         $uploadedFile->moveTo($targetPath);
 
@@ -206,9 +200,8 @@ class UploadedFileTest extends TestCase
     public function testMoveToInvalidTargetPath()
     {
         $uploadedFile = $this->getUploadedFile();
-
         $path = 'this will fail';
-        self::$realpath = true;
+        self::$realpath = false;
 
         $this->expectException(\InvalidArgumentException::class);
         $uploadedFile->moveTo($path);
@@ -221,7 +214,7 @@ class UploadedFileTest extends TestCase
     public function testMoveToExistingTargetPath()
     {
         $uploadedFile = $this->getUploadedFile();
-        $path = $this->getFilePath(true);
+        $path = $this->getFilePath();
 
         $this->expectException(\InvalidArgumentException::class);
         $uploadedFile->moveTo($path);
@@ -229,16 +222,70 @@ class UploadedFileTest extends TestCase
 
     /**
      * Move the uploaded file to a new location.
-     * throws \RuntimeException on any error during the move operation
+     * throws \RuntimeException on any error during the move operation.
+     * @dataProvider providerFsErrorCases
      */
-    public function testMoveToFsError()
+    public function testMoveToThrowsExceptionOnFilesystemError(bool $isCli, bool $streamWithUri)
     {
         $uploadedFile = $this->getUploadedFile();
-        $path = $this->getFilePath();
+        $path = $this->getEmptyPath();
+        $mockStream = $this->getStreamMock($path, [
+            'getContents' => 'foo bar baz !',
+            'getMetadata' => 'test_uri',
+        ]);
 
-        self::$move = true;
+        $uploadedFile = new \IngeniozIT\Http\Message\UploadedFile($mockStream);
+        $path = $this->getEmptyPath();
+        self::$rename = false;
+        self::$move_uploaded_file = false;
+        self::$file_put_contents = false;
+        self::$fopen = false;
+        self::$php_sapi_name = $isCli ? 'cli' : 'not_cli';
+
         $this->expectException(\RuntimeException::class);
         $uploadedFile->moveTo($path);
+    }
+
+    /**
+     * Move the uploaded file to a new location.
+     * throws \RuntimeException on any error during the move operation.
+     * @dataProvider providerFsErrorCases
+     */
+    public function testMoveToWorksWithAllEnvs(bool $isCli, bool $streamWithUri)
+    {
+        $uploadedFile = $this->getUploadedFile();
+        $path = $this->getEmptyPath();
+        $mockStream = $this->getStreamMock($path, [
+            'getContents' => 'foo bar baz !',
+            'getMetadata' => 'test_uri',
+        ]);
+        $uploadedFile = new \IngeniozIT\Http\Message\UploadedFile($mockStream);
+        $path = $this->getEmptyPath();
+        self::$rename = true;
+        self::$is_uploaded_file = true;
+        self::$move_uploaded_file = true;
+        self::$file_put_contents = true;
+        self::$is_resource = true;
+        self::$php_sapi_name = $isCli ? 'cli' : 'not_cli';
+
+        $uploadedFile->moveTo($path);
+        $this->assertTrue(true);
+    }
+
+    /**
+     * Provider. Gives filesystem error cases based on
+     * - cli / not cli environment
+     * - StreamInterface object with / without uri metadata
+     * @return array
+     */
+    public function providerFsErrorCases(): array
+    {
+        return [
+            'cli + uri' => [true, true],
+            'cli + no uri' => [true, false],
+            'not cli + uri' => [false, true],
+            'not cli + no uri' => [false, false],
+        ];
     }
 
     // ========================================== //
@@ -345,9 +392,7 @@ class UploadedFileTest extends TestCase
      */
     public function testGetClientFileName()
     {
-        /**
- * @var StreamInterface $mockStreamInterface
-*/
+        /** @var StreamInterface $mockStreamInterface */
         $stream = $this->createMock(StreamInterface::class);
 
         $uploadedFile = $this->getUploadedFile(null, null, 0, 'fileName.test');
@@ -376,9 +421,7 @@ class UploadedFileTest extends TestCase
      */
     public function testGetClientMediaType()
     {
-        /**
-         * @var StreamInterface $mockStreamInterface
-        */
+        /** @var StreamInterface $mockStreamInterface */
         $stream = $this->createMock(StreamInterface::class);
 
         $uploadedFile = $this->getUploadedFile(null, null, 0, null, 'MIME/TYPE');
@@ -405,22 +448,44 @@ class UploadedFileTest extends TestCase
 
 namespace IngeniozIT\Http\Message;
 
-function fopen(string $filename, string $mode)
-{
-    return \IngeniozIT\Http\Message\Tests\UploadedFileTest::$fopen ? false : \fopen($filename, $mode);
-}
+use IngeniozIT\Http\Message\Tests\UploadedFileTest;
 
 function rename(string $oldname, string $newname)
 {
-    return \IngeniozIT\Http\Message\Tests\UploadedFileTest::$move ? false : \rename($oldname, $newname);
+    return UploadedFileTest::$rename ?? \rename($oldname, $newname);
+}
+
+function is_uploaded_file(string $filename)
+{
+    return UploadedFileTest::$is_uploaded_file ?? \is_uploaded_file($filename);
 }
 
 function move_uploaded_file(string $filename, string $destination)
 {
-    return \IngeniozIT\Http\Message\Tests\UploadedFileTest::$move ? false : \move_uploaded_file($filename, $destination);
+    return UploadedFileTest::$move_uploaded_file ?? \move_uploaded_file($filename, $destination);
+}
+
+function file_put_contents($filename, $data)
+{
+    return UploadedFileTest::$file_put_contents ?? \file_put_contents($filename, $data);
+}
+
+function fopen(string $path, $mode)
+{
+    return UploadedFileTest::$fopen ?? \fopen($path, $mode);
 }
 
 function realpath(string $path)
 {
-    return \IngeniozIT\Http\Message\Tests\UploadedFileTest::$realpath ? false : \realpath($path);
+    return UploadedFileTest::$realpath ?? \realpath($path);
+}
+
+function php_sapi_name()
+{
+    return UploadedFileTest::$php_sapi_name ?? \php_sapi_name();
+}
+
+function is_resource($var)
+{
+    return UploadedFileTest::$is_resource ?? \is_resource($var);
 }
