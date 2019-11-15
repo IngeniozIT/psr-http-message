@@ -62,12 +62,8 @@ class UploadedFileTest extends TestCase
      * @suppress PhanAccessMethodInternal
      * @suppress PhanTypeMismatchReturn
      */
-    protected function getStreamMock(?string $path = null, $methods = []): StreamInterface
+    protected function getStreamMock($methods = []): StreamInterface
     {
-        if ($path === null) {
-            $path = $this->getTempFilePath();
-        }
-
         $streamMock = $this->createMock(StreamInterface::class);
 
         foreach ($methods as $name => $returnValue) {
@@ -90,9 +86,9 @@ class UploadedFileTest extends TestCase
      * @param  ?string $clientMediaType [description]
      * @return UploadedFileInterface
      */
-    protected function getUploadedFile(?string $path = null, ?int $size = null, ?int $error = null, ?string $clientFilename = null, ?string $clientMediaType = null)
+    protected function getUploadedFile(?int $size = null, ?int $error = null, ?string $clientFilename = null, ?string $clientMediaType = null)
     {
-        $mockStream = $this->getStreamMock($path, [
+        $mockStream = $this->getStreamMock([
             'getContents' => 'foo bar baz !',
         ]);
 
@@ -166,10 +162,7 @@ class UploadedFileTest extends TestCase
      */
     public function testMoveTo()
     {
-        $path = $this->getFilePath();
-        file_put_contents($path, 'foo bar baz !');
-
-        $uploadedFile = $this->getUploadedFile($path);
+        $uploadedFile = $this->getUploadedFile();
 
         $targetPath = $this->getEmptyPath();
         $uploadedFile->moveTo($targetPath);
@@ -184,9 +177,7 @@ class UploadedFileTest extends TestCase
      */
     public function testMoveToMoved()
     {
-        $path = $this->getFilePath();
-
-        $uploadedFile = $this->getUploadedFile($path);
+        $uploadedFile = $this->getUploadedFile();
 
         $targetPath = $this->getEmptyPath();
         // Call moveTo a first time
@@ -233,7 +224,7 @@ class UploadedFileTest extends TestCase
     {
         $uploadedFile = $this->getUploadedFile();
         $path = $this->getEmptyPath();
-        $mockStream = $this->getStreamMock($path, [
+        $mockStream = $this->getStreamMock([
             'getContents' => 'foo bar baz !',
             'getMetadata' => $streamWithUri ? 'test_uri' : null,
         ]);
@@ -278,7 +269,7 @@ class UploadedFileTest extends TestCase
     {
         $uploadedFile = $this->getUploadedFile();
         $path = $this->getEmptyPath();
-        $mockStream = $this->getStreamMock($path, [
+        $mockStream = $this->getStreamMock([
             'getContents' => 'foo bar baz !',
             'getMetadata' => $streamWithUri ? 'test_uri' : null,
         ]);
@@ -321,7 +312,7 @@ class UploadedFileTest extends TestCase
      */
     public function testGetSize()
     {
-        $uploadedFile = $this->getUploadedFile(null, 42);
+        $uploadedFile = $this->getUploadedFile(42);
 
         $this->assertSame(42, $uploadedFile->getSize());
     }
@@ -332,9 +323,24 @@ class UploadedFileTest extends TestCase
      */
     public function testGetSizeWithUnknownSize()
     {
-        $uploadedFile = $this->getUploadedFile(null);
+        $uploadedFile = $this->getUploadedFile();
 
         $this->assertNull($uploadedFile->getSize());
+    }
+
+    /**
+     * Retrieve the file size.
+     * return int|null The file size in bytes or null if unknown.
+     */
+    public function testGetSizeFromStreamSize()
+    {
+        $mockStream = $this->getStreamMock([
+            'getSize' => 84,
+        ]);
+
+        $uploadedFile = new \IngeniozIT\Http\Message\UploadedFile($mockStream);
+
+        $this->assertSame(84, $uploadedFile->getSize());
     }
 
     // ========================================== //
@@ -346,7 +352,7 @@ class UploadedFileTest extends TestCase
      */
     public function testGetError()
     {
-        $uploadedFile = $this->getUploadedFile(null, null, \UPLOAD_ERR_CANT_WRITE);
+        $uploadedFile = $this->getUploadedFile(null, \UPLOAD_ERR_CANT_WRITE);
 
         $this->assertSame(\UPLOAD_ERR_CANT_WRITE, $uploadedFile->getError());
     }
@@ -359,7 +365,7 @@ class UploadedFileTest extends TestCase
      */
     public function testGetErrorWithAllValidErrors(int $error)
     {
-        $uploadedFile = $this->getUploadedFile(null, null, $error);
+        $uploadedFile = $this->getUploadedFile(null, $error);
 
         $this->assertSame($error, $uploadedFile->getError());
     }
@@ -390,7 +396,7 @@ class UploadedFileTest extends TestCase
     public function testGetErrorWithInvalidErrors(int $error)
     {
         $this->expectException(\InvalidArgumentException::class);
-        $uploadedFile = $this->getUploadedFile(null, null, $error);
+        $uploadedFile = $this->getUploadedFile(null, $error);
     }
 
     /**
@@ -419,7 +425,7 @@ class UploadedFileTest extends TestCase
         /** @var StreamInterface $mockStreamInterface */
         $stream = $this->createMock(StreamInterface::class);
 
-        $uploadedFile = $this->getUploadedFile(null, null, 0, 'fileName.test');
+        $uploadedFile = $this->getUploadedFile(null, 0, 'fileName.test');
 
         $this->assertSame('fileName.test', $uploadedFile->getClientFilename());
     }
@@ -448,7 +454,7 @@ class UploadedFileTest extends TestCase
         /** @var StreamInterface $mockStreamInterface */
         $stream = $this->createMock(StreamInterface::class);
 
-        $uploadedFile = $this->getUploadedFile(null, null, 0, null, 'MIME/TYPE');
+        $uploadedFile = $this->getUploadedFile(null, 0, null, 'MIME/TYPE');
 
         $this->assertSame('MIME/TYPE', $uploadedFile->getClientMediaType());
     }

@@ -36,7 +36,7 @@ class UploadedFile implements UploadedFileInterface
         $this->error = $error;
 
         $this->stream = $stream;
-        $this->size = $size;
+        $this->size = $size ?? $stream->getSize();
         $this->clientFilename = $clientFilename;
         $this->clientMediaType = $clientMediaType;
     }

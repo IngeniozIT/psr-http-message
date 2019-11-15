@@ -36,7 +36,7 @@ class MessageTest extends TestCase
     /**
      * Get a \Psr\Http\Message\StreamInterface mock.
      *
-      * @suppress PhanTypeMismatchReturn
+     * @suppress PhanTypeMismatchReturn
      * @return StreamInterface
      */
     protected function getMockStream(): StreamInterface
