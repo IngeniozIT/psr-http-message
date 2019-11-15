@@ -34,6 +34,8 @@ class RequestTest extends MessageTest
      * @param array $methods (optional) Methods to mock.
      *
      * @return UriInterface
+     * @suppress PhanAccessMethodInternal
+     * @suppress PhanTypeMismatchReturn
      */
     protected function getMockUri($methods = []): UriInterface
     {

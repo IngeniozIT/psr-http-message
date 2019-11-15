@@ -22,9 +22,9 @@ class UploadedFileTest extends TestCase
     public static $is_resource = null;
 
     /**
-     * Before each test, reset functions overrides.
+     * After each test, reset functions overrides.
      */
-    protected function setUp(): void
+    protected function tearDown(): void
     {
         self::$rename = null;
         self::$is_uploaded_file = null;
@@ -58,13 +58,16 @@ class UploadedFileTest extends TestCase
         return tempnam(sys_get_temp_dir(), 'UploadedFileTest');
     }
 
+    /**
+     * @suppress PhanAccessMethodInternal
+     * @suppress PhanTypeMismatchReturn
+     */
     protected function getStreamMock(?string $path = null, $methods = []): StreamInterface
     {
         if ($path === null) {
             $path = $this->getTempFilePath();
         }
 
-        /** @var StreamInterface */
         $streamMock = $this->createMock(StreamInterface::class);
 
         foreach ($methods as $name => $returnValue) {
@@ -89,21 +92,22 @@ class UploadedFileTest extends TestCase
      */
     protected function getUploadedFile(?string $path = null, ?int $size = null, ?int $error = null, ?string $clientFilename = null, ?string $clientMediaType = null)
     {
-        $mockStream = $this->getStreamMock($path);
-        $mockStream
-            ->method('getContents')
-            ->willReturn('foo bar baz !');
+        $mockStream = $this->getStreamMock($path, [
+            'getContents' => 'foo bar baz !',
+        ]);
+
+        $errorToUse = $error ?? \UPLOAD_ERR_OK;
 
         if ($clientMediaType !== null) {
-            return new \IngeniozIT\Http\Message\UploadedFile($mockStream, $size, $error, $clientFilename, $clientMediaType);
+            return new \IngeniozIT\Http\Message\UploadedFile($mockStream, $size, $errorToUse, $clientFilename, $clientMediaType);
         }
 
         if ($clientFilename !== null) {
-            return new \IngeniozIT\Http\Message\UploadedFile($mockStream, $size, $error, $clientFilename);
+            return new \IngeniozIT\Http\Message\UploadedFile($mockStream, $size, $errorToUse, $clientFilename);
         }
 
         if ($error !== null) {
-            return new \IngeniozIT\Http\Message\UploadedFile($mockStream, $size, $error);
+            return new \IngeniozIT\Http\Message\UploadedFile($mockStream, $size, $errorToUse);
         }
 
         if ($size !== null) {
@@ -225,31 +229,50 @@ class UploadedFileTest extends TestCase
      * throws \RuntimeException on any error during the move operation.
      * @dataProvider providerFsErrorCases
      */
-    public function testMoveToThrowsExceptionOnFilesystemError(bool $isCli, bool $streamWithUri)
+    public function testMoveToThrowsExceptionOnFilesystemError(bool $isCli, bool $streamWithUri, bool $overrideFopen)
     {
         $uploadedFile = $this->getUploadedFile();
         $path = $this->getEmptyPath();
         $mockStream = $this->getStreamMock($path, [
             'getContents' => 'foo bar baz !',
-            'getMetadata' => 'test_uri',
+            'getMetadata' => $streamWithUri ? 'test_uri' : null,
         ]);
-
         $uploadedFile = new \IngeniozIT\Http\Message\UploadedFile($mockStream);
         $path = $this->getEmptyPath();
+
         self::$rename = false;
         self::$move_uploaded_file = false;
         self::$file_put_contents = false;
         self::$fopen = false;
         self::$php_sapi_name = $isCli ? 'cli' : 'not_cli';
+        if ($overrideFopen) {
+            self::$fopen = false;
+        }
 
         $this->expectException(\RuntimeException::class);
         $uploadedFile->moveTo($path);
     }
 
     /**
+     * Provider. Gives filesystem error cases based on
+     * - cli / not cli environment
+     * - StreamInterface object with / without uri, metadata, fopen fail
+     * @return array
+     */
+    public function providerFsErrorCases(): array
+    {
+        return [
+            'cli + uri' => [true, true, false],
+            'cli + no uri' => [true, false, false],
+            'not cli + uri' => [false, true, false],
+            'not cli + no uri' => [false, false, false],
+            'cli + no uri + fopen fail' => [false, false, true],
+        ];
+    }
+
+    /**
      * Move the uploaded file to a new location.
-     * throws \RuntimeException on any error during the move operation.
-     * @dataProvider providerFsErrorCases
+     * @dataProvider providerFsWorkingCases
      */
     public function testMoveToWorksWithAllEnvs(bool $isCli, bool $streamWithUri)
     {
@@ -257,7 +280,7 @@ class UploadedFileTest extends TestCase
         $path = $this->getEmptyPath();
         $mockStream = $this->getStreamMock($path, [
             'getContents' => 'foo bar baz !',
-            'getMetadata' => 'test_uri',
+            'getMetadata' => $streamWithUri ? 'test_uri' : null,
         ]);
         $uploadedFile = new \IngeniozIT\Http\Message\UploadedFile($mockStream);
         $path = $this->getEmptyPath();
@@ -278,13 +301,14 @@ class UploadedFileTest extends TestCase
      * - StreamInterface object with / without uri metadata
      * @return array
      */
-    public function providerFsErrorCases(): array
+    public function providerFsWorkingCases(): array
     {
         return [
             'cli + uri' => [true, true],
             'cli + no uri' => [true, false],
             'not cli + uri' => [false, true],
             'not cli + no uri' => [false, false],
+            'cli + no uri + fopen fail' => [false, false],
         ];
     }
 

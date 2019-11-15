@@ -66,7 +66,7 @@ class StreamTest extends TestCase
     /**
      * Get a generic StreamInterface object with a specific stream.
      *
-     * @param  resource $handle {@see \fopen}.
+     * @param  resource|mixed $handle {@see \fopen}.
      * @return StreamInterface
      */
     protected function getStreamWithHandle($handle)

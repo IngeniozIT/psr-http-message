@@ -1029,7 +1029,8 @@ class UriTest extends TestCase
      * Return the string representation as a URI reference.
      *
      * @dataProvider providerStringUri
-     * @param        string $str Expected uri.
+     * @param string $str Expected uri.
+     * @suppress PhanTypeSuspiciousStringExpression
      */
     public function testReturnsExpectedStringWhenPassingUriInConstructor(string $str)
     {
@@ -1058,7 +1059,8 @@ class UriTest extends TestCase
      * Return the string representation as a URI reference.
      *
      * @dataProvider providerInvalidStringUri
-     * @param        string $str Invalid uri.
+     * @param string $str Invalid uri.
+     * @suppress PhanNoopNew
      */
     public function testThrowsInvalidargumentExceptionOnInvalidString(string $str)
     {
