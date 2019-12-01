@@ -13,40 +13,11 @@ use Psr\Http\Message\StreamInterface;
 class StreamTest extends TestCase
 {
     /**
-     * @var bool True to make fstat fail.
+     * After each test, reset functions overrides.
      */
-    public static $fstat = false;
-
-    /**
-     * @var bool True to make ftell fail.
-     */
-    public static $ftell = false;
-
-    /**
-     * @var bool True to make fread fail.
-     */
-    public static $fread = false;
-
-    /**
-     * @var bool True to make fwrite fail.
-     */
-    public static $fwrite = false;
-
-    /**
-     * @var bool False to make a stream unseekable.
-     */
-    public static $seekable = true;
-
-    /**
-     * Before each test, reset functions overrides.
-     */
-    protected function setUp(): void
+    protected function tearDown(): void
     {
-        self::$fstat = false;
-        self::$ftell = false;
-        self::$fread = false;
-        self::$fwrite = false;
-        self::$seekable = true;
+        NativeFunctionsMocker::resetAll();
     }
 
     // ========================================== //
@@ -158,7 +129,7 @@ class StreamTest extends TestCase
         $stream->write('foo bar baz');
         $stream->rewind();
 
-        self::$fread = true;
+        NativeFunctionsMocker::makeFunctionReturn('fread', false);
         $this->assertSame('', (string)$stream);
     }
 
@@ -272,9 +243,8 @@ class StreamTest extends TestCase
         $this->assertSame(11, $stream->getSize());
 
         // Simulate fstat failure
-        self::$fstat = true;
+        NativeFunctionsMocker::makeFunctionReturn('fstat', false);
         $this->assertNull($stream->getSize());
-        self::$fstat = false;
     }
 
     // ========================================== //
@@ -308,7 +278,7 @@ class StreamTest extends TestCase
     public function testTellException()
     {
         $stream = $this->getStream();
-        self::$ftell = true;
+        NativeFunctionsMocker::makeFunctionReturn('ftell', false);
         $this->expectException(\RuntimeException::class);
         $stream->tell();
     }
@@ -358,10 +328,15 @@ class StreamTest extends TestCase
         $stream = $this->getStream();
         $this->assertTrue($stream->isSeekable());
 
-        self::$seekable = false;
+        NativeFunctionsMocker::makeFunctionReturn(
+            'stream_get_meta_data',
+            [
+                'seekable' => false,
+                'mode' => 'r',
+            ]
+        );
         $stream = $this->getStream();
         $this->assertFalse($stream->isSeekable());
-        self::$seekable = true;
     }
 
     // ========================================== //
@@ -445,7 +420,7 @@ class StreamTest extends TestCase
     {
         $stream = $this->getStream();
 
-        self::$fwrite = true;
+        NativeFunctionsMocker::makeFunctionReturn('fwrite', false);
         $this->expectException(\RuntimeException::class);
         $stream->write('foo');
     }
@@ -542,7 +517,7 @@ class StreamTest extends TestCase
     {
         $stream = $this->getStream();
 
-        self::$fread = true;
+        NativeFunctionsMocker::makeFunctionReturn('fread', false);
         $this->expectException(\RuntimeException::class);
         $stream->read(42);
     }
@@ -569,35 +544,4 @@ class StreamTest extends TestCase
 
         $this->assertSame(stream_get_meta_data($fd), $stream->getMetadata());
     }
-}
-
-// ========================================== //
-// Filesystem overrides                       //
-// ========================================== //
-
-namespace IngeniozIT\Http\Message;
-
-function fread($resource, $length)
-{
-    return \IngeniozIT\Http\Tests\Message\StreamTest::$fread ? false : \fread($resource, $length);
-}
-
-function fwrite($resource, $string)
-{
-    return \IngeniozIT\Http\Tests\Message\StreamTest::$fwrite ? false : \fwrite($resource, $string);
-}
-
-function fstat($resource)
-{
-    return \IngeniozIT\Http\Tests\Message\StreamTest::$fstat ? [] : \fstat($resource);
-}
-
-function ftell($resource)
-{
-    return \IngeniozIT\Http\Tests\Message\StreamTest::$ftell ? false : \ftell($resource);
-}
-
-function stream_get_meta_data($resource)
-{
-    return !\IngeniozIT\Http\Tests\Message\StreamTest::$seekable ? ['seekable' => false, 'mode' => 'r'] : \stream_get_meta_data($resource);
 }

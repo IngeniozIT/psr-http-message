@@ -6,34 +6,19 @@ namespace IngeniozIT\Http\Message\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\{UploadedFileInterface, StreamInterface};
+use IngeniozIT\Http\Tests\Message\NativeFunctionsMocker;
 
 /**
  * @coversDefaultClass \IngeniozIT\Http\Message\UploadedFile
  */
 class UploadedFileTest extends TestCase
 {
-    public static $rename = null;
-    public static $is_uploaded_file = null;
-    public static $move_uploaded_file = null;
-    public static $file_put_contents = null;
-    public static $fopen = null;
-    public static $realpath = null;
-    public static $php_sapi_name = null;
-    public static $is_resource = null;
-
     /**
      * After each test, reset functions overrides.
      */
     protected function tearDown(): void
     {
-        self::$rename = null;
-        self::$is_uploaded_file = null;
-        self::$move_uploaded_file = null;
-        self::$file_put_contents = null;
-        self::$fopen = null;
-        self::$realpath = null;
-        self::$php_sapi_name = null;
-        self::$is_resource = null;
+        NativeFunctionsMocker::resetAll();
     }
 
     /**
@@ -196,7 +181,7 @@ class UploadedFileTest extends TestCase
     {
         $uploadedFile = $this->getUploadedFile();
         $path = 'this will fail';
-        self::$realpath = false;
+        NativeFunctionsMocker::makeFunctionReturn('realpath', false);
 
         $this->expectException(\InvalidArgumentException::class);
         $uploadedFile->moveTo($path);
@@ -220,7 +205,7 @@ class UploadedFileTest extends TestCase
      * throws \RuntimeException on any error during the move operation.
      * @dataProvider providerFsErrorCases
      */
-    public function testMoveToThrowsExceptionOnFilesystemError(bool $isCli, bool $streamWithUri, bool $overrideFopen)
+    public function testMoveToThrowsExceptionOnFilesystemError(bool $streamWithUri, array $functionsOverrides)
     {
         $uploadedFile = $this->getUploadedFile();
         $path = $this->getEmptyPath();
@@ -231,14 +216,7 @@ class UploadedFileTest extends TestCase
         $uploadedFile = new \IngeniozIT\Http\Message\UploadedFile($mockStream);
         $path = $this->getEmptyPath();
 
-        self::$rename = false;
-        self::$move_uploaded_file = false;
-        self::$file_put_contents = false;
-        self::$fopen = false;
-        self::$php_sapi_name = $isCli ? 'cli' : 'not_cli';
-        if ($overrideFopen) {
-            self::$fopen = false;
-        }
+        NativeFunctionsMocker::makeFunctionsReturn($functionsOverrides);
 
         $this->expectException(\RuntimeException::class);
         $uploadedFile->moveTo($path);
@@ -253,11 +231,12 @@ class UploadedFileTest extends TestCase
     public function providerFsErrorCases(): array
     {
         return [
-            'cli + uri' => [true, true, false],
-            'cli + no uri' => [true, false, false],
-            'not cli + uri' => [false, true, false],
-            'not cli + no uri' => [false, false, false],
-            'cli + no uri + fopen fail' => [false, false, true],
+            'steam with uri + php cli  + rename fail' => [true, ['php_sapi_name' => 'cli', 'rename' => false]],
+            'steam with uri + php not cli  + is_uploaded_file fail' => [true, ['php_sapi_name' => 'not_cli', 'is_uploaded_file' => false]],
+            'steam with uri + php not cli  + move_uploaded_file fail' => [true, ['php_sapi_name' => 'not_cli', 'move_uploaded_file' => false]],
+            'steam without uri + fopen fail' => [false, ['fopen' => false]],
+            'steam without uri + fwrite fail' => [false, ['fwrite' => false]],
+            'steam without uri + fclose fail' => [false, ['fclose' => false]],
         ];
     }
 
@@ -265,7 +244,7 @@ class UploadedFileTest extends TestCase
      * Move the uploaded file to a new location.
      * @dataProvider providerFsWorkingCases
      */
-    public function testMoveToWorksWithAllEnvs(bool $isCli, bool $streamWithUri)
+    public function testMoveToWorksWithAllEnvs(bool $streamWithUri, array $functionsOverrides)
     {
         $uploadedFile = $this->getUploadedFile();
         $path = $this->getEmptyPath();
@@ -275,12 +254,7 @@ class UploadedFileTest extends TestCase
         ]);
         $uploadedFile = new \IngeniozIT\Http\Message\UploadedFile($mockStream);
         $path = $this->getEmptyPath();
-        self::$rename = true;
-        self::$is_uploaded_file = true;
-        self::$move_uploaded_file = true;
-        self::$file_put_contents = true;
-        self::$is_resource = true;
-        self::$php_sapi_name = $isCli ? 'cli' : 'not_cli';
+        NativeFunctionsMocker::makeFunctionsReturn($functionsOverrides);
 
         $uploadedFile->moveTo($path);
         $this->assertTrue(true);
@@ -295,11 +269,9 @@ class UploadedFileTest extends TestCase
     public function providerFsWorkingCases(): array
     {
         return [
-            'cli + uri' => [true, true],
-            'cli + no uri' => [true, false],
-            'not cli + uri' => [false, true],
-            'not cli + no uri' => [false, false],
-            'cli + no uri + fopen fail' => [false, false],
+            'steam with uri + php cli' => [true, ['php_sapi_name' => 'cli', 'rename' => true]],
+            'steam with uri + php not cli' => [true, ['php_sapi_name' => 'not_cli', 'is_uploaded_file' => true, 'move_uploaded_file' => true]],
+            'steam without uri' => [false, ['fopen' => fopen('php://temp', 'w')]],
         ];
     }
 
@@ -470,52 +442,4 @@ class UploadedFileTest extends TestCase
 
         $this->assertNull($uploadedFile->getClientMediaType());
     }
-}
-
-// ========================================== //
-// Filesystem overrides                       //
-// ========================================== //
-
-namespace IngeniozIT\Http\Message;
-
-use IngeniozIT\Http\Message\Tests\UploadedFileTest;
-
-function rename(string $oldname, string $newname)
-{
-    return UploadedFileTest::$rename ?? \rename($oldname, $newname);
-}
-
-function is_uploaded_file(string $filename)
-{
-    return UploadedFileTest::$is_uploaded_file ?? \is_uploaded_file($filename);
-}
-
-function move_uploaded_file(string $filename, string $destination)
-{
-    return UploadedFileTest::$move_uploaded_file ?? \move_uploaded_file($filename, $destination);
-}
-
-function file_put_contents($filename, $data)
-{
-    return UploadedFileTest::$file_put_contents ?? \file_put_contents($filename, $data);
-}
-
-function fopen(string $path, $mode)
-{
-    return UploadedFileTest::$fopen ?? \fopen($path, $mode);
-}
-
-function realpath(string $path)
-{
-    return UploadedFileTest::$realpath ?? \realpath($path);
-}
-
-function php_sapi_name()
-{
-    return UploadedFileTest::$php_sapi_name ?? \php_sapi_name();
-}
-
-function is_resource($var)
-{
-    return UploadedFileTest::$is_resource ?? \is_resource($var);
 }

@@ -6,7 +6,6 @@ namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\{UploadedFileInterface, StreamInterface};
 use IngeniozIT\Http\Message\Enums\File;
-use IngeniozIT\Http\Message\Stream;
 use IngeniozIT\Http\Message\Exceptions\{InvalidArgumentException, RuntimeException, FileSystemException};
 
 /**
@@ -153,8 +152,12 @@ class UploadedFile implements UploadedFileInterface
         if ($targetResource === false) {
             throw new FileSystemException("Could not open $targetPath.");
         }
-        $targetStream = new Stream($targetResource);
-        $targetStream->write($this->stream->getContents());
+        if (fwrite($targetResource, $this->stream->getContents()) === false) {
+            throw new FileSystemException("Could not write to $targetPath.");
+        }
+        if (fclose($targetResource) === false) {
+            throw new FileSystemException("Could not close $targetPath.");
+        }
     }
 
     protected function copyStreamToPathFromFile(string $targetPath, string $streamUri): void
