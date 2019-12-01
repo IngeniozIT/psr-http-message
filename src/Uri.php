@@ -80,32 +80,20 @@ class Uri implements UriInterface
     {
         if ($uri !== '') {
             $parsed = parse_url($uri);
-
-            if (false === $parsed) {
+            if ($parsed === false) {
                 throw new InvalidArgumentException('Uri could not be parsed.');
             }
+            $this->importUriParts($parsed);
+        }
+    }
 
-            if (!empty($parsed['scheme'])) {
-                $this->scheme = $parsed['scheme'];
-            }
-            if (!empty($parsed['host'])) {
-                $this->host = $parsed['host'];
-            }
-            if (!empty($parsed['port'])) {
-                $this->port = $parsed['port'];
-            }
-            if (!empty($parsed['user'])) {
-                $this->user = $parsed['user'];
-                $this->pass = $parsed['pass'] ?? null;
-            }
-            if (!empty($parsed['path'])) {
-                $this->path = $parsed['path'];
-            }
-            if (!empty($parsed['query'])) {
-                $this->query = $parsed['query'];
-            }
-            if (!empty($parsed['fragment'])) {
-                $this->fragment = $parsed['fragment'];
+    protected function importUriParts(array $parts): void
+    {
+        static $partsToImport = ['scheme', 'host', 'port', 'user', 'pass', 'path', 'query', 'fragment'];
+
+        foreach ($partsToImport as $partName) {
+            if (!empty($parts[$partName])) {
+                $this->$partName = $parts[$partName];
             }
         }
     }
@@ -669,29 +657,37 @@ class Uri implements UriInterface
      */
     protected static function percentEncode(string $str, ?string $ignoreChar = null): string
     {
-        // Empty strings
-        if ($str === '' || ($ignoreChar !== null && $str === $ignoreChar)) {
+        if (self::hasNothingToPercentEncode($str, $ignoreChar) || self::isAlreadyEncoded($str, $ignoreChar)) {
             return $str;
+        } elseif ($ignoreChar === null) {
+            return urlencode($str);
         }
+        return implode($ignoreChar, array_map('urlencode', explode($ignoreChar, $str)));
+    }
 
-        // Detect already encoded strings
-        if (preg_match('/^[a-zA-Z0-9-_~%' . ($ignoreChar ? "\\$ignoreChar" : '') . ']+$/', $str)) {
-            return $str;
-        }
+    /**
+     * Check if a string has nothing to percent encode.
+     *
+     * @param  string $str The string to be encoded.
+     * @param  ?string $ignoreChar A character not to encode. Null to not ignore
+     *                             any character.
+     * @return bool
+     */
+    protected static function hasNothingToPercentEncode(string $str, ?string $ignoreChar): bool
+    {
+        return $str === '' || $str === $ignoreChar;
+    }
 
-        // Encode string
-        if ($ignoreChar === null) {
-            // No character to ignore
-            $str = urlencode($str);
-        } elseif ($str !== $ignoreChar) {
-            // Character to ignore. Explode, encode, implode.
-            $parts = explode($ignoreChar, $str);
-            foreach ($parts as &$part) {
-                $part = urlencode($part);
-            }
-            $str = implode($ignoreChar, $parts);
-        }
-
-        return $str;
+    /**
+     * Check if a string is already encoded.
+     *
+     * @param  string $str The string to be encoded.
+     * @param  ?string $ignoreChar A character not to encode. Null to not ignore
+     *                             any character.
+     * @return bool
+     */
+    protected static function isAlreadyEncoded(string $str, ?string $ignoreChar): bool
+    {
+        return preg_match('/^[a-zA-Z0-9-_~%' . ($ignoreChar ? "\\$ignoreChar" : '') . ']+$/', $str) === 1;
     }
 }
