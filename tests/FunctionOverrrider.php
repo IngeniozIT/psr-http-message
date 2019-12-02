@@ -9,7 +9,7 @@ namespace IngeniozIT\Http\Tests\Message;
  */
 class NativeFunctionsMocker
 {
-    public static $overrides = [];
+    public static array $overrides = [];
 
     public static function resetAll(): void
     {

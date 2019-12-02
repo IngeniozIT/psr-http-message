@@ -18,10 +18,10 @@ class MessageTest extends TestCase
     // ========================================== //
 
     /** @var string $className Class name of the tested class */
-    protected $className = \IngeniozIT\Http\Message\Message::class;
+    protected string $className = \IngeniozIT\Http\Message\Message::class;
 
     /** @var string $defaultProtocolVersion Implementation's default HTTP protocol. */
-    protected $defaultProtocolVersion = '1.1';
+    protected string $defaultProtocolVersion = '1.1';
 
     /**
      * Get a new MessageInterface instance.

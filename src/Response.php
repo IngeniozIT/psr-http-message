@@ -30,8 +30,8 @@ class Response extends Message implements ResponseInterface
     const DEFAULT_STATUS_CODE = 200;
     const DEFAULT_REASON_PHRASE = Http::REASON_PHRASES[self::DEFAULT_STATUS_CODE];
 
-    protected $statusCode = self::DEFAULT_STATUS_CODE;
-    protected $reasonPhrase = self::DEFAULT_REASON_PHRASE;
+    protected int $statusCode = self::DEFAULT_STATUS_CODE;
+    protected string $reasonPhrase = self::DEFAULT_REASON_PHRASE;
 
     /**
      * Constructor.

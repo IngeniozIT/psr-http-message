@@ -19,10 +19,10 @@ use IngeniozIT\Http\Message\Exceptions\{InvalidArgumentException, RuntimeExcepti
 class UploadedFile implements UploadedFileInterface
 {
     protected $stream;
-    protected $size;
-    protected $error;
-    protected $clientFilename;
-    protected $clientMediaType;
+    protected ?int $size;
+    protected int $error;
+    protected ?string $clientFilename;
+    protected ?string $clientMediaType;
 
     public function __construct(
         StreamInterface $stream,

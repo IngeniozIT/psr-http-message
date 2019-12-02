@@ -24,17 +24,17 @@ class Stream implements StreamInterface
     /**
      * @var bool Whether the resource is readable or not.
      */
-    protected $readable;
+    protected bool $readable;
 
     /**
      * @var bool Whether the resource is readable or not.
      */
-    protected $writable;
+    protected bool $writable;
 
     /**
      * @var bool Whether the resource is seekable or not.
      */
-    protected $seekable;
+    protected bool $seekable;
 
     /**
      * Constructor.

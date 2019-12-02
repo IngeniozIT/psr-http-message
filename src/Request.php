@@ -38,12 +38,12 @@ class Request extends Message implements RequestInterface
     /**
      * @var string HTTP method.
      */
-    protected $method = self::DEFAULT_METHOD;
+    protected string $method = self::DEFAULT_METHOD;
 
     /**
      * @var UriInterface Uri.
      */
-    protected $uri;
+    protected UriInterface $uri;
 
     /**
      * Constructor.

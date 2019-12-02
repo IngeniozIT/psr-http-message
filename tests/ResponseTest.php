@@ -17,7 +17,7 @@ class ResponseTest extends MessageTest
     // ========================================== //
 
     /** @var string $className Class name of the tested class */
-    protected $className = \IngeniozIT\Http\Message\Response::class;
+    protected string $className = \IngeniozIT\Http\Message\Response::class;
 
     /**
      * @var int Implementation's default HTTP status code.

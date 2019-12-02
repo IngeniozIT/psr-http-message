@@ -33,42 +33,42 @@ class Uri implements UriInterface
     /**
      * @var string Scheme part of the uri.
      */
-    protected $scheme = '';
+    protected string $scheme = '';
 
     /**
      * @var string Host part of the uri.
      */
-    protected $host = '';
+    protected string $host = '';
 
     /**
      * @var ?int Port part of the uri.
      */
-    protected $port = null;
+    protected ?int $port = null;
 
     /**
      * @var string User part of the uri.
      */
-    protected $user = '';
+    protected string $user = '';
 
     /**
      * @var ?string Password part of the uri.
      */
-    protected $pass = null;
+    protected ?string $pass = null;
 
     /**
      * @var string Path part of the uri.
      */
-    protected $path = '';
+    protected string $path = '';
 
     /**
      * @var string Query part of the uri.
      */
-    protected $query = '';
+    protected string $query = '';
 
     /**
      * @var string Fragment part of the uri.
      */
-    protected $fragment = '';
+    protected string $fragment = '';
 
     /**
      * Constructor.

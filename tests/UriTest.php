@@ -17,7 +17,7 @@ class UriTest extends TestCase
     // ========================================== //
 
     /** @var string Class name of the tested class */
-    protected $className = \IngeniozIT\Http\Message\Uri::class;
+    protected string $className = \IngeniozIT\Http\Message\Uri::class;
 
     // ========================================== //
     // Constructor                                //

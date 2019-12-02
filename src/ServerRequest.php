@@ -47,23 +47,12 @@ use IngeniozIT\Http\Message\Request;
  */
 class ServerRequest extends Request implements ServerRequestInterface
 {
-    /** @var array */
-    protected $serverParams;
-
-    /** @var array */
-    protected $cookieParams = [];
-
-    /** @var array */
-    protected $queryParams = [];
-
-    /** @var array */
-    protected $uploadedFiles = [];
-
-    /** @var ?array */
-    protected $parsedBody;
-
-    /** @var array */
-    protected $attributes = [];
+    protected array $serverParams;
+    protected array $cookieParams = [];
+    protected array $queryParams = [];
+    protected array $uploadedFiles = [];
+    protected array $attributes = [];
+    protected ?array $parsedBody = null;
 
     /**
      * Constructor.

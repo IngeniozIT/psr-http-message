@@ -29,22 +29,22 @@ class Message implements MessageInterface
     /**
      * @var string HTTP protocol version.
      */
-    protected $protocolVersion = self::DEFAULT_PROTOCOL_VERSION;
+    protected string $protocolVersion = self::DEFAULT_PROTOCOL_VERSION;
 
     /**
      * @var array HTTP headers.
      */
-    protected $headers = [];
+    protected array $headers = [];
 
     /**
      * @var array Mapping between sanitized header names and given header names.
      */
-    protected $headerNames = [];
+    protected array $headerNames = [];
 
     /**
      * @var StreamInterface Body of the message.
      */
-    protected $body;
+    protected StreamInterface $body;
 
     /**
      * Constructor.

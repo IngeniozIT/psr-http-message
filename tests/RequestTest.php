@@ -17,7 +17,7 @@ class RequestTest extends MessageTest
     // ========================================== //
 
     /** @var string $className Class name of the tested class */
-    protected $className = \IngeniozIT\Http\Message\Request::class;
+    protected string $className = \IngeniozIT\Http\Message\Request::class;
 
 
     /**
@@ -46,6 +46,7 @@ class RequestTest extends MessageTest
                 ->method($methodName)
                 ->willReturn($returnValue);
         }
+        $mockUriInterface->method('withHost')->willReturn($mockUriInterface);
 
         return $mockUriInterface;
     }

@@ -17,7 +17,7 @@ class ServerRequestTest extends RequestTest
     // ========================================== //
 
     /** @var string $className Class name of the tested class */
-    protected $className = \IngeniozIT\Http\Message\ServerRequest::class;
+    protected string $className = \IngeniozIT\Http\Message\ServerRequest::class;
 
     /**
      * Get a new ServerRequestInterface instance.
