@@ -47,16 +47,39 @@ return [
     // Base names without extensions such as 'AlwaysReturnPlugin'
     // can be used to refer to a plugin that is bundled with Phan)
     'plugins' => [
-        // checks if a function, closure or method unconditionally returns.
-
-        // can also be written as 'vendor/phan/phan/.phan/plugins/AlwaysReturnPlugin.php'
         'AlwaysReturnPlugin',
-        // Checks for syntactically unreachable statements in
-        // the global scope or function bodies.
-        'UnreachableCodePlugin',
-        'DollarDollarPlugin',
         'DuplicateArrayKeyPlugin',
         'PregRegexCheckerPlugin',
         'PrintfCheckerPlugin',
+        'UnreachableCodePlugin',
+        'InvokePHPNativeSyntaxCheckPlugin',
+        'PHPUnitAssertionPlugin',
+        'EmptyStatementListPlugin',
+        'LoopVariableReusePlugin',
+        'RedundantAssignmentPlugin',
+        'PHPUnitNotDeadCodePlugin',
+        'WhitespacePlugin',
+        'PossiblyStaticMethodPlugin',
+        'PHPDocRedundantPlugin',
+    ],
+    'plugin_config' => [
+        // A list of 1 or more PHP binaries (Absolute path or program name found in $PATH)
+        // to use to analyze your files with PHP's native `--syntax-check`.
+        //
+        // This can be used to simultaneously run PHP's syntax checks with multiple PHP versions.
+        // e.g. `'plugin_config' => ['php_native_syntax_check_binaries' => ['php72', 'php70', 'php56']]`
+        // if all of those programs can be found in $PATH
+
+        // 'php_native_syntax_check_binaries' => [PHP_BINARY],
+
+        // The maximum number of `php --syntax-check` processes to run at any point in time
+        // (Minimum: 1. Default: 1).
+        // This may be temporarily higher if php_native_syntax_check_binaries
+        // has more elements than this process count.
+        'php_native_syntax_check_max_processes' => 4,
+    ],
+    // Add any issue types (such as 'PhanUndeclaredMethod')
+    // here to inhibit them from being reported
+    'suppress_issue_types' => [
     ],
 ];
