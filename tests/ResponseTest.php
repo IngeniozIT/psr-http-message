@@ -45,7 +45,7 @@ class ResponseTest extends MessageTest
     /**
      * Check default status code and reason phrase.
      */
-    public function testGetDefaults()
+    public function testGetDefaults(): void
     {
         $response = $this->getResponse();
 
@@ -60,7 +60,7 @@ class ResponseTest extends MessageTest
     /**
      * Return an instance with the specified status code
      */
-    public function testWithStatus()
+    public function testWithStatus(): void
     {
         $response = $this->getResponse();
 
@@ -74,7 +74,7 @@ class ResponseTest extends MessageTest
      * The status code is a 3-digit integer result code of the server's attempt
      * to understand and satisfy the request.
      */
-    public function testWithBadStatus()
+    public function testWithBadStatus(): void
     {
         $response = $this->getResponse();
 
@@ -85,7 +85,7 @@ class ResponseTest extends MessageTest
     /**
      * Return an instance with the specified status code and, optionally, reason phrase.
      */
-    public function testWithStatusAndReasonPhrase()
+    public function testWithStatusAndReasonPhrase(): void
     {
         $response = $this->getResponse();
 
@@ -101,7 +101,7 @@ class ResponseTest extends MessageTest
      * immutability of the message, and MUST return an instance that has the
      * updated status and reason phrase.
      */
-    public function testWithStatusIsImmutable()
+    public function testWithStatusIsImmutable(): void
     {
         $response = $this->getResponse()->withStatus(200);
         $response2 = $response->withStatus(200);
@@ -121,7 +121,7 @@ class ResponseTest extends MessageTest
      * immutability of the message, and MUST return an instance that has the
      * updated status and reason phrase.
      */
-    public function testWithStatusAndReasonPhraseIsImmutable()
+    public function testWithStatusAndReasonPhraseIsImmutable(): void
     {
         $response = $this->getResponse()->withStatus(200, 'Reason phrase');
         $response2 = $response->withStatus(200, 'Reason phrase');

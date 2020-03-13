@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IngeniozIT\Http\Tests\Message;
+namespace IngeniozIT\Http\Message\Tests;
 
 /**
  * Used to mock calls to native PHP functions.
@@ -35,7 +35,7 @@ class NativeFunctionsMocker
 
 namespace IngeniozIT\Http\Message;
 
-use IngeniozIT\Http\Tests\Message\NativeFunctionsMocker;
+use IngeniozIT\Http\Message\Tests\NativeFunctionsMocker;
 
 function fread($resource, $length)
 {

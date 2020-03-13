@@ -59,7 +59,7 @@ class RequestTest extends MessageTest
      * During construction, implementations MUST attempt to set the Host header from
      * a provided URI if no Host header is provided.
      */
-    public function testCanSetHostWithUri()
+    public function testCanSetHostWithUri(): void
     {
         $mockUriInterface = $this->getMockUri([
             '__toString' => 'hostname/foo',
@@ -76,7 +76,7 @@ class RequestTest extends MessageTest
      * a provided URI if no Host header is provided.
      * Give an Uri without host. Expect no host header.
      */
-    public function testConstructSetHostHeaderWithUriWithNoHost()
+    public function testConstructSetHostHeaderWithUriWithNoHost(): void
     {
         $mockUriInterface = $this->getMockUri([
             '__toString' => '/',
@@ -97,7 +97,7 @@ class RequestTest extends MessageTest
      * If no URI is available, and no request-target has been specifically
      * provided, this method MUST return the string "/".
      */
-    public function testGetRequestTargetDefaultValue()
+    public function testGetRequestTargetDefaultValue(): void
     {
         $request = $this->getRequest();
 
@@ -108,7 +108,7 @@ class RequestTest extends MessageTest
      * Retrieves the message's request target.
      * In most cases, this will be the origin-form of the composed URI
      */
-    public function testGetRequestTargetWithUri()
+    public function testGetRequestTargetWithUri(): void
     {
         $uri = 'http://example.com/path?query=yes#fragment';
 
@@ -123,7 +123,7 @@ class RequestTest extends MessageTest
      * unless a value was provided to the concrete implementation (see
      * withRequestTarget() below).
      */
-    public function testGetRequestTargetWithRequestTarget()
+    public function testGetRequestTargetWithRequestTarget(): void
     {
         $uri = 'http://example.com/path?query=yes#fragment';
 
@@ -141,7 +141,7 @@ class RequestTest extends MessageTest
      *
      * @dataProvider getRequestTargetFormsProvider
      */
-    public function testWithRequestTargetForm(string $uri)
+    public function testWithRequestTargetForm(string $uri): void
     {
         $uri = 'http://example.com/path?query=yes#fragment';
 
@@ -169,7 +169,7 @@ class RequestTest extends MessageTest
      * immutability of the message, and MUST return an instance that has the
      * changed request target.
      */
-    public function testWithRequestTargetImmutability()
+    public function testWithRequestTargetImmutability(): void
     {
         $request = $this->getRequest();
         $request2 = $request->withRequestTarget('/');
@@ -192,7 +192,7 @@ class RequestTest extends MessageTest
      *
      * @dataProvider getValidHttpMethodsProvider
      */
-    public function testGetMethod($method)
+    public function testGetMethod($method): void
     {
         $request = $this->getRequest();
         $request = $request->withMethod($method);
@@ -207,7 +207,7 @@ class RequestTest extends MessageTest
      *
      * @dataProvider getValidHttpMethodsProvider
      */
-    public function testWithMethodCaseSensitive($method)
+    public function testWithMethodCaseSensitive($method): void
     {
         $method = strtolower($method);
         $request = $this->getRequest();
@@ -218,6 +218,8 @@ class RequestTest extends MessageTest
 
     /**
      * Provider. Gives valid methods.
+     *
+     * @return array<array>
      */
     public function getValidHttpMethodsProvider(): array
     {
@@ -245,7 +247,7 @@ class RequestTest extends MessageTest
      * immutability of the message, and MUST return an instance that has the
      * changed request method.
      */
-    public function testWithMethodImmutability()
+    public function testWithMethodImmutability(): void
     {
         $request = $this->getRequest();
         $request2 = $request->withMethod('GET');
@@ -267,7 +269,7 @@ class RequestTest extends MessageTest
      * Retrieves the URI instance.
      * This method MUST return a UriInterface instance.
      */
-    public function testGetUriGivesUriInterface()
+    public function testGetUriGivesUriInterface(): void
     {
         $request = $this->getRequest();
 
@@ -283,7 +285,7 @@ class RequestTest extends MessageTest
      * contain a host component, any pre-existing Host header MUST be carried
      * over to the returned request.
      */
-    public function testWithUriDefault()
+    public function testWithUriDefault(): void
     {
         $request = $this->getRequest();
 
@@ -323,7 +325,7 @@ class RequestTest extends MessageTest
      *   a host component, this method MUST update the Host header in the returned
      *   request.
      */
-    public function testWithUriPreserveHostCase1()
+    public function testWithUriPreserveHostCase1(): void
     {
         // Setup
         $request = $this->getRequest();
@@ -359,7 +361,7 @@ class RequestTest extends MessageTest
      *   host component, this method MUST NOT update the Host header in the returned
      *   request.
      */
-    public function testWithUriPreserveHostCase2()
+    public function testWithUriPreserveHostCase2(): void
     {
         // Setup
         $request = $this->getRequest();
@@ -393,7 +395,7 @@ class RequestTest extends MessageTest
      * - If a Host header is present and non-empty, this method MUST NOT update
      *   the Host header in the returned request.
      */
-    public function testWithUriPreserveHostCase3()
+    public function testWithUriPreserveHostCase3(): void
     {
         // Setup
         $request = $this->getRequest()->withHeader('Host', 'hostname');

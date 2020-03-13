@@ -21,14 +21,12 @@ class MessageTest extends TestCase
     protected string $className = \IngeniozIT\Http\Message\Message::class;
 
     /** @var string $defaultProtocolVersion Implementation's default HTTP protocol. */
-    protected string $defaultProtocolVersion = '1.1';
+    protected string $defaultProtocolVersion = \IngeniozIT\Http\Message\Message::DEFAULT_PROTOCOL_VERSION;
 
     /**
      * Get a new MessageInterface instance.
-     *
-     * @return MessageInterface
      */
-    protected function getMessage()
+    protected function getMessage(): MessageInterface
     {
         return new $this->className($this->getMockStream());
     }
@@ -37,7 +35,6 @@ class MessageTest extends TestCase
      * Get a \Psr\Http\Message\StreamInterface mock.
      *
      * @suppress PhanTypeMismatchReturn
-     * @return StreamInterface
      */
     protected function getMockStream(): StreamInterface
     {
@@ -51,7 +48,7 @@ class MessageTest extends TestCase
     /**
      * MessageInterface can be instantiated.
      */
-    public function testCanBeInstantiated()
+    public function testCanBeInstantiated(): void
     {
         $message = new $this->className($this->getMockStream());
         $this->assertInstanceOf(MessageInterface::class, $message);
@@ -69,7 +66,7 @@ class MessageTest extends TestCase
      *                                        disable giving a new protocol version.
      * @param        string $expectedProtocol Expected protocol value.
      */
-    public function testProcotolVersion($newProtocol, $expectedProtocol)
+    public function testProcotolVersion($newProtocol, $expectedProtocol): void
     {
         $message = $this->getMessage();
 
@@ -104,6 +101,8 @@ class MessageTest extends TestCase
 
     /**
      * Provider. Gives input protocol versions and the expected formatted value.
+     *
+     * @return array<array>
      */
     public function getProcotolVersionProvider(): array
     {
@@ -125,7 +124,7 @@ class MessageTest extends TestCase
      * @dataProvider getProcotolVersionInvalidVersionProvider
      * @param        mixed $newProtocol Protocol to give to the Message.
      */
-    public function testProcotolVersionExceptions($newProtocol)
+    public function testProcotolVersionExceptions($newProtocol): void
     {
         $message = $this->getMessage();
 
@@ -136,6 +135,8 @@ class MessageTest extends TestCase
 
     /**
      * Provider. Gives invalid protocol versions.
+     *
+     * @return array<array>
      */
     public function getProcotolVersionInvalidVersionProvider(): array
     {
@@ -165,7 +166,7 @@ class MessageTest extends TestCase
      * @param        array $headers         The headers to check.
      * @param        array $expectedHeaders The expected output of getHeaders().
      */
-    public function testGetHeaders(array $headers, array $expectedHeaders)
+    public function testGetHeaders(array $headers, array $expectedHeaders): void
     {
         $message = $this->getMessage();
 
@@ -184,7 +185,7 @@ class MessageTest extends TestCase
      * @param        array $headers         The headers to check.
      * @param        array $expectedHeaders The expected output of getHeaders().
      */
-    public function testGetHeader(array $headers, array $expectedHeaders)
+    public function testGetHeader(array $headers, array $expectedHeaders): void
     {
         $message = $this->getMessage();
 
@@ -203,6 +204,8 @@ class MessageTest extends TestCase
 
     /**
      * Provider. Return valid headers and the expected output of getHeaders().
+     *
+     * @return array<array>
      */
     public function getValidHeadersProvider(): array
     {
@@ -256,7 +259,7 @@ class MessageTest extends TestCase
      * @param        array $headers             The headers to add.
      * @param        array $expectedHeaderLines The expected output of getHeaderLine().
      */
-    public function testGetHeaderLine(array $headers, array $expectedHeaderLines)
+    public function testGetHeaderLine(array $headers, array $expectedHeaderLines): void
     {
         $message = $this->getMessage();
 
@@ -271,6 +274,8 @@ class MessageTest extends TestCase
 
     /**
      * Provider. Return valid headers and the expected output of getHeaderLine().
+     *
+     * @return array<array>
      */
     public function getValidHeaderLinesProvider(): array
     {
@@ -318,7 +323,7 @@ class MessageTest extends TestCase
     /**
      * Checks if a header exists by the given case-insensitive name.
      */
-    public function testHasHeader()
+    public function testHasHeader(): void
     {
         $message = $this->getMessage();
 
@@ -334,7 +339,7 @@ class MessageTest extends TestCase
      * immutability of the message, and MUST return an instance that has the
      * new and/or updated header and value.
      */
-    public function testWithHeaderReturnsNewInstance()
+    public function testWithHeaderReturnsNewInstance(): void
     {
         $message = $this->getMessage();
 
@@ -348,7 +353,7 @@ class MessageTest extends TestCase
      * If the header given is the same as the Message's header, the same
      * instance will be returned.
      */
-    public function testWithHeaderReturnsSameInstanceOnSameValue()
+    public function testWithHeaderReturnsSameInstanceOnSameValue(): void
     {
         $message = $this->getMessage()->withHeader('name', 'value');
         $message2 = $message->withHeader('name', 'value');
@@ -361,7 +366,7 @@ class MessageTest extends TestCase
      * immutability of the message, and MUST return an instance that has the
      * new and/or updated header and value.
      */
-    public function testWithoutHeaderReturnsNewInstance()
+    public function testWithoutHeaderReturnsNewInstance(): void
     {
         $message = $this->getMessage()->withHeader('name', 'value');
 
@@ -375,7 +380,7 @@ class MessageTest extends TestCase
     /**
      * If the header is not in the Message, the same instance will be returned.
      */
-    public function testWithoutHeaderReturnsSameInstanceOnSameValue()
+    public function testWithoutHeaderReturnsSameInstanceOnSameValue(): void
     {
         $message = $this->getMessage();
         $message2 = $message->withoutHeader('name');
@@ -390,7 +395,7 @@ class MessageTest extends TestCase
      * @param        mixed $newValue      Header to give to the Message.
      * @param        array $expectedValue Expected header value.
      */
-    public function testHeadersValues($newValue, $expectedValue)
+    public function testHeadersValues($newValue, $expectedValue): void
     {
         $message = $this->getMessage()->withHeader('foo', $newValue);
 
@@ -402,8 +407,10 @@ class MessageTest extends TestCase
 
     /**
      * Provider. Gives input protocol versions and the expected formatted value.
+     *
+     * @return array<array>
      */
-    public function getHeadersValuesProvider()
+    public function getHeadersValuesProvider(): array
     {
         return [
             '(string)' => ['value', ['value']],
@@ -421,7 +428,7 @@ class MessageTest extends TestCase
      * @dataProvider getHeadersInvalidValuesProvider
      * @param        mixed $value Value to give to the header.
      */
-    public function testHeadersInvalidValues($value)
+    public function testHeadersInvalidValues($value): void
     {
         $message = $this->getMessage();
 
@@ -436,7 +443,7 @@ class MessageTest extends TestCase
      * @dataProvider getHeadersInvalidNamesProvider
      * @param        mixed $name Name to give to the header.
      */
-    public function testHeadersInvalidNames($name)
+    public function testHeadersInvalidNames($name): void
     {
         $message = $this->getMessage();
 
@@ -447,8 +454,10 @@ class MessageTest extends TestCase
 
     /**
      * Provider. Gives invalid header values.
+     *
+     * @return array<array>
      */
-    public function getHeadersInvalidValuesProvider()
+    public function getHeadersInvalidValuesProvider(): array
     {
         return [
             '(array)' => [['test' => 1]],
@@ -459,7 +468,7 @@ class MessageTest extends TestCase
     /**
      * Provider. Gives invalid header names.
      */
-    public function getHeadersInvalidNamesProvider()
+    public function getHeadersInvalidNamesProvider(): array
     {
         return $this->getHeadersInvalidValuesProvider();
     }
@@ -471,7 +480,7 @@ class MessageTest extends TestCase
     /**
      * The body MUST be a StreamInterface object.
      */
-    public function testGetBody()
+    public function testGetBody(): void
     {
         $message = $this->getMessage();
 
@@ -484,7 +493,7 @@ class MessageTest extends TestCase
      * immutability of the message, and MUST return a new instance that has the
      * new body stream.
      */
-    public function testWithBody()
+    public function testWithBody(): void
     {
         $message = $this->getMessage();
 

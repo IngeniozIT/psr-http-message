@@ -6,7 +6,7 @@ namespace IngeniozIT\Http\Message\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\{UploadedFileInterface, StreamInterface};
-use IngeniozIT\Http\Tests\Message\NativeFunctionsMocker;
+use IngeniozIT\Http\Message\Tests\NativeFunctionsMocker;
 
 /**
  * @coversDefaultClass \IngeniozIT\Http\Message\UploadedFile
@@ -69,9 +69,8 @@ class UploadedFileTest extends TestCase
      * @param  ?int    $error           [description]
      * @param  ?string $clientFilename  [description]
      * @param  ?string $clientMediaType [description]
-     * @return UploadedFileInterface
      */
-    protected function getUploadedFile(?int $size = null, ?int $error = null, ?string $clientFilename = null, ?string $clientMediaType = null)
+    protected function getUploadedFile(?int $size = null, ?int $error = null, ?string $clientFilename = null, ?string $clientMediaType = null): UploadedFileInterface
     {
         $mockStream = $this->getStreamMock([
             'getContents' => 'foo bar baz !',
@@ -105,7 +104,7 @@ class UploadedFileTest extends TestCase
     /**
      * Does getUploadedFile() return a UploadedFileInterface ?
      */
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(UploadedFileInterface::class, $this->getUploadedFile(), 'getUploadedFile does not give an UploadedFileInterface object.');
     }
@@ -117,7 +116,7 @@ class UploadedFileTest extends TestCase
     /**
      * Retrieve a stream representing the uploaded file.
      */
-    public function testGetStream()
+    public function testGetStream(): void
     {
         $uploadedFile = $this->getUploadedFile();
 
@@ -128,7 +127,7 @@ class UploadedFileTest extends TestCase
      * Retrieve a stream representing the uploaded file.
      * throws \RuntimeException in cases when no stream can be created.
      */
-    public function testGetStreamMoved()
+    public function testGetStreamMoved(): void
     {
         $uploadedFile = $this->getUploadedFile();
 
@@ -145,7 +144,7 @@ class UploadedFileTest extends TestCase
     /**
      * Move the uploaded file to a new location.
      */
-    public function testMoveTo()
+    public function testMoveTo(): void
     {
         $uploadedFile = $this->getUploadedFile();
 
@@ -160,7 +159,7 @@ class UploadedFileTest extends TestCase
      * Move the uploaded file to a new location.
      * throws \RuntimeException on the second or subsequent call to the method.
      */
-    public function testMoveToMoved()
+    public function testMoveToMoved(): void
     {
         $uploadedFile = $this->getUploadedFile();
 
@@ -177,7 +176,7 @@ class UploadedFileTest extends TestCase
      * Move the uploaded file to a new location.
      * throws \InvalidArgumentException if the $targetPath specified is invalid.
      */
-    public function testMoveToInvalidTargetPath()
+    public function testMoveToInvalidTargetPath(): void
     {
         $uploadedFile = $this->getUploadedFile();
         $path = 'this will fail';
@@ -191,7 +190,7 @@ class UploadedFileTest extends TestCase
      * Move the uploaded file to a new location.
      * throws \InvalidArgumentException if the $targetPath specified already exists.
      */
-    public function testMoveToExistingTargetPath()
+    public function testMoveToExistingTargetPath(): void
     {
         $uploadedFile = $this->getUploadedFile();
         $path = $this->getFilePath();
@@ -205,7 +204,7 @@ class UploadedFileTest extends TestCase
      * throws \RuntimeException on any error during the move operation.
      * @dataProvider providerFsErrorCases
      */
-    public function testMoveToThrowsExceptionOnFilesystemError(bool $streamWithUri, array $functionsOverrides)
+    public function testMoveToThrowsExceptionOnFilesystemError(bool $streamWithUri, array $functionsOverrides): void
     {
         $uploadedFile = $this->getUploadedFile();
         $path = $this->getEmptyPath();
@@ -226,7 +225,8 @@ class UploadedFileTest extends TestCase
      * Provider. Gives filesystem error cases based on
      * - cli / not cli environment
      * - StreamInterface object with / without uri, metadata, fopen fail
-     * @return array
+     *
+     * @return array<array>
      */
     public function providerFsErrorCases(): array
     {
@@ -244,7 +244,7 @@ class UploadedFileTest extends TestCase
      * Move the uploaded file to a new location.
      * @dataProvider providerFsWorkingCases
      */
-    public function testMoveToWorksWithAllEnvs(bool $streamWithUri, array $functionsOverrides)
+    public function testMoveToWorksWithAllEnvs(bool $streamWithUri, array $functionsOverrides): void
     {
         $uploadedFile = $this->getUploadedFile();
         $path = $this->getEmptyPath();
@@ -264,7 +264,8 @@ class UploadedFileTest extends TestCase
      * Provider. Gives filesystem error cases based on
      * - cli / not cli environment
      * - StreamInterface object with / without uri metadata
-     * @return array
+     *
+     * @return array<array>
      */
     public function providerFsWorkingCases(): array
     {
@@ -282,7 +283,7 @@ class UploadedFileTest extends TestCase
     /**
      * Retrieve the file size.
      */
-    public function testGetSize()
+    public function testGetSize(): void
     {
         $uploadedFile = $this->getUploadedFile(42);
 
@@ -293,7 +294,7 @@ class UploadedFileTest extends TestCase
      * Retrieve the file size.
      * return int|null The file size in bytes or null if unknown.
      */
-    public function testGetSizeWithUnknownSize()
+    public function testGetSizeWithUnknownSize(): void
     {
         $uploadedFile = $this->getUploadedFile();
 
@@ -304,7 +305,7 @@ class UploadedFileTest extends TestCase
      * Retrieve the file size.
      * return int|null The file size in bytes or null if unknown.
      */
-    public function testGetSizeFromStreamSize()
+    public function testGetSizeFromStreamSize(): void
     {
         $mockStream = $this->getStreamMock([
             'getSize' => 84,
@@ -322,7 +323,7 @@ class UploadedFileTest extends TestCase
     /**
      * Retrieve the error associated with the uploaded file.
      */
-    public function testGetError()
+    public function testGetError(): void
     {
         $uploadedFile = $this->getUploadedFile(null, \UPLOAD_ERR_CANT_WRITE);
 
@@ -335,7 +336,7 @@ class UploadedFileTest extends TestCase
      *
      * @dataProvider getGetErrorWithAllValidErrorsProvider
      */
-    public function testGetErrorWithAllValidErrors(int $error)
+    public function testGetErrorWithAllValidErrors(int $error): void
     {
         $uploadedFile = $this->getUploadedFile(null, $error);
 
@@ -344,6 +345,8 @@ class UploadedFileTest extends TestCase
 
     /**
      * Provider. Gives all possible valid uploaded file errors.
+     *
+     * @return array<array>
      */
     public function getGetErrorWithAllValidErrorsProvider(): array
     {
@@ -365,7 +368,7 @@ class UploadedFileTest extends TestCase
      *
      * @dataProvider getGetErrorWithInvalidErrorsProvider
      */
-    public function testGetErrorWithInvalidErrors(int $error)
+    public function testGetErrorWithInvalidErrors(int $error): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $uploadedFile = $this->getUploadedFile(null, $error);
@@ -373,6 +376,8 @@ class UploadedFileTest extends TestCase
 
     /**
      * Provider. Gives invalid uploaded file errors.
+     *
+     * @return array<array>
      */
     public function getGetErrorWithInvalidErrorsProvider(): array
     {
@@ -392,7 +397,7 @@ class UploadedFileTest extends TestCase
     /**
      * Retrieve the filename sent by the client.
      */
-    public function testGetClientFileName()
+    public function testGetClientFileName(): void
     {
         /** @var StreamInterface $mockStreamInterface */
         $stream = $this->createMock(StreamInterface::class);
@@ -407,7 +412,7 @@ class UploadedFileTest extends TestCase
      * return string|null The filename sent by the client or null if none
      *     was provided.
      */
-    public function testGetClientFileNameWithUnknownFileName()
+    public function testGetClientFileNameWithUnknownFileName(): void
     {
         $uploadedFile = $this->getUploadedFile();
 
@@ -421,7 +426,7 @@ class UploadedFileTest extends TestCase
     /**
      * Retrieve the media type sent by the client.
      */
-    public function testGetClientMediaType()
+    public function testGetClientMediaType(): void
     {
         /** @var StreamInterface $mockStreamInterface */
         $stream = $this->createMock(StreamInterface::class);
@@ -436,7 +441,7 @@ class UploadedFileTest extends TestCase
      * return string|null The media type sent by the client or null if none
      *     was provided.
      */
-    public function testGetClientMediaTypeWithUnknownMediaType()
+    public function testGetClientMediaTypeWithUnknownMediaType(): void
     {
         $uploadedFile = $this->getUploadedFile();
 

@@ -209,7 +209,8 @@ class Request extends Message implements RequestInterface
         $nextHost = $uri->getHost();
 
         $request = null;
-        if ($nextHost !== '' &&
+        if (
+            $nextHost !== '' &&
             $nextHost !== $currentHost &&
             (
                 !$preserveHost ||

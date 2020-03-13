@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IngeniozIT\Http\Tests\Message;
+namespace IngeniozIT\Http\Message\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface;
@@ -26,7 +26,7 @@ class UriTest extends TestCase
     /**
      * Does getUri() return a UriInterface ?
      */
-    public function testCanBeInstantiated()
+    public function testCanBeInstantiated(): void
     {
         $this->assertInstanceOf(UriInterface::class, new $this->className());
     }
@@ -39,7 +39,7 @@ class UriTest extends TestCase
      * Retrieve the scheme component of the URI.
      * If no scheme is present, this method MUST return an empty string.
      */
-    public function testDefaultSchemeIsEmpty()
+    public function testDefaultSchemeIsEmpty(): void
     {
         $uri = new $this->className();
 
@@ -49,7 +49,7 @@ class UriTest extends TestCase
     /**
      * Return an instance with the specified scheme.
      */
-    public function testCanSetScheme()
+    public function testCanSetScheme(): void
     {
         $uri = (new $this->className())->withScheme('http');
 
@@ -61,7 +61,7 @@ class UriTest extends TestCase
      * The value returned MUST be normalized to lowercase, per RFC 3986
      * Section 3.1.
      */
-    public function testSchemeIsNormalizedToLowercase()
+    public function testSchemeIsNormalizedToLowercase(): void
     {
         $uri = (new $this->className())->withScheme('HTTP');
 
@@ -73,7 +73,7 @@ class UriTest extends TestCase
      * This method MUST retain the state of the current instance, and return
      * an instance that contains the specified scheme.
      */
-    public function testWithSchemeIsImmutable()
+    public function testWithSchemeIsImmutable(): void
     {
         $uri = new $this->className();
         $uri2 = $uri->withScheme('http');
@@ -86,7 +86,7 @@ class UriTest extends TestCase
      * If the scheme given is the same as the Uri's scheme, the same instance
      * will be returned.
      */
-    public function testWithSchemeReturnsSameInstanceOnSameValue()
+    public function testWithSchemeReturnsSameInstanceOnSameValue(): void
     {
         $uri = (new $this->className())->withScheme('http');
         $uri2 = $uri->withScheme('http');
@@ -99,7 +99,7 @@ class UriTest extends TestCase
      * If the scheme given is the same as the Uri's scheme, the same instance
      * will be returned.
      */
-    public function testWithSchemeReturnsSameInstanceOnSameValueCaseInsensitive()
+    public function testWithSchemeReturnsSameInstanceOnSameValueCaseInsensitive(): void
     {
         $uri = (new $this->className())->withScheme('http');
         $uri2 = $uri->withScheme('HTTP');
@@ -112,7 +112,7 @@ class UriTest extends TestCase
      * Implementations MUST support the schemes "http" and "https" case
      * insensitively, and MAY accommodate other schemes if required.
      */
-    public function testWithSchemeImplementsHttp()
+    public function testWithSchemeImplementsHttp(): void
     {
         $uri = (new $this->className())->withScheme('http');
 
@@ -124,7 +124,7 @@ class UriTest extends TestCase
      * Implementations MUST support the schemes "http" and "https" case
      * insensitively, and MAY accommodate other schemes if required.
      */
-    public function testWithSchemeImplementsHttps()
+    public function testWithSchemeImplementsHttps(): void
     {
         $uri = (new $this->className())->withScheme('https');
 
@@ -134,7 +134,7 @@ class UriTest extends TestCase
     /**
      * Test throws \InvalidArgumentException for invalid schemes.
      */
-    public function testWithSchemeThrowsExceptionOnInvalidScheme()
+    public function testWithSchemeThrowsExceptionOnInvalidScheme(): void
     {
         $uri = new $this->className();
 
@@ -146,7 +146,7 @@ class UriTest extends TestCase
      * Return an instance with the specified scheme.
      * Test throws \InvalidArgumentException for unsupported schemes.
      */
-    public function testWithSchemeThrowsInvalidArgumentExceptionOnUnsupportedScheme()
+    public function testWithSchemeThrowsInvalidArgumentExceptionOnUnsupportedScheme(): void
     {
         $uri = new $this->className();
 
@@ -158,7 +158,7 @@ class UriTest extends TestCase
      * Return an instance with the specified scheme.
      * An empty scheme is equivalent to removing the scheme.
      */
-    public function testWithSchemeWithEmptyValueRemovesTheScheme()
+    public function testWithSchemeWithEmptyValueRemovesTheScheme(): void
     {
         $uri = (new $this->className())->withScheme('http');
         $uri = $uri->withScheme('');
@@ -175,7 +175,7 @@ class UriTest extends TestCase
      * If no user information is present, this method MUST return an empty
      * string.
      */
-    public function testDefaultUserInfoIsEmpty()
+    public function testDefaultUserInfoIsEmpty(): void
     {
         $uri = new $this->className();
 
@@ -186,7 +186,7 @@ class UriTest extends TestCase
      * Return an instance with the specified user information.
      * If a user is present in the URI, this will return that value.
      */
-    public function testUserNameCanBeSet()
+    public function testUserNameCanBeSet(): void
     {
         $uri = (new $this->className())->withUserInfo('username');
 
@@ -199,7 +199,7 @@ class UriTest extends TestCase
      * additionally, if the password is also present, it will be appended to the
      * user value, with a colon (":") separating the values.
      */
-    public function testUserPasswordCanBeSet()
+    public function testUserPasswordCanBeSet(): void
     {
         $uri = (new $this->className())->withUserInfo('username', 'password');
 
@@ -211,7 +211,7 @@ class UriTest extends TestCase
      * This method MUST retain the state of the current instance, and return
      * an instance that contains the specified user information.
      */
-    public function testWithUserInfoIsImmutable()
+    public function testWithUserInfoIsImmutable(): void
     {
         $uri = new $this->className();
         $uri2 = $uri->withUserInfo('username');
@@ -224,7 +224,7 @@ class UriTest extends TestCase
      * If the user info given is the same as the Uri's user info, the same
      * instance will be returned.
      */
-    public function testWithUserInfoReturnsSameInstanceOnSameValue()
+    public function testWithUserInfoReturnsSameInstanceOnSameValue(): void
     {
         $uri = (new $this->className())->withUserInfo('username');
         $uri2 = $uri->withUserInfo('username');
@@ -237,7 +237,7 @@ class UriTest extends TestCase
      * This method MUST retain the state of the current instance, and return
      * an instance that contains the specified user information.
      */
-    public function testWithUserInfoWithSameUserButDifferentPasswordIsImmutable()
+    public function testWithUserInfoWithSameUserButDifferentPasswordIsImmutable(): void
     {
         $uri = new $this->className();
         $uri2 = $uri->withUserInfo('username', 'password');
@@ -250,7 +250,7 @@ class UriTest extends TestCase
      * If the user info given is the same as the Uri's user info, the same
      * instance will be returned.
      */
-    public function testWithUserInfoWithPassReturnsSameInstanceOnSameValue()
+    public function testWithUserInfoWithPassReturnsSameInstanceOnSameValue(): void
     {
         $uri = (new $this->className())->withUserInfo('username', 'password');
         $uri2 = $uri->withUserInfo('username', 'password');
@@ -263,7 +263,7 @@ class UriTest extends TestCase
      * An empty string for the user is equivalent to removing user
      * information.
      */
-    public function testWithUserInfoWithEmptyUserRemovesUserInfo()
+    public function testWithUserInfoWithEmptyUserRemovesUserInfo(): void
     {
         $uri = (new $this->className())->withUserInfo('username');
         $uri = $uri->withUserInfo('');
@@ -276,7 +276,7 @@ class UriTest extends TestCase
      * An empty string for the user is equivalent to removing user
      * information.
      */
-    public function testWithUserInfoWithEmptyUserAndPasswordRemovesUserInfo()
+    public function testWithUserInfoWithEmptyUserAndPasswordRemovesUserInfo(): void
     {
         $uri = (new $this->className())->withUserInfo('username', 'password');
         $uri = $uri->withUserInfo('');
@@ -292,7 +292,7 @@ class UriTest extends TestCase
      * Retrieve the host component of the URI.
      * If no host is present, this method MUST return an empty string.
      */
-    public function testDefaultHostIsEmpty()
+    public function testDefaultHostIsEmpty(): void
     {
         $uri = new $this->className();
 
@@ -304,7 +304,7 @@ class UriTest extends TestCase
      * The value returned MUST be normalized to lowercase, per RFC 3986
      * Section 3.2.2.
      */
-    public function testGetHostNormalizesValueToLowercase()
+    public function testGetHostNormalizesValueToLowercase(): void
     {
         $uri = (new $this->className())->withHost('LoWeRcAsE');
 
@@ -316,7 +316,7 @@ class UriTest extends TestCase
      * This method MUST retain the state of the current instance, and return
      * an instance that contains the specified user information.
      */
-    public function testWithHostIsImmutable()
+    public function testWithHostIsImmutable(): void
     {
         $uri = new $this->className();
         $uri2 = $uri->withHost('host');
@@ -329,7 +329,7 @@ class UriTest extends TestCase
      * If the host given is the same as the Uri's host, the same
      * instance will be returned.
      */
-    public function testWithHostReturnsSameInstanceOnSameValue()
+    public function testWithHostReturnsSameInstanceOnSameValue(): void
     {
         $uri = (new $this->className())->withHost('host');
         $uri2 = $uri->withHost('host');
@@ -341,7 +341,7 @@ class UriTest extends TestCase
      * Return an instance with the specified host.
      * An empty host value is equivalent to removing the host.
      */
-    public function testWithEmptyHostRemovesHost()
+    public function testWithEmptyHostRemovesHost(): void
     {
         $uri = (new $this->className())->withHost('host');
         $uri = $uri->withHost('');
@@ -358,7 +358,7 @@ class UriTest extends TestCase
      * If no port is present, and no scheme is present, this method MUST return
      * a null value.
      */
-    public function testDefaultPortIsNull()
+    public function testDefaultPortIsNull(): void
     {
         $uri = new $this->className();
 
@@ -370,7 +370,7 @@ class UriTest extends TestCase
      * If no port is present, but a scheme is present, this method MAY return
      * the standard port for that scheme, but SHOULD return null.
      */
-    public function testGetPortWithSchemeReturnsNull()
+    public function testGetPortWithSchemeReturnsNull(): void
     {
         $uri = (new $this->className())->withScheme('http');
 
@@ -382,7 +382,7 @@ class UriTest extends TestCase
      * If a port is present, and it is non-standard for the current scheme,
      * this method MUST return it as an integer.
      */
-    public function testWithNonStandardPortWithSchemeReturnsPort()
+    public function testWithNonStandardPortWithSchemeReturnsPort(): void
     {
         $uri = (new $this->className())
             ->withScheme('http')
@@ -396,7 +396,7 @@ class UriTest extends TestCase
      * If the port is the standard portvused with the current scheme, this
      * method SHOULD return null.
      */
-    public function testWithStandardHttpPortWithSchemeReturnsNull()
+    public function testWithStandardHttpPortWithSchemeReturnsNull(): void
     {
         $uri = (new $this->className())
             ->withScheme('http')
@@ -410,7 +410,7 @@ class UriTest extends TestCase
      * If the port is the standard portvused with the current scheme, this
      * method SHOULD return null.
      */
-    public function testWithStandardHttpsPortWithSchemeReturnsNull()
+    public function testWithStandardHttpsPortWithSchemeReturnsNull(): void
     {
         $uri = (new $this->className())
             ->withScheme('https')
@@ -424,7 +424,7 @@ class UriTest extends TestCase
      * Implementations MUST raise an exception for ports outside the
      * established TCP and UDP port ranges.
      */
-    public function testWithPortTooSmallThrowsInvalidArgumentException()
+    public function testWithPortTooSmallThrowsInvalidArgumentException(): void
     {
         $uri = new $this->className();
 
@@ -437,7 +437,7 @@ class UriTest extends TestCase
      * Implementations MUST raise an exception for ports outside the
      * established TCP and UDP port ranges.
      */
-    public function testWithPortTooBigThrowsInvalidArgumentException()
+    public function testWithPortTooBigThrowsInvalidArgumentException(): void
     {
         $uri = new $this->className();
 
@@ -450,7 +450,7 @@ class UriTest extends TestCase
      * A null value provided for the port is equivalent to removing the port
      * information.
      */
-    public function testWithNullPortRemovesPort()
+    public function testWithNullPortRemovesPort(): void
     {
         $uri = (new $this->className())->withPort(4242);
         $uri = $uri->withPort(null);
@@ -463,7 +463,7 @@ class UriTest extends TestCase
      * This method MUST retain the state of the current instance, and return
      * an instance that contains the specified user information.
      */
-    public function testWithPortIsImmutable()
+    public function testWithPortIsImmutable(): void
     {
         $uri = new $this->className();
         $uri2 = $uri->withPort(4242);
@@ -476,7 +476,7 @@ class UriTest extends TestCase
      * If the port given is the same as the Uri's port, the same
      * instance will be returned.
      */
-    public function testWithPortReturnsSameInstanceOnSameValue()
+    public function testWithPortReturnsSameInstanceOnSameValue(): void
     {
         $uri = (new $this->className())->withPort(4242);
         $uri2 = $uri->withPort(4242);
@@ -493,7 +493,7 @@ class UriTest extends TestCase
      * If no authority information is present, this method MUST return an empty
      * string.
      */
-    public function testDefaultAuthorityIsEmpty()
+    public function testDefaultAuthorityIsEmpty(): void
     {
         $uri = new $this->className();
 
@@ -515,7 +515,7 @@ class UriTest extends TestCase
      * @param ?int $port Port.
      * @param string $expected Expected authority.
      */
-    public function testGetAuthorityHasRightSyntax(string $host, string $user, ?string $password, ?int $port, string $expected)
+    public function testGetAuthorityHasRightSyntax(string $host, string $user, ?string $password, ?int $port, string $expected): void
     {
         $uri = (new $this->className())
             ->withHost($host)
@@ -528,8 +528,10 @@ class UriTest extends TestCase
     /**
      * Provider. Gives input host, user name, user password, port and the
      * expected formatted authority.
+     *
+     * @return array<array>
      */
-    public function providerAuthoritySyntax()
+    public function providerAuthoritySyntax(): array
     {
         return [
             'Host' => [
@@ -610,7 +612,7 @@ class UriTest extends TestCase
      * If the port component is not set or is the standard port for the current
      * scheme, it SHOULD NOT be included.
      */
-    public function testGetAuthorityDoesNotIncludeDefaultPortForHttp()
+    public function testGetAuthorityDoesNotIncludeDefaultPortForHttp(): void
     {
         $uri = (new $this->className())
             ->withScheme('http')
@@ -625,7 +627,7 @@ class UriTest extends TestCase
      * If the port component is not set or is the standard port for the current
      * scheme, it SHOULD NOT be included.
      */
-    public function testGetAuthorityDoesNotIncludeDefaultPortForHttps()
+    public function testGetAuthorityDoesNotIncludeDefaultPortForHttps(): void
     {
         $uri = (new $this->className())
             ->withScheme('https')
@@ -643,7 +645,7 @@ class UriTest extends TestCase
      * Retrieve the path component of the URI.
      * Default path is ''.
      */
-    public function testDefaultPathIsEmpty()
+    public function testDefaultPathIsEmpty(): void
     {
         $uri = new $this->className();
 
@@ -656,7 +658,7 @@ class UriTest extends TestCase
      * rootless (not starting with a slash). Implementations MUST support all
      * three syntaxes.
      */
-    public function testPathCanBeEmpty()
+    public function testPathCanBeEmpty(): void
     {
         $uri = (new $this->className())->withPath('');
 
@@ -669,7 +671,7 @@ class UriTest extends TestCase
      * rootless (not starting with a slash). Implementations MUST support all
      * three syntaxes.
      */
-    public function testPathCanBeAbsolute()
+    public function testPathCanBeAbsolute(): void
     {
         $uri = (new $this->className())->withPath('/foo/bar');
 
@@ -682,7 +684,7 @@ class UriTest extends TestCase
      * rootless (not starting with a slash). Implementations MUST support all
      * three syntaxes.
      */
-    public function testPathCanBeRootless()
+    public function testPathCanBeRootless(): void
     {
         $uri = (new $this->className())->withPath('foo/bar');
 
@@ -697,7 +699,7 @@ class UriTest extends TestCase
      * the front controller, this difference becomes significant. It's the task
      * of the user to handle both "" and "/".
      */
-    public function testWithPathDoesNotNormalizeEmptyAndSlash()
+    public function testWithPathDoesNotNormalizeEmptyAndSlash(): void
     {
         $uri = (new $this->className())->withPath('');
         $uri2 = $uri->withPath('/');
@@ -709,7 +711,7 @@ class UriTest extends TestCase
      * Return an instance with the specified path.
      * The value returned MUST be percent-encoded.
      */
-    public function testGetPathPercentEncode()
+    public function testGetPathPercentEncode(): void
     {
         $uri = (new $this->className())->withPath('föô*BÂr+baz');
 
@@ -722,7 +724,7 @@ class UriTest extends TestCase
      * any characters. To determine what characters to encode, please refer to
      * RFC 3986, Sections 2 and 3.3.
      */
-    public function testGetPathPercentEncodeDoubleEncode()
+    public function testGetPathPercentEncodeDoubleEncode(): void
     {
         $uri = (new $this->className())->withPath('f%C3%B6%C3%B4%2AB%C3%82r%2Bbaz');
 
@@ -734,7 +736,7 @@ class UriTest extends TestCase
      * If a URI contains an authority component, then the path component must
      * either be empty or begin with a slash ("/") character.
      */
-    public function testWithPathWithAuthorityCanBeEmpty()
+    public function testWithPathWithAuthorityCanBeEmpty(): void
     {
         $uri = (new $this->className())->withhost('hostname');
         $uri = $uri->withPath('');
@@ -747,7 +749,7 @@ class UriTest extends TestCase
      * If a URI contains an authority component, then the path component must
      * either be empty or begin with a slash ("/") character.
      */
-    public function testWithPathWithAuthorityCanBeginWithASlash()
+    public function testWithPathWithAuthorityCanBeginWithASlash(): void
     {
         $uri = (new $this->className())->withhost('hostname');
         $uri = $uri->withPath('/foo/bar');
@@ -760,7 +762,7 @@ class UriTest extends TestCase
      * If a URI contains an authority component, then the path component must
      * either be empty or begin with a slash ("/") character.
      */
-    public function testWithPathWithAuthorityMustBeginWithSlashIfNotEmpty()
+    public function testWithPathWithAuthorityMustBeginWithSlashIfNotEmpty(): void
     {
         $uri = (new $this->className())->withhost('hostname');
 
@@ -773,7 +775,7 @@ class UriTest extends TestCase
      * If a URI does not contain an authority component, then the path cannot
      * begin with two slash characters ("//").
      */
-    public function testWithPathWithoutAuthorityThrowsInvalidArgumentExceptionWhenPathStartsWithDoubleSlash()
+    public function testWithPathWithoutAuthorityThrowsInvalidArgumentExceptionWhenPathStartsWithDoubleSlash(): void
     {
         $uri = new $this->className();
 
@@ -786,7 +788,7 @@ class UriTest extends TestCase
      * This method MUST retain the state of the current instance, and return
      * an instance that contains the specified user information.
      */
-    public function testWithPathIsImmutable()
+    public function testWithPathIsImmutable(): void
     {
         $uri = new $this->className();
         $uri2 = $uri->withPath('/foo/bar');
@@ -799,7 +801,7 @@ class UriTest extends TestCase
      * If the path given is the same as the Uri's path, the same
      * instance will be returned.
      */
-    public function testWithPathReturnsSameInstanceOnSameValue()
+    public function testWithPathReturnsSameInstanceOnSameValue(): void
     {
         $uri = (new $this->className())->withPath('/foo/bar');
         $uri2 = $uri->withPath('/foo/bar');
@@ -815,7 +817,7 @@ class UriTest extends TestCase
      * Retrieve the query string of the URI.
      * If no query string is present, this method MUST return an empty string.
      */
-    public function testGetQueryIsEmptyByDefault()
+    public function testGetQueryIsEmptyByDefault(): void
     {
         $uri = new $this->className();
 
@@ -827,7 +829,7 @@ class UriTest extends TestCase
      * The leading "?" character is not part of the query and MUST NOT be
      * added.
      */
-    public function testGetQueryDoesNotHaveALeadingQuestionMark()
+    public function testGetQueryDoesNotHaveALeadingQuestionMark(): void
     {
         $uri = (new $this->className())->withQuery('test');
 
@@ -839,7 +841,7 @@ class UriTest extends TestCase
      * The leading "?" character is not part of the query and MUST NOT be
      * added.
      */
-    public function testGetQueryEncodesLeadingQuestionMark()
+    public function testGetQueryEncodesLeadingQuestionMark(): void
     {
         $uri = (new $this->className())->withQuery('?test');
 
@@ -850,7 +852,7 @@ class UriTest extends TestCase
      * Return an instance with the specified query string.
      * The value returned MUST be percent-encoded.
      */
-    public function testWithQueryPercentEncodesValue()
+    public function testWithQueryPercentEncodesValue(): void
     {
         $uri = (new $this->className())->withQuery('föô*BÂr+baz');
 
@@ -863,7 +865,7 @@ class UriTest extends TestCase
      * any characters. To determine what characters to encode, please refer to
      * RFC 3986, Sections 2 and 3.4.
      */
-    public function testWithQueryDoesNotPercentEncodeTwice()
+    public function testWithQueryDoesNotPercentEncodeTwice(): void
     {
         $uri = (new $this->className())->withQuery('f%C3%B6%C3%B4%2AB%C3%82r%2Bbaz');
 
@@ -874,7 +876,7 @@ class UriTest extends TestCase
      * This method MUST retain the state of the current instance, and return
      * an instance that contains the specified user information.
      */
-    public function testWithQueryIsImmutable()
+    public function testWithQueryIsImmutable(): void
     {
         $uri = new $this->className();
         $uri2 = $uri->withQuery('foo=bar&baz');
@@ -886,7 +888,7 @@ class UriTest extends TestCase
      * If the query given is the same as the Uri's query, the same
      * instance will be returned.
      */
-    public function testWithQueryReturnsSameInstanceOnSameValue()
+    public function testWithQueryReturnsSameInstanceOnSameValue(): void
     {
         $uri = (new $this->className())->withQuery('foo=bar&baz');
         $uri2 = $uri->withQuery('foo=bar&baz');
@@ -897,7 +899,7 @@ class UriTest extends TestCase
     /**
      * An empty query string value is equivalent to removing the query string.
      */
-    public function testPassingEmptyQueryRemovesQuery()
+    public function testPassingEmptyQueryRemovesQuery(): void
     {
         $uri = (new $this->className())
             ->withQuery('foo=bar&baz')
@@ -925,7 +927,7 @@ class UriTest extends TestCase
         string $query,
         string $fragment,
         string $expectedUri
-    ) {
+    ): void {
         $uri = (new $this->className())
             ->withScheme($scheme)
             ->withUserInfo($user, $password)
@@ -941,8 +943,10 @@ class UriTest extends TestCase
     /**
      * Provider. Gives input scheme, user name, user password, host, port, path,
      * query, fragment and the expected __toString output.
+     *
+     * @return array<array>
      */
-    public function providerFullComponents()
+    public function providerFullComponents(): array
     {
         return [
             'Full example' => [
@@ -1032,7 +1036,7 @@ class UriTest extends TestCase
      * @param string $str Expected uri.
      * @suppress PhanTypeSuspiciousStringExpression
      */
-    public function testReturnsExpectedStringWhenPassingUriInConstructor(string $str)
+    public function testReturnsExpectedStringWhenPassingUriInConstructor(string $str): void
     {
         /** @var UriInterface */
         $uri = new $this->className($str);
@@ -1042,8 +1046,10 @@ class UriTest extends TestCase
 
     /**
      * Provider. Gives valid uri string.
+     *
+     * @return array<array>
      */
-    public function providerStringUri()
+    public function providerStringUri(): array
     {
         return [
             'Full example' => ['http://username:password@hostname:4242/path/to/foo?query=foo&query2=bar#fragment'],
@@ -1062,7 +1068,7 @@ class UriTest extends TestCase
      * @param string $str Invalid uri.
      * @suppress PhanNoopNew
      */
-    public function testThrowsInvalidargumentExceptionOnInvalidString(string $str)
+    public function testThrowsInvalidargumentExceptionOnInvalidString(string $str): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new $this->className($str);
@@ -1070,8 +1076,10 @@ class UriTest extends TestCase
 
     /**
      * Provider. Gives invalid uri strings.
+     *
+     * @return array<array>
      */
-    public function providerInvalidStringUri()
+    public function providerInvalidStringUri(): array
     {
         return [
             'http:///example.com' => ['http:///example.com'],

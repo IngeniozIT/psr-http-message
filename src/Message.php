@@ -24,7 +24,7 @@ class Message implements MessageInterface
     /**
      * @var string Default HTTP protocol version.
      */
-    const DEFAULT_PROTOCOL_VERSION = '1.1';
+    const DEFAULT_PROTOCOL_VERSION = '2';
 
     /**
      * @var string HTTP protocol version.
@@ -32,12 +32,12 @@ class Message implements MessageInterface
     protected string $protocolVersion = self::DEFAULT_PROTOCOL_VERSION;
 
     /**
-     * @var array HTTP headers.
+     * @var array<array> HTTP headers.
      */
     protected array $headers = [];
 
     /**
-     * @var array Mapping between sanitized header names and given header names.
+     * @var array<string> Mapping between sanitized header names and given header names.
      */
     protected array $headerNames = [];
 
@@ -208,7 +208,8 @@ class Message implements MessageInterface
         $parsedHeaderName = static::parseHeaderName($name);
         $parsedHeaderValue = static::parseHeaderValue($value);
 
-        if (isset($this->headerNames[$parsedHeaderName])
+        if (
+            isset($this->headerNames[$parsedHeaderName])
             && $this->headerNames[$parsedHeaderName] === $name
             && $this->headers[$this->headerNames[$parsedHeaderName]] === $parsedHeaderValue
         ) {
@@ -333,7 +334,7 @@ class Message implements MessageInterface
      * Parse and sanitize a header value.
      *
      * @param  string|string[] $value The header value.
-     * @return array The sanitized header value.
+     * @return array<string> The sanitized header value.
      * @throws InvalidArgumentException If $value cannot be converted to a
      * string[].
      */

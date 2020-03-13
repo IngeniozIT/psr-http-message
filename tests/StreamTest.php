@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IngeniozIT\Http\Tests\Message;
+namespace IngeniozIT\Http\Message\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
@@ -26,10 +26,8 @@ class StreamTest extends TestCase
 
     /**
      * Get a generic StreamInterface object.
-     *
-     * @return StreamInterface
      */
-    protected function getStream()
+    protected function getStream(): StreamInterface
     {
         return $this->getStreamWithHandle(fopen('php://temp', 'r+'));
     }
@@ -38,9 +36,8 @@ class StreamTest extends TestCase
      * Get a generic StreamInterface object with a specific stream.
      *
      * @param  resource|mixed $handle {@see \fopen}.
-     * @return StreamInterface
      */
-    protected function getStreamWithHandle($handle)
+    protected function getStreamWithHandle($handle): StreamInterface
     {
         return new \IngeniozIT\Http\Message\Stream($handle);
     }
@@ -74,7 +71,7 @@ class StreamTest extends TestCase
     /**
      * Does getStream() return a StreamInterface ?
      */
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(StreamInterface::class, $this->getStream());
     }
@@ -82,7 +79,7 @@ class StreamTest extends TestCase
     /**
      * Call the constructor with a bad argument.
      */
-    public function testConstructBadArgument()
+    public function testConstructBadArgument(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->getStreamWithHandle('not a handle');
@@ -95,7 +92,7 @@ class StreamTest extends TestCase
     /**
      * Reads all data from the stream into a string, from the beginning to end.
      */
-    public function testToString()
+    public function testToString(): void
     {
         $stream = $this->getStream();
         $this->assertSame('', (string)$stream);
@@ -109,7 +106,7 @@ class StreamTest extends TestCase
      * This method MUST attempt to seek to the beginning of the stream before
      * reading data and read the stream until the end is reached.
      */
-    public function testToStringNoSeek()
+    public function testToStringNoSeek(): void
     {
         $stream = $this->getStream();
         $this->assertSame('', (string)$stream);
@@ -123,7 +120,7 @@ class StreamTest extends TestCase
      * This method MUST NOT raise an exception in order to conform with PHP's
      * string casting operations.
      */
-    public function testToStringException()
+    public function testToStringException(): void
     {
         $stream = $this->getStream();
         $stream->write('foo bar baz');
@@ -140,7 +137,7 @@ class StreamTest extends TestCase
     /**
      * Closes the stream and any underlying resources.
      */
-    public function testClose()
+    public function testClose(): void
     {
         $rs = fopen('php://temp', 'r+');
         $stream = $this->getStreamWithHandle($rs);
@@ -157,7 +154,7 @@ class StreamTest extends TestCase
     /**
      * Separates any underlying resources from the stream.
      */
-    public function testDetach()
+    public function testDetach(): void
     {
         $rs = fopen('php://temp', 'r+');
         $stream = $this->getStreamWithHandle($rs);
@@ -174,7 +171,7 @@ class StreamTest extends TestCase
     /**
      * After the stream has been detached, the stream is in an unusable state.
      */
-    public function testDetachedStreamIsUnusable()
+    public function testDetachedStreamIsUnusable(): void
     {
         $stream = $this->getStream();
         $stream->detach();
@@ -231,7 +228,7 @@ class StreamTest extends TestCase
     /**
      * Get the size of the stream if known.
      */
-    public function testGetSize()
+    public function testGetSize(): void
     {
         $stream = $this->getStream();
         $this->assertSame(0, $stream->getSize());
@@ -254,7 +251,7 @@ class StreamTest extends TestCase
     /**
      * Returns the current position of the file read/write pointer
      */
-    public function testTell()
+    public function testTell(): void
     {
         $stream = $this->getStream();
         $this->assertSame(0, $stream->tell());
@@ -275,7 +272,7 @@ class StreamTest extends TestCase
     /**
      * Tests throws \RuntimeException on error.
      */
-    public function testTellException()
+    public function testTellException(): void
     {
         $stream = $this->getStream();
         NativeFunctionsMocker::makeFunctionReturn('ftell', false);
@@ -290,7 +287,7 @@ class StreamTest extends TestCase
     /**
      * Returns true if the stream is at the end of the stream.
      */
-    public function testEof()
+    public function testEof(): void
     {
         $rs = fopen('php://temp', 'w+');
         $stream = $this->getStreamWithHandle($rs);
@@ -323,7 +320,7 @@ class StreamTest extends TestCase
     /**
      * Returns whether or not the stream is seekable.
      */
-    public function testIsSeekable()
+    public function testIsSeekable(): void
     {
         $stream = $this->getStream();
         $this->assertTrue($stream->isSeekable());
@@ -351,7 +348,7 @@ class StreamTest extends TestCase
      * @param        string $mode
      * @param        bool   $shouldBeWritable
      */
-    public function testIsWritable(string $mode, bool $shouldBeWritable)
+    public function testIsWritable(string $mode, bool $shouldBeWritable): void
     {
         $stream = $this->getStreamWithHandle($this->getFileDescriptor($mode));
 
@@ -367,6 +364,8 @@ class StreamTest extends TestCase
 
     /**
      * Provider. Return fopen modes and whether they are writable or not.
+     *
+     * @return array<array>
      */
     public function getWritableProvider(): array
     {
@@ -416,7 +415,7 @@ class StreamTest extends TestCase
     /**
      * Write data to the stream. @throws \RuntimeException on failure.
      */
-    public function testWriteFilesystemError()
+    public function testWriteFilesystemError(): void
     {
         $stream = $this->getStream();
 
@@ -437,7 +436,7 @@ class StreamTest extends TestCase
      * @param        string $mode
      * @param        bool   $shouldBeReadable
      */
-    public function testIsReadable(string $mode, bool $shouldBeReadable)
+    public function testIsReadable(string $mode, bool $shouldBeReadable): void
     {
         $stream = $this->getStreamWithHandle($this->getFileDescriptor($mode));
 
@@ -453,6 +452,8 @@ class StreamTest extends TestCase
 
     /**
      * Provider. Return fopen modes and whether they are readable or not.
+     *
+     * @return array<array>
      */
     public function getReadableProvider(): array
     {
@@ -498,7 +499,7 @@ class StreamTest extends TestCase
     /**
      * @throws \RuntimeException if an error occurs.
      */
-    public function testReadWithNegativeNumber()
+    public function testReadWithNegativeNumber(): void
     {
         $stream = $this->getStream();
 
@@ -513,7 +514,7 @@ class StreamTest extends TestCase
     /**
      * Read data from the stream. @throws \RuntimeException if an error occurs.
      */
-    public function testReadFilesystemError()
+    public function testReadFilesystemError(): void
     {
         $stream = $this->getStream();
 
@@ -525,7 +526,7 @@ class StreamTest extends TestCase
     /**
      * Read data from the stream. @throws \RuntimeException if an error occurs.
      */
-    public function testReadNegativeLength()
+    public function testReadNegativeLength(): void
     {
         $stream = $this->getStream();
 
@@ -537,7 +538,7 @@ class StreamTest extends TestCase
     // Get Metadata                               //
     // ========================================== //
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $fd = $this->getFileDescriptor('r+');
         $stream = $this->getStreamWithHandle($fd);

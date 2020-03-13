@@ -23,9 +23,8 @@ class ServerRequestTest extends RequestTest
      * Get a new ServerRequestInterface instance.
      *
      * @param array $headers (optional) HTTP headers.
-     * @return ServerRequestInterface
      */
-    protected function getMessage(array $headers = [])
+    protected function getMessage(array $headers = []): ServerRequestInterface
     {
         return new $this->className($this->getMockStream(), $headers);
     }
@@ -37,7 +36,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Retrieve server parameters.
      */
-    public function testGetServerParamsDefault()
+    public function testGetServerParamsDefault(): void
     {
         $serverRequest = $this->getMessage();
 
@@ -47,7 +46,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Retrieve server parameters.
      */
-    public function testGetServerParams()
+    public function testGetServerParams(): void
     {
         $serverParams = [
             'param1' => 'value1',
@@ -67,7 +66,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Retrieve cookies.
      */
-    public function testGetCookieParamsDefault()
+    public function testGetCookieParamsDefault(): void
     {
         $serverRequest = $this->getMessage();
 
@@ -77,7 +76,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Retrieve cookies.
      */
-    public function testGetCookieParams()
+    public function testGetCookieParams(): void
     {
         $cookieParams = [
             'param1' => 'value1',
@@ -93,7 +92,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Return an instance with the specified cookies.
      */
-    public function testWithCookieParams()
+    public function testWithCookieParams(): void
     {
         $cookieParams = [
             'param1' => 'value1',
@@ -112,7 +111,7 @@ class ServerRequestTest extends RequestTest
      * immutability of the message, and MUST return an instance that has the
      * updated cookie values.
      */
-    public function testWithCookieParamsReturnsNewInstance()
+    public function testWithCookieParamsReturnsNewInstance(): void
     {
         $cookieParams = [
             'param1' => 'value1',
@@ -131,7 +130,7 @@ class ServerRequestTest extends RequestTest
      * If the cookieParams given is the same as the ServerRequest's cookieParams,
      * the same instance will be returned.
      */
-    public function testWithCookieParamsReturnsSameInstanceOnSameValue()
+    public function testWithCookieParamsReturnsSameInstanceOnSameValue(): void
     {
         $cookieParams = [
             'param1' => 'value1',
@@ -152,7 +151,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Retrieve query string arguments.
      */
-    public function testGetQueryParamsDefault()
+    public function testGetQueryParamsDefault(): void
     {
         $serverRequest = $this->getMessage();
 
@@ -162,7 +161,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Retrieve query string arguments.
      */
-    public function testGetQueryParams()
+    public function testGetQueryParams(): void
     {
         $queryParams = [
             'param1' => 'value1',
@@ -179,7 +178,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Return an instance with the specified query string arguments.
      */
-    public function testWithQueryParams()
+    public function testWithQueryParams(): void
     {
         $cookieParams = [
             'param1' => 'value1',
@@ -198,7 +197,7 @@ class ServerRequestTest extends RequestTest
      * immutability of the message, and MUST return an instance that has the
      * updated query string arguments.
      */
-    public function testWithQueryParamsReturnsNewInstance()
+    public function testWithQueryParamsReturnsNewInstance(): void
     {
         $queryParams = [
             'param1' => 'value1',
@@ -217,7 +216,7 @@ class ServerRequestTest extends RequestTest
      * If the queryParams given is the same as the ServerRequest's queryParams,
      * the same instance will be returned.
      */
-    public function testWithQueryParamsReturnsSameInstanceOnSameValue()
+    public function testWithQueryParamsReturnsSameInstanceOnSameValue(): void
     {
         $queryParams = [
             'param1' => 'value1',
@@ -238,7 +237,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Retrieve normalized file upload data.
      */
-    public function testGetUploadedFilesDefault()
+    public function testGetUploadedFilesDefault(): void
     {
         $serverRequest = $this->getMessage();
 
@@ -248,7 +247,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Retrieve normalized file upload data.
      */
-    public function testGetUploadedFiles()
+    public function testGetUploadedFiles(): void
     {
         $uploadedFiles = [
             'param1' => $this->createMock(UploadedFileInterface::class),
@@ -264,7 +263,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Create a new instance with the specified uploaded files.
      */
-    public function testWithUploadedFiles()
+    public function testWithUploadedFiles(): void
     {
         $uploadedFiles = [
             'param1' => $this->createMock(UploadedFileInterface::class),
@@ -283,7 +282,7 @@ class ServerRequestTest extends RequestTest
      * immutability of the message, and MUST return an instance that has the
      * updated body parameters.
      */
-    public function testWithUploadedFilesReturnsNewInstance()
+    public function testWithUploadedFilesReturnsNewInstance(): void
     {
         $uploadedFiles = [
             'param1' => $this->createMock(UploadedFileInterface::class),
@@ -302,7 +301,7 @@ class ServerRequestTest extends RequestTest
      * If the uploadedFiles given is the same as the ServerRequest's uploadedFiles,
      * the same instance will be returned.
      */
-    public function testWithUploadedFilesReturnsSameInstanceOnSameValue()
+    public function testWithUploadedFilesReturnsSameInstanceOnSameValue(): void
     {
         $uploadedFiles = [
             'param1' => $this->createMock(UploadedFileInterface::class),
@@ -324,7 +323,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Retrieve any parameters provided in the request body.
      */
-    public function testGetParsedBodyDefault()
+    public function testGetParsedBodyDefault(): void
     {
         $serverRequest = $this->getMessage();
 
@@ -334,7 +333,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Return an instance with the specified body parameters.
      */
-    public function testWithParsedBody()
+    public function testWithParsedBody(): void
     {
         $parsedBody = [
             'foo' => 42,
@@ -353,7 +352,7 @@ class ServerRequestTest extends RequestTest
      * immutability of the message, and MUST return an instance that has the
      * updated body parameters.
      */
-    public function testWithParsedBodyReturnsNewInstance()
+    public function testWithParsedBodyReturnsNewInstance(): void
     {
         $parsedBody = [
             'foo' => 42,
@@ -372,7 +371,7 @@ class ServerRequestTest extends RequestTest
      * immutability of the message, and MUST return an instance that has the
      * updated body parameters.
      */
-    public function testWithParsedBodyReturnsSameInstanceOnSameValue()
+    public function testWithParsedBodyReturnsSameInstanceOnSameValue(): void
     {
         $parsedBody = [
             'foo' => 42,
@@ -393,7 +392,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Retrieve attributes derived from the request.
      */
-    public function testGetAttributesDefault()
+    public function testGetAttributesDefault(): void
     {
         $serverRequest = $this->getMessage();
 
@@ -403,7 +402,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Retrieve attributes derived from the request.
      */
-    public function testGetAttributes()
+    public function testGetAttributes(): void
     {
         $serverRequest = $this
             ->getMessage()
@@ -424,7 +423,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Return an instance with the specified derived request attribute.
      */
-    public function testWithAttribute()
+    public function testWithAttribute(): void
     {
         $serverRequest = $this->getMessage();
 
@@ -439,7 +438,7 @@ class ServerRequestTest extends RequestTest
      * immutability of the message, and MUST return an instance that has the
      * updated attribute.
      */
-    public function testWithAttributeReturnsNewInstance()
+    public function testWithAttributeReturnsNewInstance(): void
     {
         $serverRequest = $this->getMessage();
         $serverRequest2 = $serverRequest->withAttribute('foo', 'bar baz');
@@ -453,7 +452,7 @@ class ServerRequestTest extends RequestTest
      * immutability of the message, and MUST return an instance that has the
      * updated attribute.
      */
-    public function testWithAttributeReturnsSameInstanceOnSameValue()
+    public function testWithAttributeReturnsSameInstanceOnSameValue(): void
     {
         $serverRequest = $this->getMessage()->withAttribute('foo', 'bar baz');
         $serverRequest2 = $serverRequest->withAttribute('foo', 'bar baz');
@@ -464,7 +463,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Return an instance that removes the specified derived request attribute.
      */
-    public function testWithoutAttribute()
+    public function testWithoutAttribute(): void
     {
         $serverRequest = $this->getMessage()->withAttribute('foo', 'bar baz');
 
@@ -479,7 +478,7 @@ class ServerRequestTest extends RequestTest
      * immutability of the message, and MUST return an instance that removes
      * the attribute.
      */
-    public function testWithoutAttributeReturnsNewInstance()
+    public function testWithoutAttributeReturnsNewInstance(): void
     {
         $serverRequest = $this->getMessage()->withAttribute('foo', 'bar baz');
 
@@ -494,7 +493,7 @@ class ServerRequestTest extends RequestTest
      * immutability of the message, and MUST return an instance that removes
      * the attribute.
      */
-    public function testWithoutAttributeReturnsSameInstanceOnSameValue()
+    public function testWithoutAttributeReturnsSameInstanceOnSameValue(): void
     {
         $serverRequest = $this->getMessage();
 

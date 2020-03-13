@@ -198,7 +198,8 @@ class Uri implements UriInterface
     {
         $scheme = $this->getScheme();
 
-        if ($this->port === null
+        if (
+            $this->port === null
             || (
                 $scheme !== ''
                 && isset(Protocol::PORTS[$scheme])

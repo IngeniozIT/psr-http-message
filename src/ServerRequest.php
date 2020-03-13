@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
-use Psr\Http\Message\{ServerRequestInterface, StreamInterface, UriInterface};
+use Psr\Http\Message\{ServerRequestInterface, StreamInterface, UriInterface, UploadedFileInterface};
 use IngeniozIT\Http\Message\Request;
 
 /**
@@ -47,18 +47,29 @@ use IngeniozIT\Http\Message\Request;
  */
 class ServerRequest extends Request implements ServerRequestInterface
 {
+    /** @var array<string> */
     protected array $serverParams;
+
+    /** @var array<string> */
     protected array $cookieParams = [];
+
+    /** @var array<string> */
     protected array $queryParams = [];
+
+    /** @var array<UploadedFileInterface> */
     protected array $uploadedFiles = [];
+
+    /** @var array<string> */
     protected array $attributes = [];
+
+    /** @var array<string>|null */
     protected ?array $parsedBody = null;
 
     /**
      * Constructor.
      *
      * @param StreamInterface $stream The StreamInterface to be used as body.
-     * @param array $serverParams (optional)
+     * @param array<string> $serverParams (optional)
      * @param ?UriInterface $uri (optional) Uri of the request.
      */
     public function __construct(
@@ -204,7 +215,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * immutability of the message, and MUST return an instance that has the
      * updated body parameters.
      *
-     * @param  array $uploadedFiles An array tree of UploadedFileInterface instances.
+     * @param  array<UploadedFileInterface> $uploadedFiles An array tree of UploadedFileInterface instances.
      * @return static
      * @throws \InvalidArgumentException if an invalid structure is provided.
      */
@@ -333,7 +344,8 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withAttribute($name, $value): self
     {
-        if ((isset($this->attributes[$name])
+        if (
+            (isset($this->attributes[$name])
             || array_key_exists($name, $this->attributes))
             && $this->attributes[$name] === $value
         ) {
@@ -362,7 +374,8 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withoutAttribute($name): self
     {
-        if (!isset($this->attributes[$name])
+        if (
+            !isset($this->attributes[$name])
             && !array_key_exists($name, $this->attributes)
         ) {
             return $this;
