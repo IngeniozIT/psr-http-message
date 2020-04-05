@@ -18,7 +18,7 @@ use IngeniozIT\Http\Message\Exceptions\{InvalidArgumentException, RuntimeExcepti
  */
 class UploadedFile implements UploadedFileInterface
 {
-    protected $stream;
+    protected ?StreamInterface $stream;
     protected ?int $size;
     protected int $error;
     protected ?string $clientFilename;
@@ -111,7 +111,7 @@ class UploadedFile implements UploadedFileInterface
      */
     public function moveTo($targetPath): void
     {
-        if (!($this->stream instanceof StreamInterface)) {
+        if ($this->stream === null) {
             throw new RuntimeException('Stream has been moved.');
         }
 

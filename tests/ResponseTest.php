@@ -35,7 +35,7 @@ class ResponseTest extends MessageTest
      */
     protected function getResponse(): ResponseInterface
     {
-        return $this->getMessage();
+        return new $this->className($this->getMockStream());
     }
 
     // ========================================== //

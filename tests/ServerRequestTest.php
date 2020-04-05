@@ -22,7 +22,7 @@ class ServerRequestTest extends RequestTest
     /**
      * Get a new ServerRequestInterface instance.
      *
-     * @param array $headers (optional) HTTP headers.
+     * @param array<mixed> $headers (optional) HTTP headers.
      */
     protected function getMessage(array $headers = []): ServerRequestInterface
     {

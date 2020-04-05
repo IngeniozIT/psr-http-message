@@ -3,3 +3,7 @@ parameters:
   paths:
     - src
     - tests
+  ignoreErrors:
+    -
+      message: '#Variable \$mockStreamInterface#'
+      path: %currentWorkingDirectory%/tests/UploadedFileTest.php

@@ -89,7 +89,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * typically derived from PHP's $_SERVER superglobal. The data IS NOT
      * REQUIRED to originate from $_SERVER.
      *
-     * @return array
+     * @return array<string>
      */
     public function getServerParams(): array
     {
@@ -104,7 +104,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * The data MUST be compatible with the structure of the $_COOKIE
      * superglobal.
      *
-     * @return array
+     * @return array<string>
      */
     public function getCookieParams(): array
     {
@@ -114,7 +114,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     /**
      * Return an instance with the specified cookies.
      *
-     * The data IS NOT REQUIRED to come from the $_COOKIE superglobal, but MUST
+     * The data IS NOT REQUI<string>RED to come from the $_COOKIE superglobal, but MUST
      * be compatible with the structure of $_COOKIE. Typically, this data will
      * be injected at instantiation.
      *
@@ -125,7 +125,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * immutability of the message, and MUST return an instance that has the
      * updated cookie values.
      *
-     * @param  array $cookies Array of key/value pairs representing cookies.
+     * @param array<string> $cookies Array of key/value pairs representing cookies.
      * @return static
      */
     public function withCookieParams(array $cookies): self
@@ -150,7 +150,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * values, you may need to parse the query string from `getUri()->getQuery()`
      * or from the `QUERY_STRING` server param.
      *
-     * @return array
+     * @return array<string>
      */
     public function getQueryParams(): array
     {
@@ -175,7 +175,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * immutability of the message, and MUST return an instance that has the
      * updated query string arguments.
      *
-     * @param  array $query Array of query string arguments, typically from
+     * @param array<string> $query Array of query string arguments, typically from
      *                      $_GET.
      * @return static
      */
@@ -200,7 +200,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * These values MAY be prepared from $_FILES or the message body during
      * instantiation, or MAY be injected via withUploadedFiles().
      *
-     * @return array An array tree of UploadedFileInterface instances; an empty
+     * @return array<UploadedFileInterface> An array tree of UploadedFileInterface instances; an empty
      *     array MUST be returned if no data is present.
      */
     public function getUploadedFiles(): array

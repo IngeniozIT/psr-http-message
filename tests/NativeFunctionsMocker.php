@@ -9,6 +9,7 @@ namespace IngeniozIT\Http\Message\Tests;
  */
 class NativeFunctionsMocker
 {
+    /** @var array<string,bool> */
     public static array $overrides = [];
 
     public static function resetAll(): void
@@ -37,6 +38,11 @@ namespace IngeniozIT\Http\Message;
 
 use IngeniozIT\Http\Message\Tests\NativeFunctionsMocker;
 
+/**
+ * @param resource $resource
+ * @param int $length
+ * @return string|false
+ */
 function fread($resource, $length)
 {
     return NativeFunctionsMocker::$overrides['fread'] ?? \fread($resource, $length);

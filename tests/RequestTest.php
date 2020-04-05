@@ -26,12 +26,12 @@ class RequestTest extends MessageTest
      */
     public function getRequest(): RequestInterface
     {
-        return $this->getMessage();
+        return new $this->className($this->getMockStream());
     }
 
     /**
      * Get a \Psr\Http\Message\UriInterface mock.
-     * @param array $methods (optional) Methods to mock.
+     * @param array<mixed> $methods (optional) Methods to mock.
      *
      * @return UriInterface
      * @suppress PhanAccessMethodInternal
@@ -152,6 +152,7 @@ class RequestTest extends MessageTest
 
     /**
      * Provider. Gives request targets of each form.
+     * @return array<string,array<string>>
      */
     public function getRequestTargetFormsProvider(): array
     {
@@ -192,7 +193,7 @@ class RequestTest extends MessageTest
      *
      * @dataProvider getValidHttpMethodsProvider
      */
-    public function testGetMethod($method): void
+    public function testGetMethod(string $method): void
     {
         $request = $this->getRequest();
         $request = $request->withMethod($method);
@@ -207,7 +208,7 @@ class RequestTest extends MessageTest
      *
      * @dataProvider getValidHttpMethodsProvider
      */
-    public function testWithMethodCaseSensitive($method): void
+    public function testWithMethodCaseSensitive(string $method): void
     {
         $method = strtolower($method);
         $request = $this->getRequest();

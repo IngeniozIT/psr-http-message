@@ -40,10 +40,17 @@ class UploadedFileTest extends TestCase
 
     protected function getTempFilePath(): string
     {
-        return tempnam(sys_get_temp_dir(), 'UploadedFileTest');
+        $filePath = tempnam(sys_get_temp_dir(), 'UploadedFileTest');
+
+        if ($filePath === false) {
+            throw new \Exception('Could not get temporary file path');
+        }
+
+        return $filePath;
     }
 
     /**
+     * @param array<mixed> $methods
      * @suppress PhanAccessMethodInternal
      * @suppress PhanTypeMismatchReturn
      */
@@ -202,6 +209,8 @@ class UploadedFileTest extends TestCase
     /**
      * Move the uploaded file to a new location.
      * throws \RuntimeException on any error during the move operation.
+     * @param bool $streamWithUri
+     * @param array<mixed> $functionsOverrides
      * @dataProvider providerFsErrorCases
      */
     public function testMoveToThrowsExceptionOnFilesystemError(bool $streamWithUri, array $functionsOverrides): void
@@ -242,6 +251,8 @@ class UploadedFileTest extends TestCase
 
     /**
      * Move the uploaded file to a new location.
+     * @param bool $streamWithUri
+     * @param array<mixed> $functionsOverrides
      * @dataProvider providerFsWorkingCases
      */
     public function testMoveToWorksWithAllEnvs(bool $streamWithUri, array $functionsOverrides): void

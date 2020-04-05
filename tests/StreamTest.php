@@ -51,6 +51,11 @@ class StreamTest extends TestCase
     protected function getFileDescriptor(string $mode = 'r+')
     {
         $tmpFd = tmpfile();
+
+        if ($tmpFd === false) {
+            throw new \Exception('Could not create temporary file');
+        }
+
         $path = stream_get_meta_data($tmpFd)['uri'];
 
         if ($mode[0] === 'x') {
@@ -59,6 +64,10 @@ class StreamTest extends TestCase
         } else {
             $fd = fopen($path, $mode);
             fclose($tmpFd);
+        }
+
+        if ($fd === false) {
+            throw new \Exception("Could not open file $path");
         }
 
         return $fd;
