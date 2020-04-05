@@ -33,5 +33,9 @@
         "psr-4": {
             "IngeniozIT\\Http\\Message\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "testfull" : "vendor/bin/phpunit && vendor/bin/phpcs && vendor/bin/phpstan analyze && vendor/bin/phan --allow-polyfill-parser"
     }
 }
