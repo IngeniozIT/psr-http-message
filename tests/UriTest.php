@@ -2,1081 +2,494 @@
 
 declare(strict_types=1);
 
-namespace IngeniozIT\Http\Tests\Message;
+namespace IngeniozIT\Http\Message\Tests;
 
 use PHPUnit\Framework\TestCase;
+use IngeniozIT\Http\Message\Uri;
 use Psr\Http\Message\UriInterface;
+use InvalidArgumentException;
 
 /**
- * @coversDefaultClass \IngeniozIT\Http\Message\Uri
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class UriTest extends TestCase
 {
-    // ========================================== //
-    // Implementation specific                    //
-    // ========================================== //
-
-    /** @var string Class name of the tested class */
-    protected string $className = \IngeniozIT\Http\Message\Uri::class;
-
-    // ========================================== //
-    // Constructor                                //
-    // ========================================== //
-
-    /**
-     * Does getUri() return a UriInterface ?
-     */
-    public function testCanBeInstantiated()
+    protected function createUriInstance(): Uri
     {
-        $this->assertInstanceOf(UriInterface::class, new $this->className());
+        return new Uri(
+            scheme: '',
+            user: '',
+            password: null,
+            host: '',
+            port: null,
+            path: '',
+            query: '',
+            fragment: '',
+        );
     }
 
-    // ========================================== //
-    // Scheme                                     //
-    // ========================================== //
-
-    /**
-     * Retrieve the scheme component of the URI.
-     * If no scheme is present, this method MUST return an empty string.
-     */
-    public function testDefaultSchemeIsEmpty()
+    public function testIsAPsrUri(): void
     {
-        $uri = new $this->className();
+        $uri = $this->createUriInstance();
 
-        $this->assertSame('', $uri->getScheme());
+        self::assertInstanceOf(UriInterface::class, $uri);
     }
 
     /**
-     * Return an instance with the specified scheme.
+     * @dataProvider providerSchemes
      */
-    public function testCanSetScheme()
+    public function testHasAScheme(string $scheme, string $expectedScheme): void
     {
-        $uri = (new $this->className())->withScheme('http');
+        $uri = $this->createUriInstance()->withScheme($scheme);
 
-        $this->assertSame('http', $uri->getScheme());
+        self::assertEquals($expectedScheme, $uri->getScheme());
     }
 
     /**
-     * Return an instance with the specified scheme.
-     * The value returned MUST be normalized to lowercase, per RFC 3986
-     * Section 3.1.
+     * @return array<string, array{scheme: string, expectedScheme: string}>
      */
-    public function testSchemeIsNormalizedToLowercase()
-    {
-        $uri = (new $this->className())->withScheme('HTTP');
-
-        $this->assertSame('http', $uri->getScheme());
-    }
-
-    /**
-     * Return an instance with the specified scheme.
-     * This method MUST retain the state of the current instance, and return
-     * an instance that contains the specified scheme.
-     */
-    public function testWithSchemeIsImmutable()
-    {
-        $uri = new $this->className();
-        $uri2 = $uri->withScheme('http');
-
-        $this->assertNotSame($uri, $uri2);
-    }
-
-    /**
-     * Return an instance with the specified scheme.
-     * If the scheme given is the same as the Uri's scheme, the same instance
-     * will be returned.
-     */
-    public function testWithSchemeReturnsSameInstanceOnSameValue()
-    {
-        $uri = (new $this->className())->withScheme('http');
-        $uri2 = $uri->withScheme('http');
-
-        $this->assertSame($uri, $uri2);
-    }
-
-    /**
-     * Return an instance with the specified scheme.
-     * If the scheme given is the same as the Uri's scheme, the same instance
-     * will be returned.
-     */
-    public function testWithSchemeReturnsSameInstanceOnSameValueCaseInsensitive()
-    {
-        $uri = (new $this->className())->withScheme('http');
-        $uri2 = $uri->withScheme('HTTP');
-
-        $this->assertSame($uri, $uri2);
-    }
-
-    /**
-     * Return an instance with the specified scheme.
-     * Implementations MUST support the schemes "http" and "https" case
-     * insensitively, and MAY accommodate other schemes if required.
-     */
-    public function testWithSchemeImplementsHttp()
-    {
-        $uri = (new $this->className())->withScheme('http');
-
-        $this->assertSame('http', $uri->getScheme());
-    }
-
-    /**
-     * Return an instance with the specified scheme.
-     * Implementations MUST support the schemes "http" and "https" case
-     * insensitively, and MAY accommodate other schemes if required.
-     */
-    public function testWithSchemeImplementsHttps()
-    {
-        $uri = (new $this->className())->withScheme('https');
-
-        $this->assertSame('https', $uri->getScheme());
-    }
-
-    /**
-     * Test throws \InvalidArgumentException for invalid schemes.
-     */
-    public function testWithSchemeThrowsExceptionOnInvalidScheme()
-    {
-        $uri = new $this->className();
-
-        $this->expectException(\InvalidArgumentException::class);
-        $uri->withScheme([]);
-    }
-
-    /**
-     * Return an instance with the specified scheme.
-     * Test throws \InvalidArgumentException for unsupported schemes.
-     */
-    public function testWithSchemeThrowsInvalidArgumentExceptionOnUnsupportedScheme()
-    {
-        $uri = new $this->className();
-
-        $this->expectException(\InvalidArgumentException::class);
-        $uri->withScheme('notARealScheme');
-    }
-
-    /**
-     * Return an instance with the specified scheme.
-     * An empty scheme is equivalent to removing the scheme.
-     */
-    public function testWithSchemeWithEmptyValueRemovesTheScheme()
-    {
-        $uri = (new $this->className())->withScheme('http');
-        $uri = $uri->withScheme('');
-
-        $this->assertSame('', $uri->getScheme());
-    }
-
-    // ========================================== //
-    // User Info                                  //
-    // ========================================== //
-
-    /**
-     * Retrieve the user information component of the URI.
-     * If no user information is present, this method MUST return an empty
-     * string.
-     */
-    public function testDefaultUserInfoIsEmpty()
-    {
-        $uri = new $this->className();
-
-        $this->assertSame('', $uri->getUserInfo());
-    }
-
-    /**
-     * Return an instance with the specified user information.
-     * If a user is present in the URI, this will return that value.
-     */
-    public function testUserNameCanBeSet()
-    {
-        $uri = (new $this->className())->withUserInfo('username');
-
-        $this->assertSame('username', $uri->getUserInfo());
-    }
-
-    /**
-     * Return an instance with the specified user information.
-     * If a user is present in the URI, this will return that value;
-     * additionally, if the password is also present, it will be appended to the
-     * user value, with a colon (":") separating the values.
-     */
-    public function testUserPasswordCanBeSet()
-    {
-        $uri = (new $this->className())->withUserInfo('username', 'password');
-
-        $this->assertSame('username:password', $uri->getUserInfo());
-    }
-
-    /**
-     * Return an instance with the specified user information.
-     * This method MUST retain the state of the current instance, and return
-     * an instance that contains the specified user information.
-     */
-    public function testWithUserInfoIsImmutable()
-    {
-        $uri = new $this->className();
-        $uri2 = $uri->withUserInfo('username');
-
-        $this->assertNotSame($uri, $uri2);
-    }
-
-    /**
-     * Return an instance with the specified user information.
-     * If the user info given is the same as the Uri's user info, the same
-     * instance will be returned.
-     */
-    public function testWithUserInfoReturnsSameInstanceOnSameValue()
-    {
-        $uri = (new $this->className())->withUserInfo('username');
-        $uri2 = $uri->withUserInfo('username');
-
-        $this->assertSame($uri, $uri2);
-    }
-
-    /**
-     * Return an instance with the specified user information.
-     * This method MUST retain the state of the current instance, and return
-     * an instance that contains the specified user information.
-     */
-    public function testWithUserInfoWithSameUserButDifferentPasswordIsImmutable()
-    {
-        $uri = new $this->className();
-        $uri2 = $uri->withUserInfo('username', 'password');
-
-        $this->assertNotSame($uri, $uri2);
-    }
-
-    /**
-     * Return an instance with the specified user information.
-     * If the user info given is the same as the Uri's user info, the same
-     * instance will be returned.
-     */
-    public function testWithUserInfoWithPassReturnsSameInstanceOnSameValue()
-    {
-        $uri = (new $this->className())->withUserInfo('username', 'password');
-        $uri2 = $uri->withUserInfo('username', 'password');
-
-        $this->assertSame($uri, $uri2);
-    }
-
-    /**
-     * Return an instance with the specified user information.
-     * An empty string for the user is equivalent to removing user
-     * information.
-     */
-    public function testWithUserInfoWithEmptyUserRemovesUserInfo()
-    {
-        $uri = (new $this->className())->withUserInfo('username');
-        $uri = $uri->withUserInfo('');
-
-        $this->assertSame('', $uri->getUserInfo());
-    }
-
-    /**
-     * Return an instance with the specified user information.
-     * An empty string for the user is equivalent to removing user
-     * information.
-     */
-    public function testWithUserInfoWithEmptyUserAndPasswordRemovesUserInfo()
-    {
-        $uri = (new $this->className())->withUserInfo('username', 'password');
-        $uri = $uri->withUserInfo('');
-
-        $this->assertSame('', $uri->getUserInfo());
-    }
-
-    // ========================================== //
-    // Host                                       //
-    // ========================================== //
-
-    /**
-     * Retrieve the host component of the URI.
-     * If no host is present, this method MUST return an empty string.
-     */
-    public function testDefaultHostIsEmpty()
-    {
-        $uri = new $this->className();
-
-        $this->assertSame('', $uri->getHost());
-    }
-
-    /**
-     * Retrieve the host component of the URI.
-     * The value returned MUST be normalized to lowercase, per RFC 3986
-     * Section 3.2.2.
-     */
-    public function testGetHostNormalizesValueToLowercase()
-    {
-        $uri = (new $this->className())->withHost('LoWeRcAsE');
-
-        $this->assertSame('lowercase', $uri->getHost());
-    }
-
-    /**
-     * Return an instance with the specified host.
-     * This method MUST retain the state of the current instance, and return
-     * an instance that contains the specified user information.
-     */
-    public function testWithHostIsImmutable()
-    {
-        $uri = new $this->className();
-        $uri2 = $uri->withHost('host');
-
-        $this->assertNotSame($uri, $uri2);
-    }
-
-    /**
-     * Return an instance with the specified host.
-     * If the host given is the same as the Uri's host, the same
-     * instance will be returned.
-     */
-    public function testWithHostReturnsSameInstanceOnSameValue()
-    {
-        $uri = (new $this->className())->withHost('host');
-        $uri2 = $uri->withHost('host');
-
-        $this->assertSame($uri, $uri2);
-    }
-
-    /**
-     * Return an instance with the specified host.
-     * An empty host value is equivalent to removing the host.
-     */
-    public function testWithEmptyHostRemovesHost()
-    {
-        $uri = (new $this->className())->withHost('host');
-        $uri = $uri->withHost('');
-
-        $this->assertSame('', $uri->getHost());
-    }
-
-    // ========================================== //
-    // Port                                       //
-    // ========================================== //
-
-    /**
-     * Retrieve the port component of the URI.
-     * If no port is present, and no scheme is present, this method MUST return
-     * a null value.
-     */
-    public function testDefaultPortIsNull()
-    {
-        $uri = new $this->className();
-
-        $this->assertNull($uri->getPort());
-    }
-
-    /**
-     * Retrieve the port component of the URI.
-     * If no port is present, but a scheme is present, this method MAY return
-     * the standard port for that scheme, but SHOULD return null.
-     */
-    public function testGetPortWithSchemeReturnsNull()
-    {
-        $uri = (new $this->className())->withScheme('http');
-
-        $this->assertNull($uri->getPort());
-    }
-
-    /**
-     * Return an instance with the specified port.
-     * If a port is present, and it is non-standard for the current scheme,
-     * this method MUST return it as an integer.
-     */
-    public function testWithNonStandardPortWithSchemeReturnsPort()
-    {
-        $uri = (new $this->className())
-            ->withScheme('http')
-            ->withPort(4242);
-
-        $this->assertSame(4242, $uri->getPort());
-    }
-
-    /**
-     * Return an instance with the specified port.
-     * If the port is the standard portvused with the current scheme, this
-     * method SHOULD return null.
-     */
-    public function testWithStandardHttpPortWithSchemeReturnsNull()
-    {
-        $uri = (new $this->className())
-            ->withScheme('http')
-            ->withPort(80);
-
-        $this->assertNull($uri->getPort());
-    }
-
-    /**
-     * Return an instance with the specified port.
-     * If the port is the standard portvused with the current scheme, this
-     * method SHOULD return null.
-     */
-    public function testWithStandardHttpsPortWithSchemeReturnsNull()
-    {
-        $uri = (new $this->className())
-            ->withScheme('https')
-            ->withPort(443);
-
-        $this->assertNull($uri->getPort());
-    }
-
-    /**
-     * Return an instance with the specified port.
-     * Implementations MUST raise an exception for ports outside the
-     * established TCP and UDP port ranges.
-     */
-    public function testWithPortTooSmallThrowsInvalidArgumentException()
-    {
-        $uri = new $this->className();
-
-        $this->expectException(\InvalidArgumentException::class);
-        $uri->withPort(0);
-    }
-
-    /**
-     * Return an instance with the specified port.
-     * Implementations MUST raise an exception for ports outside the
-     * established TCP and UDP port ranges.
-     */
-    public function testWithPortTooBigThrowsInvalidArgumentException()
-    {
-        $uri = new $this->className();
-
-        $this->expectException(\InvalidArgumentException::class);
-        $uri->withPort(65537);
-    }
-
-    /**
-     * Return an instance with the specified port.
-     * A null value provided for the port is equivalent to removing the port
-     * information.
-     */
-    public function testWithNullPortRemovesPort()
-    {
-        $uri = (new $this->className())->withPort(4242);
-        $uri = $uri->withPort(null);
-
-        $this->assertNull($uri->getPort());
-    }
-
-    /**
-     * Return an instance with the specified port.
-     * This method MUST retain the state of the current instance, and return
-     * an instance that contains the specified user information.
-     */
-    public function testWithPortIsImmutable()
-    {
-        $uri = new $this->className();
-        $uri2 = $uri->withPort(4242);
-
-        $this->assertNotSame($uri, $uri2);
-    }
-
-    /**
-     * Return an instance with the specified port.
-     * If the port given is the same as the Uri's port, the same
-     * instance will be returned.
-     */
-    public function testWithPortReturnsSameInstanceOnSameValue()
-    {
-        $uri = (new $this->className())->withPort(4242);
-        $uri2 = $uri->withPort(4242);
-
-        $this->assertSame($uri, $uri2);
-    }
-
-    // ========================================== //
-    // Authority                                  //
-    // ========================================== //
-
-    /**
-     * Retrieve the authority component of the URI.
-     * If no authority information is present, this method MUST return an empty
-     * string.
-     */
-    public function testDefaultAuthorityIsEmpty()
-    {
-        $uri = new $this->className();
-
-        $this->assertSame('', $uri->getAuthority());
-    }
-
-    /**
-     * Retrieve the authority component of the URI.
-     * The authority syntax of the URI is:
-     *
-     * <pre>
-     * [user-info@]host[:port]
-     * </pre>
-     *
-     * @dataProvider providerAuthoritySyntax
-     * @param string $host Hostname.
-     * @param string $user User name.
-     * @param ?string $password User password.
-     * @param ?int $port Port.
-     * @param string $expected Expected authority.
-     */
-    public function testGetAuthorityHasRightSyntax(string $host, string $user, ?string $password, ?int $port, string $expected)
-    {
-        $uri = (new $this->className())
-            ->withHost($host)
-            ->withUserInfo($user, $password)
-            ->withPort($port);
-
-        $this->assertSame($expected, $uri->getAuthority());
-    }
-
-    /**
-     * Provider. Gives input host, user name, user password, port and the
-     * expected formatted authority.
-     */
-    public function providerAuthoritySyntax()
+    public static function providerSchemes(): array
     {
         return [
-            'Host' => [
-                'hostname',
-                '',
-                null,
-                null,
-                'hostname'
+            'empty scheme' => [
+                'scheme' => '',
+                'expectedScheme' => '',
             ],
-            'User name' => [
-                '',
-                'username',
-                null,
-                null,
-                'username@'
+            'https scheme' => [
+                'scheme' => 'https',
+                'expectedScheme' => 'https',
             ],
-            'User name + User password' => [
-                '',
-                'username',
-                'password',
-                null,
-                'username:password@'
-            ],
-            'Port' => [
-                '',
-                '',
-                null,
-                4242,
-                ':4242'
-            ],
-            'Host + User name' => [
-                'hostname',
-                'username',
-                null,
-                null,
-                'username@hostname'
-            ],
-            'Host + User name + User password' => [
-                'hostname',
-                'username',
-                'password',
-                null,
-                'username:password@hostname'
-            ],
-            'Port + User name' => [
-                '',
-                'username',
-                null,
-                4242,
-                'username@:4242'
-            ],
-            'Port + User name + User password' => [
-                '',
-                'username',
-                'password',
-                4242,
-                'username:password@:4242'
-            ],
-            'Host + Port' => [
-                'hostname',
-                '',
-                null,
-                4242,
-                'hostname:4242'
-            ],
-            'Host + Port + User name + User password' => [
-                'hostname',
-                'username',
-                'password',
-                4242,
-                'username:password@hostname:4242'
+            'uppercase scheme is normalized to lowercase' => [
+                'scheme' => 'HTTP',
+                'expectedScheme' => 'http',
             ],
         ];
     }
 
     /**
-     * Retrieve the authority component of the URI.
-     * If the port component is not set or is the standard port for the current
-     * scheme, it SHOULD NOT be included.
+     * @dataProvider providerInvalidSchemes
      */
-    public function testGetAuthorityDoesNotIncludeDefaultPortForHttp()
+    public function testCannotHaveAnInvalidScheme(string $scheme): void
     {
-        $uri = (new $this->className())
-            ->withScheme('http')
-            ->withHost('hostname')
-            ->withPort(80);
-
-        $this->assertSame('hostname', $uri->getAuthority());
+        self::expectException(InvalidArgumentException::class);
+        $this->createUriInstance()->withScheme($scheme);
     }
 
     /**
-     * Retrieve the authority component of the URI.
-     * If the port component is not set or is the standard port for the current
-     * scheme, it SHOULD NOT be included.
+     * @return array<string, array{scheme: string}>
      */
-    public function testGetAuthorityDoesNotIncludeDefaultPortForHttps()
+    public static function providerInvalidSchemes(): array
     {
-        $uri = (new $this->className())
-            ->withScheme('https')
-            ->withHost('hostname')
-            ->withPort(443);
-
-        $this->assertSame('hostname', $uri->getAuthority());
-    }
-
-    // ========================================== //
-    // Path                                       //
-    // ========================================== //
-
-    /**
-     * Retrieve the path component of the URI.
-     * Default path is ''.
-     */
-    public function testDefaultPathIsEmpty()
-    {
-        $uri = new $this->className();
-
-        $this->assertSame('', $uri->getPath());
+        return [
+            'scheme starting with a number' => ['scheme' => '0http'],
+            'scheme with whitespace' => ['scheme' => 'http '],
+            'scheme with invalid characters' => ['scheme' => 'http:/\\@#?=&_;[]{}()!*^%$"`~|<>\''],
+        ];
     }
 
     /**
-     * Return an instance with the specified path.
-     * The path can either be empty or absolute (starting with a slash) or
-     * rootless (not starting with a slash). Implementations MUST support all
-     * three syntaxes.
+     * @dataProvider providerUserInfo
      */
-    public function testPathCanBeEmpty()
+    public function testHasUserInfo(string $user, ?string $password, string $userInfo): void
     {
-        $uri = (new $this->className())->withPath('');
+        $uri = $this->createUriInstance()->withUserInfo($user, $password);
 
-        $this->assertSame('', $uri->getPath());
+        self::assertEquals($userInfo, $uri->getUserInfo());
     }
 
     /**
-     * Return an instance with the specified path.
-     * The path can either be empty or absolute (starting with a slash) or
-     * rootless (not starting with a slash). Implementations MUST support all
-     * three syntaxes.
+     * @return array<string, array{user: string, password: ?string, userInfo: string}>
      */
-    public function testPathCanBeAbsolute()
+    public static function providerUserInfo(): array
     {
-        $uri = (new $this->className())->withPath('/foo/bar');
-
-        $this->assertSame('/foo/bar', $uri->getPath());
+        return [
+            'no user + no password' => ['user' => '', 'password' => null, 'userInfo' => ''],
+            'user + no password' => ['user' => 'testUser', 'password' => null, 'userInfo' => 'testUser'],
+            'user + password' => ['user' => 'testUser', 'password' => 'testPassword', 'userInfo' => 'testUser:testPassword'],
+        ];
     }
 
     /**
-     * Return an instance with the specified path.
-     * The path can either be empty or absolute (starting with a slash) or
-     * rootless (not starting with a slash). Implementations MUST support all
-     * three syntaxes.
+     * @dataProvider providerHosts
      */
-    public function testPathCanBeRootless()
+    public function testHasAHost(string $host, string $expectedHost): void
     {
-        $uri = (new $this->className())->withPath('foo/bar');
+        $uri = $this->createUriInstance()->withHost($host);
 
-        $this->assertSame('foo/bar', $uri->getPath());
+        self::assertEquals($expectedHost, $uri->getHost());
     }
 
     /**
-     * Return an instance with the specified path.
-     * Normally, the empty path "" and absolute path "/" are considered equal as
-     * defined in RFC 7230 Section 2.7.3. But this method MUST NOT automatically
-     * do this normalization because in contexts with a trimmed base path, e.g.
-     * the front controller, this difference becomes significant. It's the task
-     * of the user to handle both "" and "/".
+     * @return array<string, array{host: string, expectedHost: string}>
      */
-    public function testWithPathDoesNotNormalizeEmptyAndSlash()
+    public static function providerHosts(): array
     {
-        $uri = (new $this->className())->withPath('');
-        $uri2 = $uri->withPath('/');
+        return [
+            'empty host' => [
+                'host' => '',
+                'expectedHost' => '',
+            ],
+            'non empty host' => [
+                'host' => 'host.test',
+                'expectedHost' => 'host.test',
+            ],
+            'uppercase host is normalized to lowercase' => [
+                'host' => 'HOST.TEST',
+                'expectedHost' => 'host.test',
+            ],
+        ];
+    }
 
-        $this->assertNotSame($uri->getPath(), $uri2->getPath());
+    public function testHostMustBeValid(): void
+    {
+        self::expectException(InvalidArgumentException::class);
+        $this->createUriInstance()->withHost('!test.com');
     }
 
     /**
-     * Return an instance with the specified path.
-     * The value returned MUST be percent-encoded.
+     * @dataProvider providerValidPorts
      */
-    public function testGetPathPercentEncode()
+    public function testCanHaveAPort(?int $port): void
     {
-        $uri = (new $this->className())->withPath('föô*BÂr+baz');
+        $uri = $this->createUriInstance()->withPort($port);
 
-        $this->assertSame('f%C3%B6%C3%B4%2AB%C3%82r%2Bbaz', $uri->getPath());
+        self::assertEquals($port, $uri->getPort());
     }
 
     /**
-     * Return an instance with the specified path.
-     * The value returned MUST be percent-encoded, but MUST NOT double-encode
-     * any characters. To determine what characters to encode, please refer to
-     * RFC 3986, Sections 2 and 3.3.
+     * @return array<string, array{port: ?int}>
      */
-    public function testGetPathPercentEncodeDoubleEncode()
+    public static function providerValidPorts(): array
     {
-        $uri = (new $this->className())->withPath('f%C3%B6%C3%B4%2AB%C3%82r%2Bbaz');
-
-        $this->assertSame('f%C3%B6%C3%B4%2AB%C3%82r%2Bbaz', $uri->getPath());
+        return [
+            'no port' => ['port' => null],
+            'min port: 1' => ['port' => 1],
+            'max port: 65535' => ['port' => 65535],
+        ];
     }
 
     /**
-     * Return an instance with the specified path.
-     * If a URI contains an authority component, then the path component must
-     * either be empty or begin with a slash ("/") character.
+     * @dataProvider providerInvalidPorts
      */
-    public function testWithPathWithAuthorityCanBeEmpty()
+    public function testPortMustNotBeOutOfRange(int $port): void
     {
-        $uri = (new $this->className())->withhost('hostname');
-        $uri = $uri->withPath('');
-
-        $this->assertSame('', $uri->getPath());
+        self::expectException(InvalidArgumentException::class);
+        $this->createUriInstance()->withPort($port);
     }
 
     /**
-     * Return an instance with the specified path.
-     * If a URI contains an authority component, then the path component must
-     * either be empty or begin with a slash ("/") character.
+     * @return array<string, array{port: int}>
      */
-    public function testWithPathWithAuthorityCanBeginWithASlash()
+    public static function providerInvalidPorts(): array
     {
-        $uri = (new $this->className())->withhost('hostname');
-        $uri = $uri->withPath('/foo/bar');
-
-        $this->assertSame('/foo/bar', $uri->getPath());
+        return [
+            'negative range' => ['port' => -1],
+            'below range: 0' => ['port' => 0],
+            'above range: 65536' => ['port' => 65536],
+        ];
     }
 
     /**
-     * Return an instance with the specified path.
-     * If a URI contains an authority component, then the path component must
-     * either be empty or begin with a slash ("/") character.
+     * @dataProvider providerSchemesAndDefaultPorts
      */
-    public function testWithPathWithAuthorityMustBeginWithSlashIfNotEmpty()
+    public function testPortIsNullWhenItIsTheStandardForTheScheme(string $scheme, int $port): void
     {
-        $uri = (new $this->className())->withhost('hostname');
+        $uri = $this->createUriInstance()->withScheme($scheme)->withPort($port);
 
-        $this->expectException(\InvalidArgumentException::class);
-        $uri->withPath('foo/bar');
+        self::assertNull($uri->getPort());
     }
 
     /**
-     * Return an instance with the specified path.
-     * If a URI does not contain an authority component, then the path cannot
-     * begin with two slash characters ("//").
+     * @return array<string, array{scheme: string, port: int}>
      */
-    public function testWithPathWithoutAuthorityThrowsInvalidArgumentExceptionWhenPathStartsWithDoubleSlash()
+    public static function providerSchemesAndDefaultPorts(): array
     {
-        $uri = new $this->className();
-
-        $this->expectException(\InvalidArgumentException::class);
-        $uri->withPath('//foo/bar');
+        return [
+            'ftp' => ['scheme' => 'ftp', 'port' => 21],
+            'ssh' => ['scheme' => 'ssh', 'port' => 22],
+            'telnet' => ['scheme' => 'telnet', 'port' => 23],
+            'smtp' => ['scheme' => 'smtp', 'port' => 25],
+            'http' => ['scheme' => 'http', 'port' => 80],
+            'https' => ['scheme' => 'https', 'port' => 443],
+        ];
     }
 
     /**
-     * Return an instance with the specified path.
-     * This method MUST retain the state of the current instance, and return
-     * an instance that contains the specified user information.
+     * @dataProvider providerAuthorities
      */
-    public function testWithPathIsImmutable()
-    {
-        $uri = new $this->className();
-        $uri2 = $uri->withPath('/foo/bar');
-
-        $this->assertNotSame($uri, $uri2);
-    }
-
-    /**
-     * Return an instance with the specified path.
-     * If the path given is the same as the Uri's path, the same
-     * instance will be returned.
-     */
-    public function testWithPathReturnsSameInstanceOnSameValue()
-    {
-        $uri = (new $this->className())->withPath('/foo/bar');
-        $uri2 = $uri->withPath('/foo/bar');
-
-        $this->assertSame($uri, $uri2);
-    }
-
-    // ========================================== //
-    // Query                                      //
-    // ========================================== //
-
-    /**
-     * Retrieve the query string of the URI.
-     * If no query string is present, this method MUST return an empty string.
-     */
-    public function testGetQueryIsEmptyByDefault()
-    {
-        $uri = new $this->className();
-
-        $this->assertSame('', $uri->getQuery());
-    }
-
-    /**
-     * Return an instance with the specified query string.
-     * The leading "?" character is not part of the query and MUST NOT be
-     * added.
-     */
-    public function testGetQueryDoesNotHaveALeadingQuestionMark()
-    {
-        $uri = (new $this->className())->withQuery('test');
-
-        $this->assertSame('test', $uri->getQuery());
-    }
-
-    /**
-     * Return an instance with the specified query string.
-     * The leading "?" character is not part of the query and MUST NOT be
-     * added.
-     */
-    public function testGetQueryEncodesLeadingQuestionMark()
-    {
-        $uri = (new $this->className())->withQuery('?test');
-
-        $this->assertSame('%3Ftest', $uri->getQuery());
-    }
-
-    /**
-     * Return an instance with the specified query string.
-     * The value returned MUST be percent-encoded.
-     */
-    public function testWithQueryPercentEncodesValue()
-    {
-        $uri = (new $this->className())->withQuery('föô*BÂr+baz');
-
-        $this->assertSame('f%C3%B6%C3%B4%2AB%C3%82r%2Bbaz', $uri->getQuery());
-    }
-
-    /**
-     * Return an instance with the specified query string.
-     * The value returned MUST be percent-encoded, but MUST NOT double-encode
-     * any characters. To determine what characters to encode, please refer to
-     * RFC 3986, Sections 2 and 3.4.
-     */
-    public function testWithQueryDoesNotPercentEncodeTwice()
-    {
-        $uri = (new $this->className())->withQuery('f%C3%B6%C3%B4%2AB%C3%82r%2Bbaz');
-
-        $this->assertSame('f%C3%B6%C3%B4%2AB%C3%82r%2Bbaz', $uri->getQuery());
-    }
-
-    /**
-     * This method MUST retain the state of the current instance, and return
-     * an instance that contains the specified user information.
-     */
-    public function testWithQueryIsImmutable()
-    {
-        $uri = new $this->className();
-        $uri2 = $uri->withQuery('foo=bar&baz');
-
-        $this->assertNotSame($uri, $uri2);
-    }
-
-    /**
-     * If the query given is the same as the Uri's query, the same
-     * instance will be returned.
-     */
-    public function testWithQueryReturnsSameInstanceOnSameValue()
-    {
-        $uri = (new $this->className())->withQuery('foo=bar&baz');
-        $uri2 = $uri->withQuery('foo=bar&baz');
-
-        $this->assertSame($uri, $uri2);
-    }
-
-    /**
-     * An empty query string value is equivalent to removing the query string.
-     */
-    public function testPassingEmptyQueryRemovesQuery()
-    {
-        $uri = (new $this->className())
-            ->withQuery('foo=bar&baz')
-            ->withQuery('');
-
-        $this->assertSame('', $uri->getQuery());
-    }
-
-    // ========================================== //
-    // To String                                  //
-    // ========================================== //
-
-    /**
-     * Return the string representation as a URI reference.
-     *
-     * @dataProvider providerFullComponents
-     */
-    public function testReturnsValidUriStringWhenPassedComponents(
-        string $scheme,
+    public function testHasAnAuthority(
         string $user,
         ?string $password,
-        string $host,
         ?int $port,
+        string $authority,
+    ): void {
+        $uri = $this->createUriInstance()
+            ->withUserInfo($user, $password)
+            ->withPort($port)
+            ->withHost('host');
+
+        self::assertEquals($authority, $uri->getAuthority());
+    }
+
+    /**
+     * @return array<string, array{user: string, password: ?string, port: ?int, authority: string}>
+     */
+    public static function providerAuthorities(): array
+    {
+        return [
+            'no user + no password + no port' => [
+                'user' => '',
+                'password' => null,
+                'port' => null,
+                'authority' => 'host',
+            ],
+            'user + no password + no port' => [
+                'user' => 'testUser',
+                'password' => null,
+                'port' => null,
+                'authority' => 'testUser@host',
+            ],
+            'user + password + no port' => [
+                'user' => 'testUser',
+                'password' => 'testPassword',
+                'port' => null,
+                'authority' => 'testUser:testPassword@host',
+            ],
+            'no user + no password + port' => [
+                'user' => '',
+                'password' => null,
+                'port' => 8080,
+                'authority' => 'host:8080',
+            ],
+            'user + no password + port' => [
+                'user' => 'testUser',
+                'password' => null,
+                'port' => 8080,
+                'authority' => 'testUser@host:8080',
+            ],
+            'user + password + port' => [
+                'user' => 'testUser',
+                'password' => 'testPassword',
+                'port' => 8080,
+                'authority' => 'testUser:testPassword@host:8080',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerPaths
+     */
+    public function testHasAPath(string $inputPath, string $expectedPath): void
+    {
+        $uri = $this->createUriInstance()->withPath($inputPath);
+
+        self::assertEquals($expectedPath, $uri->getPath());
+    }
+
+    /**
+     * @return array<string, array{inputPath: string, expectedPath: string}>
+     */
+    public static function providerPaths(): array
+    {
+        return [
+            'empty path' => [
+                'inputPath' => '',
+                'expectedPath' => '',
+            ],
+            'root path' => [
+                'inputPath' => '/',
+                'expectedPath' => '/',
+            ],
+            'absolute path' => [
+                'inputPath' => '/absolute/path',
+                'expectedPath' => '/absolute/path',
+            ],
+            'relative path' => [
+                'inputPath' => 'relative/path',
+                'expectedPath' => 'relative/path',
+            ],
+            'excess slashes at the start of the path are removed' => [
+                'inputPath' => '//absolute/path',
+                'expectedPath' => '/absolute/path',
+            ],
+            'path is percent encoded' => [
+                'inputPath' => '/éà',
+                'expectedPath' => '/%c3%a9%c3%a0',
+            ],
+            'path is not percent encoded twice' => [
+                'inputPath' => '/%c3%a9%c3%a0%2f',
+                'expectedPath' => '/%c3%a9%c3%a0%2f',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerQueries
+     */
+    public function testHasAQuery(string $inputQuery, string $expectedQuery): void
+    {
+        $uri = $this->createUriInstance()->withQuery($inputQuery);
+
+        self::assertEquals($expectedQuery, $uri->getQuery());
+    }
+
+    /**
+     * @return array<string, array{inputQuery: string, expectedQuery: string}>
+     */
+    public static function providerQueries(): array
+    {
+        return [
+            'empty query' => [
+                'inputQuery' => '',
+                'expectedQuery' => '',
+            ],
+            'query with a param' => [
+                'inputQuery' => 'foo=bar',
+                'expectedQuery' => 'foo=bar',
+            ],
+            'query with boolean param' => [
+                'inputQuery' => 'foo',
+                'expectedQuery' => 'foo',
+            ],
+            'query with multiple params' => [
+                'inputQuery' => 'foo=bar&bar=baz',
+                'expectedQuery' => 'foo=bar&bar=baz',
+            ],
+            'query is percent encoded' => [
+                'inputQuery' => 'é=à&ç=%26',
+                'expectedQuery' => '%C3%A9=%C3%A0&%C3%A7=%26',
+            ],
+            'query is not percent encoded twice' => [
+                'inputQuery' => '%C3%A9=%C3%A0&%C3%A7=%26',
+                'expectedQuery' => '%C3%A9=%C3%A0&%C3%A7=%26',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerFragments
+     */
+    public function testHasAFragment(string $fragment): void
+    {
+        $uri = $this->createUriInstance()->withFragment($fragment);
+
+        self::assertEquals($fragment, $uri->getFragment());
+    }
+
+    /**
+     * @return array<string, array{fragment: string}>
+     */
+    public static function providerFragments(): array
+    {
+        return [
+            'empty fragment' => ['fragment' => ''],
+            'fragment' => ['fragment' => 'fragment'],
+        ];
+    }
+
+    /**
+     * @dataProvider providerToString
+     */
+    public function testCanBeConvertedToString(
+        string $scheme,
+        string $user,
+        string $host,
         string $path,
         string $query,
         string $fragment,
-        string $expectedUri
-    ) {
-        $uri = (new $this->className())
+        string $expectedUri,
+    ): void {
+        $uri = $this->createUriInstance()
             ->withScheme($scheme)
-            ->withUserInfo($user, $password)
-            ->withPath($path)
             ->withHost($host)
-            ->withPort($port)
+            ->withUserInfo($user)
+            ->withPath($path)
             ->withQuery($query)
             ->withFragment($fragment);
 
-        $this->assertSame($expectedUri, (string)$uri, "Expected {$expectedUri}, got {$uri} instead.");
+        self::assertEquals($expectedUri, (string) $uri);
     }
 
+
     /**
-     * Provider. Gives input scheme, user name, user password, host, port, path,
-     * query, fragment and the expected __toString output.
+     * @return array<string, array{scheme: string, user: string, host: string, path: string, query: string, fragment: string, expectedUri: string}>
      */
-    public function providerFullComponents()
+    public static function providerToString(): array
     {
         return [
-            'Full example' => [
-                'http',
-                'username',
-                'password',
-                'hostname',
-                4242,
-                '/path/to/foo',
-                'query=foo&query2=bar',
-                'fragment',
-                'http://username:password@hostname:4242/path/to/foo?query=foo&query2=bar#fragment',
+            'path only' => [
+                'scheme' => '',
+                'user' => '',
+                'host' => '',
+                'path' => '/foo/bar',
+                'query' => '',
+                'fragment' => '',
+                'expectedUri' => '/foo/bar',
             ],
-            'Percent encoding' => [
-                'http',
-                'username',
-                'password',
-                'hostname',
-                4242,
-                '/path to foo',
-                'query=fo o&query2=ba r',
-                'frag ment',
-                'http://username:password@hostname:4242/path+to+foo?query=fo+o&query2=ba+r#frag+ment',
+            'scheme is suffixed by colon' => [
+                'scheme' => 'http',
+                'user' => '',
+                'host' => '',
+                'path' => '/foo/bar',
+                'query' => '',
+                'fragment' => '',
+                'expectedUri' => 'http:/foo/bar',
             ],
-            'If a scheme is present, it MUST be suffixed by ":"' => [
-                'http',
-                '',
-                null,
-                '',
-                null,
-                '',
-                '',
-                '',
-                'http:',
+            'authority is prefixed by double slash' => [
+                'scheme' => 'https',
+                'user' => 'user',
+                'host' => 'host',
+                'path' => '',
+                'query' => '',
+                'fragment' => '',
+                'expectedUri' => 'https://user@host',
             ],
-            'If an authority is present, it MUST be prefixed by "//"' => [
-                '',
-                '',
-                null,
-                'hostname',
-                null,
-                '',
-                '',
-                '',
-                '//hostname',
+            'rootless path with authority is prefixed by slash' => [
+                'scheme' => '',
+                'user' => '',
+                'host' => 'host',
+                'path' => 'foo/bar',
+                'query' => '',
+                'fragment' => '',
+                'expectedUri' => '//host/foo/bar',
             ],
-            'If the path is rootless and an authority is present, the path MUST be prefixed by "/"' => [
-                '',
-                '',
-                null,
-                'hostname',
-                null,
-                'path/to/foo',
-                '',
-                '',
-                '//hostname/path/to/foo',
+            'path without authority cannot start with multiple slashes' => [
+                'scheme' => '',
+                'user' => '',
+                'host' => '',
+                'path' => '//foo/bar',
+                'query' => '',
+                'fragment' => '',
+                'expectedUri' => '/foo/bar',
             ],
-            'If a query is present, it MUST be prefixed by "?"' => [
-                '',
-                '',
-                null,
-                '',
-                null,
-                '',
-                'query=foo&query2=bar',
-                '',
-                '?query=foo&query2=bar',
+            'query is prefixed by question mark' => [
+                'scheme' => '',
+                'user' => '',
+                'host' => '',
+                'path' => '/foo/bar',
+                'query' => 'foo=bar',
+                'fragment' => '',
+                'expectedUri' => '/foo/bar?foo=bar',
             ],
-            'If a fragment is present, it MUST be prefixed by "#"' => [
-                '',
-                '',
-                null,
-                '',
-                null,
-                '',
-                '',
-                'fragment',
-                '#fragment',
+            'fragment is prefixed by hashtag' => [
+                'scheme' => '',
+                'user' => '',
+                'host' => '',
+                'path' => '/foo/bar',
+                'query' => '',
+                'fragment' => 'foobar',
+                'expectedUri' => '/foo/bar#foobar',
             ],
-        ];
-    }
-
-    /**
-     * Return the string representation as a URI reference.
-     *
-     * @dataProvider providerStringUri
-     * @param string $str Expected uri.
-     * @suppress PhanTypeSuspiciousStringExpression
-     */
-    public function testReturnsExpectedStringWhenPassingUriInConstructor(string $str)
-    {
-        /** @var UriInterface */
-        $uri = new $this->className($str);
-
-        $this->assertSame($str, (string)$uri, "Expected {$str}, got {$uri} instead.");
-    }
-
-    /**
-     * Provider. Gives valid uri string.
-     */
-    public function providerStringUri()
-    {
-        return [
-            'Full example' => ['http://username:password@hostname:4242/path/to/foo?query=foo&query2=bar#fragment'],
-            'If a scheme is present, it MUST be suffixed by ":"' => ['http:'],
-            'If an authority is present, it MUST be prefixed by "//"' => ['//hostname'],
-            'If the path is rootless and an authority is present, the path MUST be prefixed by "/"' => ['//hostname/path/to/foo'],
-            'If a query is present, it MUST be prefixed by "?"' => ['?query=foo&query2=bar'],
-            'If a fragment is present, it MUST be prefixed by "#"' => ['#fragment'],
-        ];
-    }
-
-    /**
-     * Return the string representation as a URI reference.
-     *
-     * @dataProvider providerInvalidStringUri
-     * @param string $str Invalid uri.
-     * @suppress PhanNoopNew
-     */
-    public function testThrowsInvalidargumentExceptionOnInvalidString(string $str)
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        new $this->className($str);
-    }
-
-    /**
-     * Provider. Gives invalid uri strings.
-     */
-    public function providerInvalidStringUri()
-    {
-        return [
-            'http:///example.com' => ['http:///example.com'],
-            'http://:80' => ['http://:80'],
-            'http://user@:80' => ['http://user@:80'],
+            'query is placed before fragment' => [
+                'scheme' => '',
+                'user' => '',
+                'host' => '',
+                'path' => '/foo/bar',
+                'query' => 'foo=bar',
+                'fragment' => 'foobar',
+                'expectedUri' => '/foo/bar?foo=bar#foobar',
+            ],
         ];
     }
 }
