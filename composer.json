@@ -1,6 +1,7 @@
 {
-    "name": "ingenioz-it/psr-message",
-    "description": "A clean new PHP project",
+    "name": "ingenioz-it/psr-http-message",
+    "description": "Implementation of PSR-7 HTTP Message Interfaces",
+    "keywords": ["PSR", "PSR-7", "Http", "Message"],
     "type": "project",
     "license": "MIT",
     "authors": [
@@ -12,7 +13,8 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.2",
+        "psr/http-message": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "*",
@@ -25,12 +27,12 @@
     },
     "autoload": {
         "psr-4": {
-            "IngeniozIT\\Message\\": "src/"
+            "IngeniozIT\\Http\\Message\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "IngeniozIT\\Message\\Tests\\": "tests/"
+            "IngeniozIT\\Http\\Message\\Tests\\": "tests/"
         }
     },
     "scripts": {
