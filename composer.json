@@ -1,7 +1,7 @@
 {
     "name": "ingenioz-it/psr-http-message",
-    "description": "Implementation of PSR-7 HTTP Message Interfaces",
-    "keywords": ["PSR", "PSR-7", "Http", "Message"],
+    "description": "Implementation of PSR-7 HTTP Message Interfaces and PSR-17 HTTP Factories",
+    "keywords": ["PSR", "PSR-7", "Http", "Message", "PSR-17", "Factories", "Factory"],
     "type": "project",
     "license": "MIT",
     "authors": [
@@ -12,9 +12,14 @@
     ],
     "minimum-stability": "dev",
     "prefer-stable": true,
+    "provide": {
+        "psr/http-message-implementation": "1.0",
+        "psr/http-factory-implementation": "1.0"
+    },
     "require": {
         "php": ">=8.2",
-        "psr/http-message": "^2.0"
+        "psr/http-message": "^2.0",
+        "psr/http-factory": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "*",
