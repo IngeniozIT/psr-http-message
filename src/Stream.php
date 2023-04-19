@@ -46,7 +46,7 @@ class Stream implements StreamInterface
         return $mode !== 'r';
     }
 
-    private static function isReadableMode(string $mode): bool
+    public static function isReadableMode(string $mode): bool
     {
         return ($mode[1] ?? ' ') === '+' || $mode[0] === 'r';
     }
