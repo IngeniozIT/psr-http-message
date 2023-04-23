@@ -175,7 +175,7 @@ class Stream implements StreamInterface
     /**
      * @param int<0, max> $length
      */
-    public function read($length): string
+    public function read(int $length): string
     {
         return $this->readContent(fn($resource) => fread($resource, $length));
     }

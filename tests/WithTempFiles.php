@@ -13,13 +13,13 @@ trait WithTempFiles
 
     public static function setUpBeforeClass(): void
     {
-        $file = tempnam('tmp', uniqid());
+        $file = tempnam(sys_get_temp_dir(), uniqid());
         if ($file === false) {
             throw new RuntimeException('Could not generate temporary file');
         }
         self::$file = $file;
 
-        $availableFile = tempnam('tmp', uniqid());
+        $availableFile = tempnam(sys_get_temp_dir(), uniqid());
         if ($availableFile === false) {
             throw new RuntimeException('Could not generate temporary file');
         }

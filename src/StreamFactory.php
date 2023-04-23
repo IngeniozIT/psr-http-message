@@ -32,7 +32,7 @@ readonly class StreamFactory implements StreamFactoryInterface
             throw new InvalidArgumentException("Mode {$mode} is invalid");
         }
 
-        $resource = fopen($filename, $mode);
+        $resource = @fopen($filename, $mode);
         if ($resource === false) {
             throw new RuntimeException("Could not open {$filename}");
         }
