@@ -10,8 +10,12 @@ use Psr\Http\Message\StreamInterface;
 
 abstract readonly class Message implements MessageInterface
 {
+    /** @var array<string, string> */
     protected array $headersName;
 
+    /**
+     * @param array<string, mixed> $headers
+     */
     public function __construct(
         protected string $protocolVersion,
         protected array $headers,
@@ -29,7 +33,7 @@ abstract readonly class Message implements MessageInterface
         return $this->protocolVersion;
     }
 
-    public function withProtocolVersion($version): static
+    public function withProtocolVersion(string $version): static
     {
         return $version === $this->protocolVersion ?
             $this :
@@ -39,6 +43,7 @@ abstract readonly class Message implements MessageInterface
     }
 
     /**
+     * @param array<string, mixed> $params
      * @return array{protocolVersion: string, headers: array, body: StreamInterface}
      */
     protected function newInstanceParams(array $params): array
@@ -50,24 +55,24 @@ abstract readonly class Message implements MessageInterface
         ];
     }
 
-    public function getHeaderLine($name): string
+    public function getHeaderLine(string $name): string
     {
         return implode(',', $this->getHeader($name));
     }
 
-    public function getHeader($name): array
+    public function getHeader(string $name): array
     {
         return $this->hasHeader($name) ?
             $this->headers[$this->headersName[strtolower($name)]] :
             [];
     }
 
-    public function hasHeader($name): bool
+    public function hasHeader(string $name): bool
     {
         return array_key_exists(strtolower($name), $this->headersName);
     }
 
-    public function withHeader($name, $value): static
+    public function withHeader(string $name, $value): static
     {
         $headerValue = $this->sanitizeHeaderValue($name, $value);
         return array_key_exists($name, $this->headers) && $this->headers[$name] === $headerValue ?
@@ -77,7 +82,7 @@ abstract readonly class Message implements MessageInterface
             ]));
     }
 
-    protected function sanitizeHeaderValue($name, $value): array
+    protected function sanitizeHeaderValue(string $name, $value): array
     {
         $this->assertValidHeaderName($name);
         if (is_string($value)) {
@@ -92,11 +97,8 @@ abstract readonly class Message implements MessageInterface
         return array_values($value);
     }
 
-    protected function assertValidHeaderName($name): void
+    protected function assertValidHeaderName(string $name): void
     {
-        if (!is_string($name)) {
-            throw new InvalidArgumentException('Header name must be a string');
-        }
         if (empty($name)) {
             throw new InvalidArgumentException('Header name must not be empty');
         }
@@ -126,7 +128,7 @@ abstract readonly class Message implements MessageInterface
         return $this->headers;
     }
 
-    public function withAddedHeader($name, $value): static
+    public function withAddedHeader(string $name, $value): static
     {
         $headerValue = $this->sanitizeHeaderValue($name, $value);
         return array_key_exists($name, $this->headers) && in_array($value, $this->headers[$name]) ?
@@ -136,7 +138,7 @@ abstract readonly class Message implements MessageInterface
             ]));
     }
 
-    public function withoutHeader($name): static
+    public function withoutHeader(string $name): static
     {
         $this->assertValidHeaderName($name);
         return $this->hasHeader($name) ?
