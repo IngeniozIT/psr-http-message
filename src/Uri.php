@@ -7,6 +7,7 @@ namespace IngeniozIT\Http\Message;
 use Psr\Http\Message\UriInterface;
 use IngeniozIT\Http\Message\ValueObject\{
     Scheme,
+    UserInfo,
     Host,
     Port,
 };
@@ -16,17 +17,15 @@ readonly class Uri implements UriInterface
     private string $path;
     private string $query;
 
-    private string $computedUserInfo;
-    private ?Port $computedPort;
+    private Port $computedPort;
     private string $computedAuthority;
     private string $computedFullUri;
 
     public function __construct(
         private Scheme $scheme,
-        private string $user,
-        private ?string $password,
+        private UserInfo $userInfo,
         private Host $host,
-        private ?Port $port,
+        private Port $port,
         string $path,
         string $query,
         private string $fragment,
@@ -34,7 +33,6 @@ readonly class Uri implements UriInterface
         $this->path = strtolower($this->urlEncodeString($path, '/'));
         $this->query = $this->urlEncodeQueryString($query);
 
-        $this->computedUserInfo = $this->computeUserInfo();
         $this->computedPort = $this->computePort();
         $this->computedAuthority = $this->computeAuthority();
         $this->computedFullUri = $this->computeFullUri();
@@ -68,23 +66,18 @@ readonly class Uri implements UriInterface
         );
     }
 
-    private function computeUserInfo(): string
+    private function computePort(): Port
     {
-        return $this->user . ($this->password !== null ? ':' . $this->password : '');
-    }
-
-    private function computePort(): ?Port
-    {
-        return $this->scheme->defaultPort() !== $this->port?->value ?
+        return $this->scheme->defaultPort() !== $this->port->value ?
             $this->port :
-            null;
+            new Port(null);
     }
 
     private function computeAuthority(): string
     {
-        return (!empty($this->computedUserInfo) ? $this->computedUserInfo . '@' : '') .
+        return $this->userInfo->toUriString() .
             $this->host .
-            ($this->computedPort ? ':' . $this->computedPort : '');
+            $this->computedPort->toUriString();
     }
 
     private function computeFullUri(): string
@@ -115,7 +108,7 @@ readonly class Uri implements UriInterface
 
     public function getUserInfo(): string
     {
-        return $this->computedUserInfo;
+        return (string) $this->userInfo;
     }
 
     public function getHost(): string
@@ -125,7 +118,7 @@ readonly class Uri implements UriInterface
 
     public function getPort(): ?int
     {
-        return $this->computedPort?->value;
+        return $this->computedPort->value;
     }
 
     public function getPath(): string
@@ -147,8 +140,7 @@ readonly class Uri implements UriInterface
     {
         return new self(
             scheme: new Scheme($scheme),
-            user: $this->user,
-            password: $this->password,
+            userInfo: $this->userInfo,
             host: $this->host,
             port: $this->port,
             path: $this->path,
@@ -161,8 +153,7 @@ readonly class Uri implements UriInterface
     {
         return new self(
             scheme: $this->scheme,
-            user: $user,
-            password: $password,
+            userInfo: new UserInfo($user, $password),
             host: $this->host,
             port: $this->port,
             path: $this->path,
@@ -175,8 +166,7 @@ readonly class Uri implements UriInterface
     {
         return new self(
             scheme: $this->scheme,
-            user: $this->user,
-            password: $this->password,
+            userInfo: $this->userInfo,
             host: new Host($host),
             port: $this->port,
             path: $this->path,
@@ -189,10 +179,9 @@ readonly class Uri implements UriInterface
     {
         return new self(
             scheme: $this->scheme,
-            user: $this->user,
-            password: $this->password,
+            userInfo: $this->userInfo,
             host: $this->host,
-            port: $port !== null ? new Port($port) : null,
+            port: new Port($port),
             path: $this->path,
             query: $this->query,
             fragment: $this->fragment,
@@ -203,8 +192,7 @@ readonly class Uri implements UriInterface
     {
         return new self(
             scheme: $this->scheme,
-            user: $this->user,
-            password: $this->password,
+            userInfo: $this->userInfo,
             host: $this->host,
             port: $this->port,
             path: $path,
@@ -217,8 +205,7 @@ readonly class Uri implements UriInterface
     {
         return new self(
             scheme: $this->scheme,
-            user: $this->user,
-            password: $this->password,
+            userInfo: $this->userInfo,
             host: $this->host,
             port: $this->port,
             path: $this->path,
@@ -231,8 +218,7 @@ readonly class Uri implements UriInterface
     {
         return new self(
             scheme: $this->scheme,
-            user: $this->user,
-            password: $this->password,
+            userInfo: $this->userInfo,
             host: $this->host,
             port: $this->port,
             path: $this->path,

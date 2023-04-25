@@ -9,7 +9,9 @@ use IngeniozIT\Http\Message\Uri;
 use Psr\Http\Message\UriInterface;
 use IngeniozIT\Http\Message\ValueObject\{
     Scheme,
-    Host
+    UserInfo,
+    Host,
+    Port,
 };
 use InvalidArgumentException;
 
@@ -23,10 +25,9 @@ class UriTest extends TestCase
     {
         return new Uri(
             scheme: new Scheme(''),
-            user: '',
-            password: null,
+            userInfo: new UserInfo('', null),
             host: new Host(''),
-            port: null,
+            port: new Port(null),
             path: '',
             query: '',
             fragment: '',
