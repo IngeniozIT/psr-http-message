@@ -26,6 +26,9 @@ readonly class StreamFactory implements StreamFactoryInterface
         return $stream;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ErrorControlOperator)
+     */
     public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface
     {
         if (!$this->isValidMode($mode)) {
@@ -47,6 +50,7 @@ readonly class StreamFactory implements StreamFactoryInterface
 
     /**
      * @param resource $resource
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function createStreamFromResource($resource): StreamInterface
     {
