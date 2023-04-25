@@ -13,7 +13,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "provide": {
-        "psr/http-message-implementation": "1.0",
+        "psr/http-message-implementation": "2.0",
         "psr/http-factory-implementation": "1.0"
     },
     "require": {
