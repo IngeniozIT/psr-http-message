@@ -5,33 +5,32 @@ declare(strict_types=1);
 namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\UriInterface;
-use InvalidArgumentException;
+use IngeniozIT\Http\Message\ValueObject\{
+    Scheme,
+    Host,
+    Port,
+};
 
 readonly class Uri implements UriInterface
 {
-    private string $scheme;
-    private string $host;
     private string $path;
     private string $query;
 
     private string $computedUserInfo;
-    private ?int $computedPort;
+    private ?Port $computedPort;
     private string $computedAuthority;
     private string $computedFullUri;
 
     public function __construct(
-        string $scheme,
+        private Scheme $scheme,
         private string $user,
         private ?string $password,
-        string $host,
-        private ?int $port,
+        private Host $host,
+        private ?Port $port,
         string $path,
         string $query,
         private string $fragment,
     ) {
-        $this->scheme = strtolower($scheme);
-        $this->host = strtolower($host);
-        $this->validateUri();
         $this->path = strtolower($this->urlEncodeString($path, '/'));
         $this->query = $this->urlEncodeQueryString($query);
 
@@ -39,41 +38,6 @@ readonly class Uri implements UriInterface
         $this->computedPort = $this->computePort();
         $this->computedAuthority = $this->computeAuthority();
         $this->computedFullUri = $this->computeFullUri();
-    }
-
-    private function validateUri(): void
-    {
-        $this->assertValidPort();
-        $this->assertValidHost();
-        $this->assertValidScheme();
-    }
-
-    private function assertValidPort(): void
-    {
-        if (
-            $this->port !== null &&
-            filter_var(
-                $this->port,
-                FILTER_VALIDATE_INT,
-                ['options' => ['min_range' => 1, 'max_range' => 65535]]
-            ) === false
-        ) {
-            throw new InvalidArgumentException("Invalid port '{$this->port}'");
-        }
-    }
-
-    private function assertValidHost(): void
-    {
-        if (!empty($this->host) && !filter_var($this->host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
-            throw new InvalidArgumentException("Invalid host '{$this->host}'");
-        }
-    }
-
-    private function assertValidScheme(): void
-    {
-        if (!empty($this->scheme) && !preg_match('/^[a-z][a-z0-9+-.]+$/', $this->scheme)) {
-            throw new InvalidArgumentException("Invalid scheme '{$this->scheme}'");
-        }
     }
 
     /**
@@ -109,9 +73,9 @@ readonly class Uri implements UriInterface
         return $this->user . ($this->password !== null ? ':' . $this->password : '');
     }
 
-    private function computePort(): ?int
+    private function computePort(): ?Port
     {
-        return (getservbyname($this->scheme, 'tcp') ?: getservbyname($this->scheme, 'udp')) !== $this->port ?
+        return $this->scheme->defaultPort() !== $this->port?->value ?
             $this->port :
             null;
     }
@@ -125,7 +89,7 @@ readonly class Uri implements UriInterface
 
     private function computeFullUri(): string
     {
-        return (!empty($this->scheme) ? $this->scheme . ':' : '') .
+        return $this->scheme->toUriString() .
             (!empty($this->computedAuthority) ? '//' . $this->computedAuthority : '') .
             (!empty($this->path) ? $this->cleanPath() : '') .
             ($this->query !== '' ? '?' . $this->query : '') .
@@ -141,7 +105,7 @@ readonly class Uri implements UriInterface
 
     public function getScheme(): string
     {
-        return $this->scheme;
+        return (string) $this->scheme;
     }
 
     public function getAuthority(): string
@@ -156,12 +120,12 @@ readonly class Uri implements UriInterface
 
     public function getHost(): string
     {
-        return $this->host;
+        return (string) $this->host;
     }
 
     public function getPort(): ?int
     {
-        return $this->computedPort;
+        return $this->computedPort?->value;
     }
 
     public function getPath(): string
@@ -182,7 +146,7 @@ readonly class Uri implements UriInterface
     public function withScheme(string $scheme): self
     {
         return new self(
-            scheme: $scheme,
+            scheme: new Scheme($scheme),
             user: $this->user,
             password: $this->password,
             host: $this->host,
@@ -213,7 +177,7 @@ readonly class Uri implements UriInterface
             scheme: $this->scheme,
             user: $this->user,
             password: $this->password,
-            host: $host,
+            host: new Host($host),
             port: $this->port,
             path: $this->path,
             query: $this->query,
@@ -228,7 +192,7 @@ readonly class Uri implements UriInterface
             user: $this->user,
             password: $this->password,
             host: $this->host,
-            port: $port,
+            port: $port !== null ? new Port($port) : null,
             path: $this->path,
             query: $this->query,
             fragment: $this->fragment,

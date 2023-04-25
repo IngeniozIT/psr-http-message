@@ -460,7 +460,17 @@ class StreamTest extends TestCase
         $stream = new Stream($resource);
 
         self::expectException(InvalidResourceOperationException::class);
-        $stream->read(1);
+        $stream->read(0);
+    }
+
+    public function testReadThrowsExceptionWhenReadingANegativeAmountOfCharacters(): void
+    {
+        $resource = $this->open('php://temp', 'w+');
+        $stream = new Stream($resource);
+        fclose($resource);
+
+        self::expectException(InvalidArgumentException::class);
+        $stream->read(-1);
     }
 
     public function testReadThrowsExceptionWhenFreadFails(): void

@@ -7,6 +7,10 @@ namespace IngeniozIT\Http\Message\Tests;
 use PHPUnit\Framework\TestCase;
 use IngeniozIT\Http\Message\Uri;
 use Psr\Http\Message\UriInterface;
+use IngeniozIT\Http\Message\ValueObject\{
+    Scheme,
+    Host
+};
 use InvalidArgumentException;
 
 /**
@@ -18,10 +22,10 @@ class UriTest extends TestCase
     protected function createUriInstance(): Uri
     {
         return new Uri(
-            scheme: '',
+            scheme: new Scheme(''),
             user: '',
             password: null,
-            host: '',
+            host: new Host(''),
             port: null,
             path: '',
             query: '',
