@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\{StreamFactoryInterface, StreamInterface, UploadedFileInterface,};
 use RuntimeException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class UploadedFileTest extends TestCase
 {
     use WithTempFiles;
@@ -143,7 +146,7 @@ class UploadedFileTest extends TestCase
         self::assertEquals('foo.bar', $mediaType);
     }
 
-    public function testClientFileTypeCanBeNull(): void
+    public function testClientMediaTypeCanBeNull(): void
     {
         $uploadedFile = $this->createSubject(
             clientMediaType: null,

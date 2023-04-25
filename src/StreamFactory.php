@@ -26,13 +26,16 @@ readonly class StreamFactory implements StreamFactoryInterface
         return $stream;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ErrorControlOperator)
+     */
     public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface
     {
         if (!$this->isValidMode($mode)) {
             throw new InvalidArgumentException("Mode {$mode} is invalid");
         }
 
-        $resource = fopen($filename, $mode);
+        $resource = @fopen($filename, $mode);
         if ($resource === false) {
             throw new RuntimeException("Could not open {$filename}");
         }
@@ -47,6 +50,7 @@ readonly class StreamFactory implements StreamFactoryInterface
 
     /**
      * @param resource $resource
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function createStreamFromResource($resource): StreamInterface
     {

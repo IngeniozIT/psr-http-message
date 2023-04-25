@@ -172,11 +172,11 @@ class Stream implements StreamInterface
         return $this->readable;
     }
 
-    /**
-     * @param int<0, max> $length
-     */
-    public function read($length): string
+    public function read(int $length): string
     {
+        if ($length < 0) {
+            throw new InvalidArgumentException('Length must be greater than 0');
+        }
         return $this->readContent(fn($resource) => fread($resource, $length));
     }
 
