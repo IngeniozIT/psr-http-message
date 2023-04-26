@@ -17,9 +17,9 @@ readonly class Uri implements UriInterface
     private string $path;
     private string $query;
 
-    private Port $computedPort;
-    private string $computedAuthority;
-    private string $computedFullUri;
+    private Port $displayedPort;
+    private string $authority;
+    private string $fullUri;
 
     public function __construct(
         private Scheme $scheme,
@@ -33,9 +33,9 @@ readonly class Uri implements UriInterface
         $this->path = strtolower($this->urlEncodeString($path, '/'));
         $this->query = $this->urlEncodeQueryString($query);
 
-        $this->computedPort = $this->computePort();
-        $this->computedAuthority = $this->computeAuthority();
-        $this->computedFullUri = $this->computeFullUri();
+        $this->displayedPort = $this->computePort();
+        $this->authority = $this->computeAuthority();
+        $this->fullUri = $this->computeFullUri();
     }
 
     /**
@@ -77,13 +77,13 @@ readonly class Uri implements UriInterface
     {
         return $this->userInfo->toUriString() .
             $this->host .
-            $this->computedPort->toUriString();
+            $this->displayedPort->toUriString();
     }
 
     private function computeFullUri(): string
     {
         return $this->scheme->toUriString() .
-            (!empty($this->computedAuthority) ? '//' . $this->computedAuthority : '') .
+            (!empty($this->authority) ? '//' . $this->authority : '') .
             (!empty($this->path) ? $this->cleanPath() : '') .
             ($this->query !== '' ? '?' . $this->query : '') .
             ($this->fragment !== '' ? '#' . $this->fragment : '');
@@ -91,7 +91,7 @@ readonly class Uri implements UriInterface
 
     private function cleanPath(): string
     {
-        return (empty($this->computedAuthority) xor !str_starts_with($this->path, '/')) ?
+        return (empty($this->authority) xor !str_starts_with($this->path, '/')) ?
             '/' . ltrim($this->path, '/') :
             $this->path;
     }
@@ -103,7 +103,7 @@ readonly class Uri implements UriInterface
 
     public function getAuthority(): string
     {
-        return $this->computedAuthority;
+        return $this->authority;
     }
 
     public function getUserInfo(): string
@@ -118,7 +118,7 @@ readonly class Uri implements UriInterface
 
     public function getPort(): ?int
     {
-        return $this->computedPort->value;
+        return $this->displayedPort->value;
     }
 
     public function getPath(): string
@@ -229,6 +229,6 @@ readonly class Uri implements UriInterface
 
     public function __toString(): string
     {
-        return $this->computedFullUri;
+        return $this->fullUri;
     }
 }
