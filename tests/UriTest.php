@@ -12,6 +12,7 @@ use IngeniozIT\Http\Message\ValueObject\{
     UserInfo,
     Host,
     Port,
+    Path,
 };
 use InvalidArgumentException;
 
@@ -28,7 +29,7 @@ class UriTest extends TestCase
             userInfo: new UserInfo('', null),
             host: new Host(''),
             port: new Port(null),
-            path: '',
+            path: new Path(''),
             query: '',
             fragment: '',
         );

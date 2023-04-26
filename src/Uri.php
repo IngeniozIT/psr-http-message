@@ -10,11 +10,11 @@ use IngeniozIT\Http\Message\ValueObject\{
     UserInfo,
     Host,
     Port,
+    Path,
 };
 
 readonly class Uri implements UriInterface
 {
-    private string $path;
     private string $query;
 
     private Port $displayedPort;
@@ -26,11 +26,10 @@ readonly class Uri implements UriInterface
         private UserInfo $userInfo,
         private Host $host,
         private Port $port,
-        string $path,
+        private Path $path,
         string $query,
         private string $fragment,
     ) {
-        $this->path = strtolower($this->urlEncodeString($path, '/'));
         $this->query = $this->urlEncodeQueryString($query);
 
         $this->displayedPort = $this->computePort();
@@ -38,18 +37,15 @@ readonly class Uri implements UriInterface
         $this->fullUri = $this->computeFullUri();
     }
 
-    /**
-     * @param non-empty-string $delimiter
-     */
-    private function urlEncodeString(string $path, string $delimiter): string
+    private function urlEncodeString(string $path): string
     {
         return implode(
-            $delimiter,
+            '=',
             array_map(
                 'rawurlencode',
                 array_map(
                     'rawurldecode',
-                    explode($delimiter, $path)
+                    explode('=', $path)
                 )
             )
         );
@@ -60,7 +56,7 @@ readonly class Uri implements UriInterface
         return implode(
             '&',
             array_map(
-                fn(string $str) => $this->urlEncodeString($str, '='),
+                fn(string $str) => $this->urlEncodeString($str),
                 explode('&', $query)
             )
         );
@@ -84,16 +80,9 @@ readonly class Uri implements UriInterface
     {
         return $this->scheme->toUriString() .
             (!empty($this->authority) ? '//' . $this->authority : '') .
-            (!empty($this->path) ? $this->cleanPath() : '') .
+            $this->path->toUriString($this->authority) .
             ($this->query !== '' ? '?' . $this->query : '') .
             ($this->fragment !== '' ? '#' . $this->fragment : '');
-    }
-
-    private function cleanPath(): string
-    {
-        return (empty($this->authority) xor !str_starts_with($this->path, '/')) ?
-            '/' . ltrim($this->path, '/') :
-            $this->path;
     }
 
     public function getScheme(): string
@@ -123,7 +112,7 @@ readonly class Uri implements UriInterface
 
     public function getPath(): string
     {
-        return str_starts_with($this->path, '//') ? '/' . ltrim($this->path, '/') : $this->path;
+        return (string) $this->path;
     }
 
     public function getQuery(): string
@@ -195,7 +184,7 @@ readonly class Uri implements UriInterface
             userInfo: $this->userInfo,
             host: $this->host,
             port: $this->port,
-            path: $path,
+            path: new Path($path),
             query: $this->query,
             fragment: $this->fragment,
         );

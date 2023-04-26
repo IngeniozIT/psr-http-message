@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
-use Psr\Http\Message\UriFactoryInterface;
-use Psr\Http\Message\UriInterface;
-use IngeniozIT\Http\Message\ValueObject\{Scheme, Host, Port, UserInfo};
+use Psr\Http\Message\{UriFactoryInterface, UriInterface};
+use IngeniozIT\Http\Message\ValueObject\{
+    Scheme,
+    UserInfo,
+    Host,
+    Port,
+    Path,
+};
 use InvalidArgumentException;
 
 readonly class UriFactory implements UriFactoryInterface
@@ -27,7 +32,7 @@ readonly class UriFactory implements UriFactoryInterface
             ),
             host: new Host($parsedUri['host'] ?? ''),
             port: new Port($parsedUri['port'] ?? null),
-            path: $parsedUri['path'] ?? '',
+            path: new Path($parsedUri['path'] ?? ''),
             query: $parsedUri['query'] ?? '',
             fragment: $parsedUri['fragment'] ?? '',
         );
