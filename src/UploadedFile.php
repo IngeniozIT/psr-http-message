@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
-use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UploadedFileInterface;
+use Psr\Http\Message\{UploadedFileInterface, StreamInterface, StreamFactoryInterface};
 use RuntimeException;
 
 class UploadedFile implements UploadedFileInterface

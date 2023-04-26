@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
-use IngeniozIT\Http\Message\{StreamFactory, UploadedFileFactory};
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\{UploadedFileFactoryInterface, UploadedFileInterface};
+use IngeniozIT\Http\Message\{StreamFactory, UploadedFileFactory};
+use InvalidArgumentException;
 
 class UploadedFileFactoryTest extends TestCase
 {

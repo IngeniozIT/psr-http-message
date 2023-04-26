@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
-use IngeniozIT\Http\Message\UriFactory;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use IngeniozIT\Http\Message\UriFactory;
 use Psr\Http\Message\UriFactoryInterface;
+use InvalidArgumentException;
 
 class UriFactoryTest extends TestCase
 {

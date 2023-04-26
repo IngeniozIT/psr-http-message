@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
+use Psr\Http\Message\{StreamFactoryInterface, StreamInterface};
 use InvalidArgumentException;
-use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
 readonly class StreamFactory implements StreamFactoryInterface

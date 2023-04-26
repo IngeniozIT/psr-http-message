@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
-use IngeniozIT\Http\Message\Exception\DetachedStreamException;
-use IngeniozIT\Http\Message\Exception\InvalidResourceOperationException;
-use IngeniozIT\Http\Message\Exception\IOException;
-use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
+use IngeniozIT\Http\Message\Exception\{
+    DetachedStreamException,
+    InvalidResourceOperationException,
+    IOException
+};
+use InvalidArgumentException;
 use Throwable;
 
 /**
@@ -103,7 +105,6 @@ class Stream implements StreamInterface
 
     public function tell(): int
     {
-
         if ($this->resource === null) {
             throw new DetachedStreamException('Cannot tell a detached resource');
         }

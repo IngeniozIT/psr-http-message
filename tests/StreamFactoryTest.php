@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
-use IngeniozIT\Http\Message\StreamFactory;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use IngeniozIT\Http\Message\StreamFactory;
 use Psr\Http\Message\StreamFactoryInterface;
+use InvalidArgumentException;
 use RuntimeException;
 
 class StreamFactoryTest extends TestCase

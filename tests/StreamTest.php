@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
+use PHPUnit\Framework\TestCase;
 use IngeniozIT\Http\Message\Stream;
+use Psr\Http\Message\StreamInterface;
 use IngeniozIT\Http\Message\Exception\{DetachedStreamException, InvalidResourceOperationException, IOException};
 use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

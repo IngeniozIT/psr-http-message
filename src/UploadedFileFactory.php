@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace IngeniozIT\Http\Message;
 
 use InvalidArgumentException;
-use Psr\Http\Message\{StreamFactoryInterface, StreamInterface, UploadedFileFactoryInterface, UploadedFileInterface,};
+use Psr\Http\Message\{
+    UploadedFileFactoryInterface,
+    StreamFactoryInterface,
+    StreamInterface,
+    UploadedFileInterface,
+};
 
 readonly class UploadedFileFactory implements UploadedFileFactoryInterface
 {

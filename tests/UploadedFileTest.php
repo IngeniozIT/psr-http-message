@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
-use IngeniozIT\Http\Message\{StreamFactory, UploadedFile};
 use PHPUnit\Framework\TestCase;
+use IngeniozIT\Http\Message\{StreamFactory, UploadedFile};
 use Psr\Http\Message\{StreamFactoryInterface, StreamInterface, UploadedFileInterface,};
 use RuntimeException;
 
