@@ -19,13 +19,6 @@ readonly final class Path
             $path;
     }
 
-    public function toUriString(string $authority): string
-    {
-        return !empty($authority) && !empty($this->value) ?
-            '/' . ltrim($this->value, '/') :
-            $this->value;
-    }
-
     /**
      * @return non-empty-string
      * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
@@ -33,6 +26,13 @@ readonly final class Path
     private function getDelimiter(): string
     {
         return '/';
+    }
+
+    public function toUriString(string $authority): string
+    {
+        return !empty($authority) && !empty($this->value) ?
+            '/' . ltrim($this->value, '/') :
+            $this->value;
     }
 
     public function __toString(): string

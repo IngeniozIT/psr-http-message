@@ -11,12 +11,11 @@ use IngeniozIT\Http\Message\ValueObject\{
     Host,
     Port,
     Path,
+    Query,
 };
 
 readonly class Uri implements UriInterface
 {
-    private string $query;
-
     private Port $displayedPort;
     private string $authority;
     private string $fullUri;
@@ -27,39 +26,12 @@ readonly class Uri implements UriInterface
         private Host $host,
         private Port $port,
         private Path $path,
-        string $query,
+        private Query $query,
         private string $fragment,
     ) {
-        $this->query = $this->urlEncodeQueryString($query);
-
         $this->displayedPort = $this->computePort();
         $this->authority = $this->computeAuthority();
         $this->fullUri = $this->computeFullUri();
-    }
-
-    private function urlEncodeString(string $path): string
-    {
-        return implode(
-            '=',
-            array_map(
-                'rawurlencode',
-                array_map(
-                    'rawurldecode',
-                    explode('=', $path)
-                )
-            )
-        );
-    }
-
-    private function urlEncodeQueryString(string $query): string
-    {
-        return implode(
-            '&',
-            array_map(
-                fn(string $str) => $this->urlEncodeString($str),
-                explode('&', $query)
-            )
-        );
     }
 
     private function computePort(): Port
@@ -81,7 +53,7 @@ readonly class Uri implements UriInterface
         return $this->scheme->toUriString() .
             (!empty($this->authority) ? '//' . $this->authority : '') .
             $this->path->toUriString($this->authority) .
-            ($this->query !== '' ? '?' . $this->query : '') .
+            $this->query->toUriString() .
             ($this->fragment !== '' ? '#' . $this->fragment : '');
     }
 
@@ -117,7 +89,7 @@ readonly class Uri implements UriInterface
 
     public function getQuery(): string
     {
-        return $this->query;
+        return (string) $this->query;
     }
 
     public function getFragment(): string
@@ -198,7 +170,7 @@ readonly class Uri implements UriInterface
             host: $this->host,
             port: $this->port,
             path: $this->path,
-            query: $query,
+            query: new Query($query),
             fragment: $this->fragment,
         );
     }
