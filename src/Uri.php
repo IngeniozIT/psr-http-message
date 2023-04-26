@@ -12,6 +12,7 @@ use IngeniozIT\Http\Message\ValueObject\{
     Port,
     Path,
     Query,
+    Fragment,
 };
 
 readonly class Uri implements UriInterface
@@ -27,7 +28,7 @@ readonly class Uri implements UriInterface
         private Port $port,
         private Path $path,
         private Query $query,
-        private string $fragment,
+        private Fragment $fragment,
     ) {
         $this->displayedPort = $this->computePort();
         $this->authority = $this->computeAuthority();
@@ -54,7 +55,7 @@ readonly class Uri implements UriInterface
             (!empty($this->authority) ? '//' . $this->authority : '') .
             $this->path->toUriString($this->authority) .
             $this->query->toUriString() .
-            ($this->fragment !== '' ? '#' . $this->fragment : '');
+            $this->fragment->toUriString();
     }
 
     public function getScheme(): string
@@ -94,7 +95,7 @@ readonly class Uri implements UriInterface
 
     public function getFragment(): string
     {
-        return $this->fragment;
+        return (string) $this->fragment;
     }
 
     public function withScheme(string $scheme): self
@@ -184,7 +185,7 @@ readonly class Uri implements UriInterface
             port: $this->port,
             path: $this->path,
             query: $this->query,
-            fragment: $fragment,
+            fragment: new Fragment($fragment),
         );
     }
 

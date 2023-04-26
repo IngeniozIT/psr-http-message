@@ -12,6 +12,7 @@ use IngeniozIT\Http\Message\ValueObject\{
     Port,
     Path,
     Query,
+    Fragment,
 };
 use InvalidArgumentException;
 
@@ -35,7 +36,7 @@ readonly class UriFactory implements UriFactoryInterface
             port: new Port($parsedUri['port'] ?? null),
             path: new Path($parsedUri['path'] ?? ''),
             query: new Query($parsedUri['query'] ?? ''),
-            fragment: $parsedUri['fragment'] ?? '',
+            fragment: new Fragment($parsedUri['fragment'] ?? ''),
         );
     }
 }
