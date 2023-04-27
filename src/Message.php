@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
-use Psr\Http\Message\{MessageInterface, StreamInterface};
+use IngeniozIT\Http\Message\ValueObject\Request\Method;
+use Psr\Http\Message\{MessageInterface, StreamInterface, UriInterface};
 use IngeniozIT\Http\Message\ValueObject\Message\Headers;
 
 readonly class Message implements MessageInterface
@@ -17,7 +18,7 @@ readonly class Message implements MessageInterface
     }
 
     /**
-     * @param array{protocolVersion?: string, headers?: Headers, body?: StreamInterface} $params
+     * @param array{protocolVersion?: string, headers?: ?Headers, body?: StreamInterface, method?: Method, requestTarget?: string, uri?: UriInterface} $params
      * @return array{protocolVersion: string, headers: Headers, body: StreamInterface}
      */
     protected function newInstanceWithParams(array $params): array
@@ -34,6 +35,9 @@ readonly class Message implements MessageInterface
         return $this->protocolVersion;
     }
 
+    /**
+     * @suppress PhanParamSignatureMismatch
+     */
     public function withProtocolVersion(string $version): MessageInterface
     {
         return $version === $this->protocolVersion ?
@@ -70,6 +74,9 @@ readonly class Message implements MessageInterface
         return $this->headers->hasHeader($name);
     }
 
+    /**
+     * @suppress PhanParamSignatureMismatch
+     */
     public function withHeader(string $name, $value): MessageInterface
     {
         return $this->headers->hasHeaderEqualTo($name, $value) ?
@@ -80,6 +87,9 @@ readonly class Message implements MessageInterface
             ]));
     }
 
+    /**
+     * @suppress PhanParamSignatureMismatch
+     */
     public function withAddedHeader(string $name, $value): MessageInterface
     {
         return $this->headers->hasHeaderWithValue($name, $value) ?
@@ -90,6 +100,9 @@ readonly class Message implements MessageInterface
             ]));
     }
 
+    /**
+     * @suppress PhanParamSignatureMismatch
+     */
     public function withoutHeader(string $name): MessageInterface
     {
         return !$this->hasHeader($name) ?
@@ -105,6 +118,9 @@ readonly class Message implements MessageInterface
         return $this->body;
     }
 
+    /**
+     * @suppress PhanParamSignatureMismatch
+     */
     public function withBody(StreamInterface $body): MessageInterface
     {
         return $body === $this->body ?
