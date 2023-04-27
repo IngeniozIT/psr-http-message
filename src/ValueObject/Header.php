@@ -24,10 +24,7 @@ readonly final class Header
         if (empty($value)) {
             throw new InvalidArgumentException('Header value cannot be empty');
         }
-        if (is_string($value)) {
-            $value = [$value];
-        }
-        $this->value = array_values($value);
+        $this->value = $this->normalizeValue($value);
     }
 
     /**
@@ -35,10 +32,10 @@ readonly final class Header
      */
     public function withAddedValue(array|string $value): self
     {
-        if (is_string($value)) {
-            $value = [$value];
-        }
-        return new self($this->name, array_unique(array_merge($this->value, $value)));
+        return new self(
+            $this->name,
+            array_unique(array_merge($this->value, $this->normalizeValue($value)))
+        );
     }
 
     /**
@@ -46,10 +43,7 @@ readonly final class Header
      */
     public function has(array|string $value): bool
     {
-        if (is_string($value)) {
-            $value = [$value];
-        }
-        foreach ($value as $v) {
+        foreach ($this->normalizeValue($value) as $v) {
             if (!in_array($v, $this->value)) {
                 return false;
             }
@@ -65,9 +59,15 @@ readonly final class Header
         if ($name !== $this->name) {
             return false;
         }
-        if (is_string($value)) {
-            $value = [$value];
-        }
-        return empty(array_diff($this->value, $value));
+        return empty(array_diff($this->value, $this->normalizeValue($value)));
+    }
+
+    /**
+     * @param string|string[] $value
+     * @return string[]
+     */
+    private function normalizeValue(string|array $value): array
+    {
+        return is_string($value) ? [$value] : array_values($value);
     }
 }
