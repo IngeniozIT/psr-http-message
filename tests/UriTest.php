@@ -6,16 +6,16 @@ namespace IngeniozIT\Http\Message\Tests;
 
 use PHPUnit\Framework\TestCase;
 use IngeniozIT\Http\Message\Uri;
-use Psr\Http\Message\UriInterface;
-use IngeniozIT\Http\Message\ValueObject\{
+use IngeniozIT\Http\Message\ValueObject\Uri\{
+    Fragment,
+    Host,
+    Path,
+    Port,
+    Query,
     Scheme,
     UserInfo,
-    Host,
-    Port,
-    Path,
-    Query,
-    Fragment,
 };
+use Psr\Http\Message\UriInterface;
 use InvalidArgumentException;
 
 /**

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
-use Psr\Http\Message\UriInterface;
-use IngeniozIT\Http\Message\ValueObject\{
+use IngeniozIT\Http\Message\ValueObject\Uri\{
+    Fragment,
+    Host,
+    Path,
+    Port,
+    Query,
     Scheme,
     UserInfo,
-    Host,
-    Port,
-    Path,
-    Query,
-    Fragment,
 };
+use Psr\Http\Message\UriInterface;
 
 readonly class Uri implements UriInterface
 {

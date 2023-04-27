@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
-use Psr\Http\Message\{UriFactoryInterface, UriInterface};
-use IngeniozIT\Http\Message\ValueObject\{
+use IngeniozIT\Http\Message\ValueObject\Uri\{
+    Fragment,
+    Host,
+    Path,
+    Port,
+    Query,
     Scheme,
     UserInfo,
-    Host,
-    Port,
-    Path,
-    Query,
-    Fragment,
 };
 use InvalidArgumentException;
+use Psr\Http\Message\{UriFactoryInterface, UriInterface};
 
 readonly class UriFactory implements UriFactoryInterface
 {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace IngeniozIT\Http\Message;
 
 use Psr\Http\Message\{MessageInterface, StreamInterface};
-use IngeniozIT\Http\Message\ValueObject\Headers;
+use IngeniozIT\Http\Message\ValueObject\Message\Headers;
 
 readonly class Message implements MessageInterface
 {
@@ -20,7 +20,7 @@ readonly class Message implements MessageInterface
      * @param array{protocolVersion?: string, headers?: Headers, body?: StreamInterface} $params
      * @return array{protocolVersion: string, headers: Headers, body: StreamInterface}
      */
-    private function newInstanceWithParams(array $params): array
+    protected function newInstanceWithParams(array $params): array
     {
         return [
             'protocolVersion' => $params['protocolVersion'] ?? $this->protocolVersion,

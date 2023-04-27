@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IngeniozIT\Http\Message\ValueObject;
+namespace IngeniozIT\Http\Message\ValueObject\Uri;
 
 readonly final class Query
 {

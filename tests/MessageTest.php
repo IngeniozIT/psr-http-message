@@ -7,7 +7,7 @@ namespace IngeniozIT\Http\Message\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\MessageInterface;
 use IngeniozIT\Http\Message\{StreamFactory, Message};
-use IngeniozIT\Http\Message\ValueObject\Headers;
+use IngeniozIT\Http\Message\ValueObject\Message\Headers;
 use InvalidArgumentException;
 
 /**
