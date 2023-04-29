@@ -22,6 +22,13 @@ class ResponseTest extends MessageTest
         );
     }
 
+    public function testIsAPsrResponse(): void
+    {
+        $response = $this->getMessage();
+
+        self::assertInstanceOf(ResponseInterface::class, $response);
+    }
+
     /**
      * @dataProvider providerStatusCodes
      */

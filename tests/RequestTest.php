@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
-use IngeniozIT\Http\Message\Request;
-use IngeniozIT\Http\Message\StreamFactory;
-use IngeniozIT\Http\Message\UriFactory;
+use Psr\Http\Message\{RequestInterface, UriInterface};
+use IngeniozIT\Http\Message\{StreamFactory,
+    UriFactory,
+    Request,
+};
 use IngeniozIT\Http\Message\ValueObject\Message\Headers;
 use IngeniozIT\Http\Message\ValueObject\Request\Method;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\UriInterface;
 
 class RequestTest extends MessageTest
 {
@@ -26,6 +26,13 @@ class RequestTest extends MessageTest
             '',
             $uriFactory->createUri(),
         );
+    }
+
+    public function testIsAPsrRequest(): void
+    {
+        $request = $this->getMessage();
+
+        self::assertInstanceOf(RequestInterface::class, $request);
     }
 
     /**
