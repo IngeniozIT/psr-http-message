@@ -21,8 +21,16 @@ readonly final class Request extends Message implements RequestInterface
         protected string $requestTarget,
         protected UriInterface $uri,
     ) {
-        parent::__construct($protocolVersion, $headers, $body);
+        parent::__construct($protocolVersion, $this->headersWithHost($headers, $uri), $body);
         $this->cleanRequestTarget = $this->computeRequestTarget();
+    }
+
+    private function headersWithHost(Headers $headers, UriInterface $uri): Headers
+    {
+        $uriHost = $uri->getHost();
+        return $uriHost !== '' && !$headers->hasHeader('Host') ?
+            $headers->withHeader('Host', $uriHost) :
+            $headers;
     }
 
     /**

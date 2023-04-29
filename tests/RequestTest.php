@@ -113,31 +113,6 @@ class RequestTest extends MessageTest
         ];
     }
 
-    public function testUsesTheSameInstanceWhenContentDoesNotChange(): void
-    {
-        $stream = (new StreamFactory())->createStream('test');
-        $uri = (new UriFactory())->createUri('http://example.com/foo/bar');
-        $request = $this->getMessage()
-            ->withProtocolVersion('2.0')
-            ->withHeader('X-Test', 'test')
-            ->withBody($stream)
-            ->withMethod('PUT')
-            ->withRequestTarget('/foo/bar')
-            ->withUri($uri);
-
-        $request2 = $request
-            ->withProtocolVersion('2.0')
-            ->withHeader('X-Test', 'test')
-            ->withAddedHeader('X-Test', 'test')
-            ->withoutHeader('X-Test2')
-            ->withBody($stream)
-            ->withMethod('PUT')
-            ->withRequestTarget('/foo/bar')
-            ->withUri($uri);
-
-        self::assertSame($request, $request2);
-    }
-
     public function testHasAUri(): void
     {
         $uri = (new UriFactory())->createUri('http://example.com/foo/bar');
@@ -213,5 +188,48 @@ class RequestTest extends MessageTest
                 'expectedHost' => 'example.com',
             ],
         ];
+    }
+
+    public function testAddsHostHeaderWhenUriWithHostIsProvided(): void
+    {
+        $streamFactory = new StreamFactory();
+        $uri = (new UriFactory())->createUri('http://example.com/');
+
+        $request = new Request(
+            '1.1',
+            new Headers([]),
+            $streamFactory->createStream(),
+            Method::GET,
+            '',
+            $uri,
+        );
+        $host = $request->getHeaderLine('Host');
+
+        self::assertEquals('example.com', $host);
+    }
+
+    public function testUsesTheSameInstanceWhenContentDoesNotChange(): void
+    {
+        $stream = (new StreamFactory())->createStream('test');
+        $uri = (new UriFactory())->createUri('http://example.com/foo/bar');
+        $request = $this->getMessage()
+            ->withProtocolVersion('2.0')
+            ->withHeader('X-Test', 'test')
+            ->withBody($stream)
+            ->withMethod('PUT')
+            ->withRequestTarget('/foo/bar')
+            ->withUri($uri);
+
+        $request2 = $request
+            ->withProtocolVersion('2.0')
+            ->withHeader('X-Test', 'test')
+            ->withAddedHeader('X-Test', 'test')
+            ->withoutHeader('X-Test2')
+            ->withBody($stream)
+            ->withMethod('PUT')
+            ->withRequestTarget('/foo/bar')
+            ->withUri($uri);
+
+        self::assertSame($request, $request2);
     }
 }
