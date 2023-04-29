@@ -128,16 +128,17 @@ class MessageTest extends TestCase
     }
 
     /**
+     * @param string|string[] $value
      * @dataProvider providerInvalidHeaders
      */
-    public function testHeaderNameAndValueMustNotBeInvalid(string $name, string $value): void
+    public function testHeaderNameAndValueMustNotBeInvalid(string $name, string|array $value): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->getMessage()->withHeader($name, $value);
     }
 
     /**
-     * @return array<string, array{name: string, value: string}>
+     * @return array<string, array{name: string, value: string|string[]}>
      */
     public static function providerInvalidHeaders(): array
     {
@@ -146,9 +147,41 @@ class MessageTest extends TestCase
                 'name' => '',
                 'value' => 'test',
             ],
+            'name with NUL char' => [
+                'name' => "X-\0Test",
+                'value' => 'test',
+            ],
+            'name with \\r char' => [
+                'name' => "X-\rTest",
+                'value' => 'test',
+            ],
+            'name with \\n char' => [
+                'name' => "X-\nTest",
+                'value' => 'test',
+            ],
+            'name with \\20 char' => [
+                'name' => "X" . chr(20) . "Test",
+                'value' => 'test',
+            ],
             'empty value' => [
                 'name' => 'X-Test',
                 'value' => '',
+            ],
+            'empty array value' => [
+                'name' => 'X-Test',
+                'value' => [],
+            ],
+            'value with NUL char' => [
+                'name' => 'X-Test',
+                'value' => "te\0st",
+            ],
+            'value with \\r char' => [
+                'name' => 'X-Test',
+                'value' => "te\rst",
+            ],
+            'value with \\n char' => [
+                'name' => 'X-Test',
+                'value' => "te\nst",
             ],
         ];
     }

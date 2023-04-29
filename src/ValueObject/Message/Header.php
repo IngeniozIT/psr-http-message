@@ -8,6 +8,9 @@ use InvalidArgumentException;
 
 readonly final class Header
 {
+    private const HEADER_INVALID_CHARACTERS = "\0\1\2\3\4\5\6\7\10\11\12\13\14\15\16\17\20\21\22\23\24";
+    private const VALUE_INVALID_CHARACTERS = "\0\r\n";
+
     /** @var string[] */
     public array $value;
 
@@ -18,13 +21,41 @@ readonly final class Header
         public string $name,
         string|array $value,
     ) {
+        $this->assertValidName($name);
+        $normalizedValue = $this->normalizeValue($value);
+        $this->assertValidValues($normalizedValue);
+        $this->value = $normalizedValue;
+    }
+
+    private function assertValidName(string $name): void
+    {
         if (empty($name)) {
             throw new InvalidArgumentException('Header name cannot be empty');
         }
+        if (strpbrk($name, self::HEADER_INVALID_CHARACTERS) !== false) {
+            throw new InvalidArgumentException('Header name cannot contain control characters');
+        }
+    }
+
+    /**
+     * @param string[] $values
+     */
+    private function assertValidValues(array $values): void
+    {
+        if (empty($values)) {
+            throw new InvalidArgumentException('Header value cannot be empty');
+        }
+        array_walk($values, $this->assertValidValue(...));
+    }
+
+    private function assertValidValue(string $value): void
+    {
         if (empty($value)) {
             throw new InvalidArgumentException('Header value cannot be empty');
         }
-        $this->value = $this->normalizeValue($value);
+        if (strpbrk($value, self::VALUE_INVALID_CHARACTERS) !== false) {
+            throw new InvalidArgumentException('Header value cannot contain control characters');
+        }
     }
 
     /**
@@ -56,10 +87,7 @@ readonly final class Header
      */
     public function equals(string $name, array|string $value): bool
     {
-        if ($name !== $this->name) {
-            return false;
-        }
-        return empty(array_diff($this->value, $this->normalizeValue($value)));
+        return $name === $this->name && empty(array_diff($this->value, $this->normalizeValue($value)));
     }
 
     /**
