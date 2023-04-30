@@ -1,5 +1,5 @@
 {
-    "name": "ingenioz-it/psr-http-message",
+    "name": "ingenioz-it/http-message",
     "description": "Implementation of PSR-7 HTTP Message Interfaces and PSR-17 HTTP Factories",
     "keywords": ["PSR", "PSR-7", "Http", "Message", "PSR-17", "Factories", "Factory"],
     "type": "project",
