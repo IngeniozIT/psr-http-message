@@ -19,9 +19,9 @@ class MessageTest extends TestCase
     {
         $streamFactory = new StreamFactory();
         return new Message(
-            '1.1',
-            new Headers([]),
-            $streamFactory->createStream(),
+            protocolVersion: '1.1',
+            headers: new Headers([]),
+            body: $streamFactory->createStream(),
         );
     }
 

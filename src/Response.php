@@ -8,7 +8,7 @@ use Psr\Http\Message\{ResponseInterface, StreamInterface};
 use IngeniozIT\Http\Message\ValueObject\Message\Headers;
 use IngeniozIT\Http\Message\ValueObject\Response\ReasonPhrase;
 
-readonly class Response extends Message implements ResponseInterface
+readonly final class Response extends Message implements ResponseInterface
 {
     protected string $reasonPhrase;
 
@@ -23,35 +23,39 @@ readonly class Response extends Message implements ResponseInterface
         $this->reasonPhrase = $this->computeReasonPhrase($this->statusCode, $reasonPhrase);
     }
 
+    /**
+     * @return array{protocolVersion: string, headers: Headers, body: StreamInterface, statusCode: int, reasonPhrase: string}
+     */
+    protected function getConstructorParams(): array
+    {
+        return array_merge(
+            parent::getConstructorParams(),
+            [
+                'statusCode' => $this->statusCode,
+                'reasonPhrase' => $this->reasonPhrase,
+            ],
+        );
+    }
+
     public function getStatusCode(): int
     {
         return $this->statusCode;
     }
 
+    /**
+     * @phan-suppress PhanParamTooFewUnpack
+     */
     public function withStatus(int $code, string $reasonPhrase = ''): ResponseInterface
     {
         return $code === $this->statusCode && ($reasonPhrase === $this->reasonPhrase || $reasonPhrase === $this->getReasonPhrase()) ?
             $this :
-            /* @phpstan-ignore-next-line */
-            new static(...$this->newInstanceWithParams([
-                'statusCode' => $code,
-                'reasonPhrase' => $reasonPhrase,
-            ]));
-    }
-
-    /**
-     * @param array{protocolVersion?: string, headers?: ?Headers, body?: StreamInterface, statusCode?: int, reasonPhrase?: string} $params
-     * @return array{protocolVersion: string, headers: Headers, body: StreamInterface, statusCode: int, reasonPhrase: string}
-     */
-    protected function newInstanceWithParams(array $params): array
-    {
-        return array_merge(
-            parent::newInstanceWithParams($params),
-            [
-                'statusCode' => $params['statusCode'] ?? $this->statusCode,
-                'reasonPhrase' => $params['reasonPhrase'] ?? $this->reasonPhrase,
-            ],
-        );
+            new self(...array_merge(
+                $this->getConstructorParams(),
+                [
+                    'statusCode' => $code,
+                    'reasonPhrase' => $reasonPhrase,
+                ],
+            ));
     }
 
     public function getReasonPhrase(): string

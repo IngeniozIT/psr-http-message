@@ -9,7 +9,7 @@ use Psr\Http\Message\{RequestInterface, StreamInterface, UriInterface};
 use IngeniozIT\Http\Message\ValueObject\Message\Headers;
 use IngeniozIT\Http\Message\ValueObject\Request\Method;
 
-readonly final class Request extends Message implements RequestInterface
+readonly class Request extends Message implements RequestInterface
 {
     private string $cleanRequestTarget;
 
@@ -34,17 +34,16 @@ readonly final class Request extends Message implements RequestInterface
     }
 
     /**
-     * @param array{protocolVersion?: string, headers?: ?Headers, body?: StreamInterface, method?: Method, requestTarget?: string, uri?: UriInterface} $params
      * @return array{protocolVersion: string, headers: Headers, body: StreamInterface, method: Method, requestTarget: string, uri: UriInterface}
      */
-    protected function newInstanceWithParams(array $params): array
+    protected function getConstructorParams(): array
     {
         return array_merge(
-            parent::newInstanceWithParams($params),
+            parent::getConstructorParams(),
             [
-                'method' => $params['method'] ?? $this->method,
-                'requestTarget' => $params['requestTarget'] ?? $this->requestTarget,
-                'uri' => $params['uri'] ?? $this->uri,
+                'method' => $this->method,
+                'requestTarget' => $this->requestTarget,
+                'uri' => $this->uri,
             ],
         );
     }
@@ -63,16 +62,22 @@ readonly final class Request extends Message implements RequestInterface
         return $this->cleanRequestTarget;
     }
 
-    public function withRequestTarget(string $requestTarget): RequestInterface
+    /**
+     * @phan-suppress PhanParamTooFewUnpack
+     * @phan-suppress PhanParamSignatureRealMismatchReturnType
+     */
+    public function withRequestTarget(string $requestTarget): static
     {
         $cleanRequestTarget = str_starts_with($requestTarget, '//') ?
             '/' . ltrim($requestTarget, '/') :
             $requestTarget;
         return $cleanRequestTarget === $this->getRequestTarget() ?
             $this :
-            new Request(...$this->newInstanceWithParams([
-                'requestTarget' => $cleanRequestTarget,
-            ]));
+            /* @phpstan-ignore-next-line */
+            new static(...array_merge(
+                $this->getConstructorParams(),
+                ['requestTarget' => $cleanRequestTarget],
+            ));
     }
 
     public function getMethod(): string
@@ -80,16 +85,26 @@ readonly final class Request extends Message implements RequestInterface
         return $this->method->value;
     }
 
+
+
     /**
+     * @phan-suppress PhanParamTooFewUnpack
+     * @phan-suppress PhanParamSignatureRealMismatchReturnType
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function withMethod(string $method): RequestInterface
+    public function withMethod(string $method): static
     {
-        return $method === $this->method->value ?
+        $validMethod = Method::tryFrom($method);
+        if ($validMethod === null) {
+            throw new InvalidArgumentException("Invalid method: $method");
+        }
+        return $validMethod->value === $this->method->value ?
             $this :
-            new Request(...$this->newInstanceWithParams([
-                'method' => Method::tryFrom($method) ?? throw new InvalidArgumentException("Invalid method: $method"),
-            ]));
+            /* @phpstan-ignore-next-line */
+            new static(...array_merge(
+                $this->getConstructorParams(),
+                ['method' => $validMethod],
+            ));
     }
 
     public function getUri(): UriInterface
@@ -98,19 +113,23 @@ readonly final class Request extends Message implements RequestInterface
     }
 
     /**
+     * @phan-suppress PhanParamTooFewUnpack
+     * @phan-suppress PhanParamSignatureRealMismatchReturnType
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function withUri(UriInterface $uri, bool $preserveHost = false): RequestInterface
+    public function withUri(UriInterface $uri, bool $preserveHost = false): static
     {
         return $uri === $this->uri ?
             $this :
-            new Request(...$this->newInstanceWithParams(
-                [
+            /* @phpstan-ignore-next-line */
+            new static(...array_merge(
+                $this->getConstructorParams(),
+                array_filter([
                     'uri' => $uri,
                     'headers' => $this->shouldAddHostHeader($uri, $preserveHost) ?
-                        $this->headers->withHeader('Host', [$uri->getHost()]) :
+                        $this->headers->withHeader('Host', $uri->getHost()) :
                         null,
-                ],
+                ]),
             ));
     }
 

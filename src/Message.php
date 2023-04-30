@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message;
 
-use IngeniozIT\Http\Message\ValueObject\Request\Method;
-use Psr\Http\Message\{MessageInterface, StreamInterface, UriInterface};
+use Psr\Http\Message\{MessageInterface, StreamInterface};
 use IngeniozIT\Http\Message\ValueObject\Message\Headers;
 
 readonly class Message implements MessageInterface
@@ -18,15 +17,14 @@ readonly class Message implements MessageInterface
     }
 
     /**
-     * @param array{protocolVersion?: string, headers?: ?Headers, body?: StreamInterface, method?: Method, requestTarget?: string, uri?: UriInterface} $params
      * @return array{protocolVersion: string, headers: Headers, body: StreamInterface}
      */
-    protected function newInstanceWithParams(array $params): array
+    protected function getConstructorParams(): array
     {
         return [
-            'protocolVersion' => $params['protocolVersion'] ?? $this->protocolVersion,
-            'headers' => $params['headers'] ?? $this->headers,
-            'body' => $params['body'] ?? $this->body,
+            'protocolVersion' => $this->protocolVersion,
+            'headers' => $this->headers,
+            'body' => $this->body,
         ];
     }
 
@@ -36,16 +34,18 @@ readonly class Message implements MessageInterface
     }
 
     /**
-     * @suppress PhanParamSignatureMismatch
+     * @phan-suppress PhanParamTooFewUnpack
+     * @phan-suppress PhanParamSignatureRealMismatchReturnType
      */
-    public function withProtocolVersion(string $version): MessageInterface
+    public function withProtocolVersion(string $version): static
     {
         return $version === $this->protocolVersion ?
             $this :
             /* @phpstan-ignore-next-line */
-            new static(...$this->newInstanceWithParams([
-                'protocolVersion' => $version,
-            ]));
+            new static(...array_merge(
+                $this->getConstructorParams(),
+                ['protocolVersion' => $version],
+            ));
     }
 
     /**
@@ -75,42 +75,48 @@ readonly class Message implements MessageInterface
     }
 
     /**
-     * @suppress PhanParamSignatureMismatch
+     * @phan-suppress PhanParamTooFewUnpack
+     * @phan-suppress PhanParamSignatureRealMismatchReturnType
      */
-    public function withHeader(string $name, $value): MessageInterface
+    public function withHeader(string $name, $value): static
     {
         return $this->headers->hasHeaderEqualTo($name, $value) ?
             $this :
             /* @phpstan-ignore-next-line */
-            new static(...$this->newInstanceWithParams([
-                'headers' => $this->headers->withHeader($name, $value),
-            ]));
+            new static(...array_merge(
+                $this->getConstructorParams(),
+                ['headers' => $this->headers->withHeader($name, $value)],
+            ));
     }
 
     /**
-     * @suppress PhanParamSignatureMismatch
+     * @phan-suppress PhanParamTooFewUnpack
+     * @phan-suppress PhanParamSignatureRealMismatchReturnType
      */
-    public function withAddedHeader(string $name, $value): MessageInterface
+    public function withAddedHeader(string $name, $value): static
     {
         return $this->headers->hasHeaderWithValue($name, $value) ?
             $this :
             /* @phpstan-ignore-next-line */
-            new static(...$this->newInstanceWithParams([
-                'headers' => $this->headers->withHeaderValue($name, $value),
-            ]));
+            new static(...array_merge(
+                $this->getConstructorParams(),
+                ['headers' => $this->headers->withHeaderValue($name, $value)],
+            ));
     }
 
     /**
-     * @suppress PhanParamSignatureMismatch
+     * @phan-suppress PhanParamTooFewUnpack
+     * @phan-suppress PhanParamSignatureRealMismatchReturnType
      */
-    public function withoutHeader(string $name): MessageInterface
+    public function withoutHeader(string $name): static
     {
         return !$this->hasHeader($name) ?
             $this :
             /* @phpstan-ignore-next-line */
-            new static(...$this->newInstanceWithParams([
-                'headers' => $this->headers->withoutHeader($name),
-            ]));
+            new static(...array_merge(
+                $this->getConstructorParams(),
+                ['headers' => $this->headers->withoutHeader($name)],
+            ));
     }
 
     public function getBody(): StreamInterface
@@ -119,15 +125,17 @@ readonly class Message implements MessageInterface
     }
 
     /**
-     * @suppress PhanParamSignatureMismatch
+     * @phan-suppress PhanParamTooFewUnpack
+     * @phan-suppress PhanParamSignatureRealMismatchReturnType
      */
-    public function withBody(StreamInterface $body): MessageInterface
+    public function withBody(StreamInterface $body): static
     {
         return $body === $this->body ?
             $this :
             /* @phpstan-ignore-next-line */
-            new static(...$this->newInstanceWithParams([
-                'body' => $body,
-            ]));
+            new static(...array_merge(
+                $this->getConstructorParams(),
+                ['body' => $body],
+            ));
     }
 }

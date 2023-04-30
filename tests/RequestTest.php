@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IngeniozIT\Http\Message\Tests;
 
+use InvalidArgumentException;
 use Psr\Http\Message\{RequestInterface, UriInterface};
 use IngeniozIT\Http\Message\{StreamFactory,
     UriFactory,
@@ -12,6 +13,9 @@ use IngeniozIT\Http\Message\{StreamFactory,
 use IngeniozIT\Http\Message\ValueObject\Message\Headers;
 use IngeniozIT\Http\Message\ValueObject\Request\Method;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RequestTest extends MessageTest
 {
     protected function getMessage(): RequestInterface
@@ -19,12 +23,12 @@ class RequestTest extends MessageTest
         $streamFactory = new StreamFactory();
         $uriFactory = new UriFactory();
         return new Request(
-            '1.1',
-            new Headers([]),
-            $streamFactory->createStream(),
-            Method::GET,
-            '',
-            $uriFactory->createUri(),
+            protocolVersion: '1.1',
+            headers: new Headers([]),
+            body: $streamFactory->createStream(),
+            method: Method::GET,
+            requestTarget: '',
+            uri: $uriFactory->createUri(),
         );
     }
 
@@ -118,6 +122,12 @@ class RequestTest extends MessageTest
             'TRACE' => ['TRACE'],
             'CONNECT' => ['CONNECT'],
         ];
+    }
+
+    public function testCannotHaveAnInvalidMethod(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->getMessage()->withMethod('INVALID');
     }
 
     public function testHasAUri(): void
