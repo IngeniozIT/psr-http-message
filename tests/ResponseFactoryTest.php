@@ -17,7 +17,7 @@ class ResponseFactoryTest extends TestCase
         self::assertInstanceOf(ResponseFactoryInterface::class, $streamFactory);
     }
 
-    public function testCanCreateADefaultResponse(): void
+    public function testCanCreateAResponse(): void
     {
         $streamFactory = new ResponseFactory(new StreamFactory());
 
@@ -29,7 +29,7 @@ class ResponseFactoryTest extends TestCase
         self::assertEquals('OK', $reasonPhrase);
     }
 
-    public function testCanCreateACustomResponse(): void
+    public function testCanCreateAResponseWithCustomCodeAndReasonPhrase(): void
     {
         $streamFactory = new ResponseFactory(new StreamFactory());
 

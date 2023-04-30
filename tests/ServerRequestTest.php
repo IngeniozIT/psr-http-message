@@ -94,7 +94,7 @@ class ServerRequestTest extends RequestTest
         self::assertSame($files, $uploadedFiles);
     }
 
-    public function testHasParsedBody(): void
+    public function testHasAParsedBody(): void
     {
         $request = $this->getMessage()
             ->withParsedBody(['foo' => 'bar']);
@@ -116,7 +116,7 @@ class ServerRequestTest extends RequestTest
         self::assertEquals(['foo' => 'bar', 'bar' => 'baz'], $attributes);
     }
 
-    public function testCanGetAttributeWithDefaultValue(): void
+    public function testGettingANonExistantAttributeCanReturnADefaultValue(): void
     {
         $request = $this->getMessage();
 
@@ -125,7 +125,7 @@ class ServerRequestTest extends RequestTest
         self::assertEquals(null, $attribute);
     }
 
-    public function testCanGetAttributeWithCustomDefaultValue(): void
+    public function testGettingANonExistantAttributeCanReturnACustomValue(): void
     {
         $request = $this->getMessage();
 
@@ -147,7 +147,7 @@ class ServerRequestTest extends RequestTest
         self::assertEquals([], $attributes);
     }
 
-    public function testUsesTheSameInstanceWhenContentDoesNotChange(): void
+    public function testUsesTheSameInstanceWhenItsContentDoesNotChange(): void
     {
         $streamFactory = new StreamFactory();
         $uploadedFileFactory = new UploadedFileFactory($streamFactory);

@@ -62,17 +62,17 @@ class RequestTest extends MessageTest
     {
         $uriFactory = new UriFactory();
         return [
-            'from request target' => [
+            'using the request target' => [
                 'requestTarget' => '/foo/bar',
                 'uri' => $uriFactory->createUri(),
                 'expected' => '/foo/bar',
             ],
-            'from uri' => [
+            'using the uri' => [
                 'requestTarget' => '',
                 'uri' => $uriFactory->createUri('/foo/bar'),
                 'expected' => '/foo/bar',
             ],
-            'request target takes precedence over uri' => [
+            'request target takes precedence over the uri' => [
                 'requestTarget' => '/foo/bar',
                 'uri' => $uriFactory->createUri('/not/foo/bar'),
                 'expected' => '/foo/bar',
@@ -225,7 +225,7 @@ class RequestTest extends MessageTest
         self::assertEquals('example.com', $host);
     }
 
-    public function testUsesTheSameInstanceWhenContentDoesNotChange(): void
+    public function testUsesTheSameInstanceWhenItsContentDoesNotChange(): void
     {
         $stream = (new StreamFactory())->createStream('test');
         $uri = (new UriFactory())->createUri('http://example.com/foo/bar');

@@ -94,7 +94,7 @@ class MessageTest extends TestCase
                 'expectedValue' => ['test', 'test2'],
                 'expectedLineValue' => 'test,test2',
             ],
-            'case insensitive name' => [
+            'case insensitive names' => [
                 'initialName' => 'X-Test',
                 'initialValue' => 'test',
                 'name' => 'x-test',
@@ -104,21 +104,33 @@ class MessageTest extends TestCase
         ];
     }
 
-    public function testOverridingAHeaderOverridesItsName(): void
+    public function testCanHaveSeveralHeaders(): void
     {
         $stream = $this->getMessage()
             ->withHeader('X-Test', 'test')
             ->withHeader('X-Test2', 'test2')
-            ->withHeader('x-test', 'test');
+            ->withHeader('X-Test3', 'test3');
+
         $headers = $stream->getHeaders();
 
         self::assertEquals([
+            'X-Test' => ['test'],
             'X-Test2' => ['test2'],
-            'x-test' => ['test'],
+            'X-Test3' => ['test3'],
         ], $headers);
     }
 
-    public function testHeaderValuesDoNotKeepIndexes(): void
+    public function testOverridingAHeaderOverridesItsName(): void
+    {
+        $stream = $this->getMessage()
+            ->withHeader('X-Test', 'test')
+            ->withHeader('x-test', 'test');
+        $headers = $stream->getHeaders();
+
+        self::assertEquals(['x-test' => ['test']], $headers);
+    }
+
+    public function testHeaderValuesDoNotKeepArrayIndexes(): void
     {
         $stream = $this->getMessage()
             ->withHeader('X-Test', ['foo' => 'test', 'bar' => 'test2']);
@@ -131,7 +143,7 @@ class MessageTest extends TestCase
      * @param string|string[] $value
      * @dataProvider providerInvalidHeaders
      */
-    public function testHeaderNameAndValueMustNotBeInvalid(string $name, string|array $value): void
+    public function testHeaderNameOrValueCanBeInvalid(string $name, string|array $value): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->getMessage()->withHeader($name, $value);
@@ -196,7 +208,7 @@ class MessageTest extends TestCase
         self::assertEquals('test,test2', $header);
     }
 
-    public function testExistingValuesDoNotGetAdded(): void
+    public function testAlreadyExistingValuesDoNotGetAdded(): void
     {
         $stream = $this->getMessage()
             ->withHeader('X-Test', 'test')
@@ -231,7 +243,7 @@ class MessageTest extends TestCase
         self::assertSame($stream, $message->getBody());
     }
 
-    public function testUsesTheSameInstanceWhenContentDoesNotChange(): void
+    public function testUsesTheSameInstanceWhenItsContentDoesNotChange(): void
     {
         $streamFactory = new StreamFactory();
         $stream = $streamFactory->createStream('test');

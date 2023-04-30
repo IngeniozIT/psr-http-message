@@ -32,7 +32,7 @@ class ResponseTest extends MessageTest
     /**
      * @dataProvider providerStatusCodes
      */
-    public function testHasStatusCodeAndReasonPhrase(int $statusCode, string $expctedReasonPhrase): void
+    public function testHasAStatusCodeAndAReasonPhrase(int $statusCode, string $expctedReasonPhrase): void
     {
         $response = $this->getMessage()
             ->withStatus($statusCode);
@@ -73,7 +73,7 @@ class ResponseTest extends MessageTest
         self::assertEquals('Custom Reason Phrase', $reasonPhrase);
     }
 
-    public function testUsesTheSameInstanceWhenContentDoesNotChange(): void
+    public function testUsesTheSameInstanceWhenItsContentDoesNotChange(): void
     {
         $stream = (new StreamFactory())->createStream('test');
         $response = $this->getMessage()
