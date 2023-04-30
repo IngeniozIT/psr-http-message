@@ -85,8 +85,6 @@ readonly class Request extends Message implements RequestInterface
         return $this->method->value;
     }
 
-
-
     /**
      * @phan-suppress PhanParamTooFewUnpack
      * @phan-suppress PhanParamSignatureRealMismatchReturnType
