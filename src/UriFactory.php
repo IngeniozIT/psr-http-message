@@ -16,7 +16,7 @@ use IngeniozIT\Http\Message\ValueObject\Uri\{
 use InvalidArgumentException;
 use Psr\Http\Message\{UriFactoryInterface, UriInterface};
 
-readonly class UriFactory implements UriFactoryInterface
+readonly final class UriFactory implements UriFactoryInterface
 {
     public function createUri(string $uri = ''): UriInterface
     {

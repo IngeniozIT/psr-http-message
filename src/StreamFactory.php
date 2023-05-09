@@ -8,7 +8,7 @@ use Psr\Http\Message\{StreamFactoryInterface, StreamInterface};
 use InvalidArgumentException;
 use RuntimeException;
 
-readonly class StreamFactory implements StreamFactoryInterface
+readonly final class StreamFactory implements StreamFactoryInterface
 {
     private const VALID_MODES = [
         'r', 'r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+',

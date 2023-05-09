@@ -15,7 +15,7 @@ use IngeniozIT\Http\Message\ValueObject\Uri\{
 };
 use Psr\Http\Message\UriInterface;
 
-readonly class Uri implements UriInterface
+readonly final class Uri implements UriInterface
 {
     private Port $displayedPort;
     private string $authority;

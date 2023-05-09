@@ -16,7 +16,7 @@ use Throwable;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class Stream implements StreamInterface
+final class Stream implements StreamInterface
 {
     /** @var ?resource $resource */
     private $resource;

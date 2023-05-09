@@ -12,7 +12,7 @@ use Psr\Http\Message\{
     UploadedFileInterface,
 };
 
-readonly class UploadedFileFactory implements UploadedFileFactoryInterface
+readonly final class UploadedFileFactory implements UploadedFileFactoryInterface
 {
     public function __construct(
         private StreamFactoryInterface $streamFactory
@@ -22,7 +22,7 @@ readonly class UploadedFileFactory implements UploadedFileFactoryInterface
     public function createUploadedFile(
         StreamInterface $stream,
         int $size = null,
-        int $error = \UPLOAD_ERR_OK,
+        int $error = UPLOAD_ERR_OK,
         string $clientFilename = null,
         string $clientMediaType = null
     ): UploadedFileInterface {

@@ -7,7 +7,7 @@ namespace IngeniozIT\Http\Message;
 use Psr\Http\Message\{UploadedFileInterface, StreamInterface, StreamFactoryInterface};
 use RuntimeException;
 
-class UploadedFile implements UploadedFileInterface
+final class UploadedFile implements UploadedFileInterface
 {
     private bool $moved = false;
 

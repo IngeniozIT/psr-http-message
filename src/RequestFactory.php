@@ -15,7 +15,7 @@ use IngeniozIT\Http\Message\ValueObject\Message\Headers;
 use IngeniozIT\Http\Message\ValueObject\Request\Method;
 use InvalidArgumentException;
 
-readonly class RequestFactory implements RequestFactoryInterface
+readonly final class RequestFactory implements RequestFactoryInterface
 {
     public function __construct(
         private StreamFactoryInterface $streamFactory,
