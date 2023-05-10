@@ -20,9 +20,20 @@ An implementation of the [PSR-7](https://www.php-fig.org/psr/psr-7/) Http Messag
 composer require ingenioz-it/http-message
 ```
 
+## Extra feature
+
+This implementation strictly follows the PSR-7 and PSR-17 specifications, but it also provides one useful extra feature: the ability to create a `ServerRequest` from the global variables.
+
+```php
+use IngeniozIT\Http\Message\ServerRequestFactory;
+
+$factory = new ServerRequestFactory(/* ... */);
+$serverRequest = $factory->fromGlobals($GLOBALS);
+```
+
 ## Full documentation
 
-You can list the available features by running
+You can list all the available features by running
 
 ```sh
 composer testdox
